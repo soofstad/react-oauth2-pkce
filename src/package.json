@@ -1,0 +1,36 @@
+{
+  "name": "react-oauth2-code-pkce",
+  "version": "0.0.4",
+  "description": "Plug-and-play react package for OAuth2 Authorization Code flow with PKCE",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@types/react": "^17.0.11",
+    "axios": "^0.21.1",
+    "typescript": "^4.3.4"
+  },
+  "peerDependencies": {
+    "react": "17.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "yarn run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soofstad/react-oauth2-pkce.git"
+  },
+  "keywords": [
+    "react",
+    "oauth2",
+    "pkce",
+    "code",
+    "flow"
+  ],
+  "author": "Stig Oskar Ofstad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/soofstad/react-oauth2-pkce/issues"
+  },
+  "homepage": "https://github.com/soofstad/react-oauth2-pkce#readme"
+}

@@ -1,23 +1,16 @@
+// @ts-ignore
 import axios from 'axios'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TTokenData } from "./Types"
+import { AuthConfig, TTokenData } from "./Types"
 
 const codeVerifierStorageKey = "PKCE_code_verifier"
 
-const authSettings = {
-  clientId: process.env.REACT_APP_AUTH_CLIENT_ID || '',
-  authorizationEndpoint: process.env.REACT_APP_AUTH_ENDPOINT || '',
-  tokenEndpoint: process.env.REACT_APP_TOKEN_ENDPOINT || '',
-  scope: process.env.REACT_APP_AUTH_SCOPE || '',
-  redirectUri: process.env.REACT_APP_AUTH_REDIRECT_URI || '',
-  logoutEndpoint: process.env.REACT_APP_LOGOUT_ENDPOINT || '',
+export function logout(authConfig: AuthConfig) {
+  window.location.href = `${authConfig.logoutEndpoint}?post_logout_redirect_uri=${authConfig.redirectUri}`
 }
 
-export function logout() {
-  window.location.href = `${authSettings.logoutEndpoint}?post_logout_redirect_uri=${authSettings.redirectUri}`
-}
-
-export async function login() {
+export async function login(authConfig: AuthConfig) {
+  console.log(authConfig)
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(20)
   window.localStorage.setItem(codeVerifierStorageKey, codeVerifier)
@@ -25,21 +18,22 @@ export async function login() {
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   generateCodeChallenge(codeVerifier).then((codeChallenge) => {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
+    console.log(authConfig)
     const params = new URLSearchParams({
       response_type: 'code',
-      client_id: authSettings.clientId,
-      scope: authSettings.scope,
-      redirect_id: authSettings.redirectUri,
+      client_id: authConfig.clientId,
+      scope: authConfig.scope,
+      redirect_id: authConfig.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
     window.location.replace(
-      `${authSettings.authorizationEndpoint}?${params.toString()}`,
+      `${authConfig.authorizationEndpoint}?${params.toString()}`,
     )
   })
 }
 
-export const getTokens = (): Promise<any> => {
+export const getTokens = (authConfig: AuthConfig): Promise<any> => {
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -50,41 +44,36 @@ export const getTokens = (): Promise<any> => {
   const codeVerifier = window.localStorage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
-    console.error("Parameter 'code' not found in URL. \nHas authentication taken place?")
-    return
+    throw "Parameter 'code' not found in URL. \nHas authentication taken place?"
   }
   if (!codeVerifier) {
-    console.error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
-    return
+    throw "Can't get tokens without the CodeVerifier. \nHas authentication taken place?"
   }
 
   const formData = new FormData()
   formData.append('grant_type', 'authorization_code')
   formData.append('code', authCode)
-  formData.append('scope', authSettings.scope)
-  formData.append('client_id', authSettings.clientId)
-  formData.append('redirect_uri', authSettings.redirectUri)
+  formData.append('scope', authConfig.scope)
+  formData.append('client_id', authConfig.clientId)
+  formData.append('redirect_uri', authConfig.redirectUri)
   formData.append('code_verifier', codeVerifier)
 
-  return axios
-    .post(authSettings.tokenEndpoint, formData)
-    .then((response) => response.data)
-    .catch((e) => {
-      console.error(e)
-    })
+  return axios.post(authConfig.tokenEndpoint, formData)
+    .then((response)=> response.data)
+
 }
 
-export const getAccessTokenFromRefreshToken = (refreshToken: string) => {
+export const getAccessTokenFromRefreshToken = ({authConfig, refreshToken}: any) => {
   const params = new URLSearchParams({
-    client_id: authSettings.clientId,
+    client_id: authConfig.clientId,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
   })
 
   return axios
-    .post(authSettings.tokenEndpoint, params)
-    .then((response) => response.data)
-    .catch((error) => {
+    .post(authConfig.tokenEndpoint, params)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
       console.error(`Failed to fetch AccessToken with RefreshToken: ${error}`)
     })
 }
