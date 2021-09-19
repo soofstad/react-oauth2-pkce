@@ -2,11 +2,7 @@
 
 Plug-and-play react package for OAuth2 Authorization Code flow with PKCE
 
-Staying true to the RFCs recommendations, cryptographically sound, and with __zero__ dependencies*!  
-
-Updated in 2021!
-
-\* TypeScript and React
+Adhering to the RFCs recommendations, cryptographically sound, and with __zero__ dependencies!  
 
 ## What is OAuth2 Authorization Code flow with PKCE?
 
