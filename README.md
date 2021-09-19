@@ -2,11 +2,11 @@
 
 Plug-and-play react package for OAuth2 Authorization Code flow with PKCE
 
-## Example
+Staying true to the RFCs recommendations, cryptographically sound, and with __zero__ dependencies*!  
 
-```javascript
-hello world!; {=>()}
-```
+Updated in 2021!
+
+\* TypeScript and React
 
 ## What is OAuth2 Authorization Code flow with PKCE?
 
@@ -17,9 +17,60 @@ Long version;
 <https://oauth.net/2/pkce/>  
 <https://datatracker.ietf.org/doc/html/rfc7636>
 
-## TODO
+## Example
 
-Not so much a Package yet, as a collection of functions.
+```javascript
+import React, { useContext } from 'react'
+import ReactDOM from 'react-dom'
+import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
 
-- A lot more error handling
-- Remove axios as a dependency
+const authConfig = {
+  clientId: 'myClientID',
+  authorizationEndpoint: 'myAuthEndpoint',
+  tokenEndpoint: 'myTokenEndpoint',
+  // Where ever your application is running. Must match whats configured in authorization server
+  redirectUri: 'http://localhost:3000/',
+  // Optional
+  scope: 'someScope',
+  // Optional
+  logoutEndpoint: '',
+  // Optional
+  logoutRedirect: ''
+}
+
+function LoginInfo() {
+  const { tokenData, token, logOut } = useContext(AuthContext)
+
+  return (
+      <>
+        {token ?
+            <>
+              <div>
+                <h4>Access Token (JWT)</h4>
+                <pre>{token}</pre>
+              </div>
+              <div>
+                <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
+                <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+              </div>
+            </> :
+            <div>You are not logged in</div>
+        }
+      </>
+  )
+
+}
+
+
+ReactDOM.render(
+    <div>
+      <AuthProvider authConfig={authConfig}>
+        <LoginInfo/>
+      </AuthProvider>
+    </div>, document.getElementById('root'),
+)
+```
+
+## Contribute
+
+You are welcome to create issues and pull requests :)

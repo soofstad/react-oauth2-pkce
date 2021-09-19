@@ -18,61 +18,56 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const logOut = () => {
     setRefreshToken(null)
     setToken(null)
+    setTokenData(undefined)
     logout(authConfig)
   }
 
   useEffect(() => {
-    console.log("refresh: " + refreshToken)
-    console.log("token: " + token)
-    console.log("inprogress: " + loginInProgress)
-    console.log("data: " + tokenData)
-    if (!loginInProgress && !token) {  // First page visit
-      // @ts-ignore
-      setLoginInProgress(true)
-      login(authConfig)
-    } else if (!loginInProgress && refreshToken) {  // A refresh token is stored in client
-      if (token) {
-        if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
-          getAccessTokenFromRefreshToken({ authConfig, refreshToken })
-            .then(({ response }: any) => {
-              setRefreshToken(response.refresh_token)
-              setToken(response.access_token)
-              // @ts-ignore
-              setLoginInProgress(false)
-              setTokenData(decodeToken(response.access_token))
-            })
-            .catch(() => {  // For any reason we failed to get a new token with the refreshToken, login again
-              // @ts-ignore
-              setLoginInProgress(true)
-              login(authConfig)
-            })
-        }
-      }
-    } else if (loginInProgress) {  // The client has been redirected back from the Auth endpoint with an auth code
+    if (loginInProgress) {  // The client has been redirected back from the Auth endpoint with an auth code
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now..."
         // Clearing all site data...
-        // setRefreshToken(null)
-        // setToken(null)
+        setRefreshToken(null)
+        setToken(null)
+        setTokenData(undefined)
         // @ts-ignore
         setLoginInProgress(false)
-        window.location.reload()
-      } else {
-        getTokens(authConfig).then((response: any) => {  // Request token from auth server with the auth code
-          console.log(response)
+        location.reload()
+      } else { // Request token from auth server with the auth code
+        getTokens(authConfig).then((response: any) => {
           setRefreshToken(response.refresh_token)
           setToken(response.access_token)
           // @ts-ignore
           setLoginInProgress(false)
           setTokenData(decodeToken(response.access_token))
-          window.history.replaceState(null, null, window.location.pathname);  // Clear ugly url params
+          history.replaceState(null, "", location.pathname)  // Clear ugly url params
         })
       }
-
-
+    } else if (!token) {  // First page visit
+      // @ts-ignore
+      setLoginInProgress(true)
+      login(authConfig)
+    } else if (refreshToken) {  // A refresh token is stored in client
+      if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
+        getAccessTokenFromRefreshToken({ authConfig, refreshToken })
+          .then(({ response }: any) => {
+            setRefreshToken(response.refresh_token)
+            setToken(response.access_token)
+            setTokenData(decodeToken(response.access_token))
+            // @ts-ignore
+            setLoginInProgress(false)
+          })
+          .catch((error: any) => {  // For any reason we failed to get a new token with the refreshToken, login again
+            console.error(error)
+            // @ts-ignore
+            setLoginInProgress(true)
+            login(authConfig)
+          })
+      } else {
+        setTokenData(decodeToken(token))
+      }
     }
-
   }, [])
 
   return (

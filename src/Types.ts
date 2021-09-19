@@ -14,7 +14,8 @@ export type AuthConfig = {
   clientId:  string
   authorizationEndpoint:  string
   tokenEndpoint: string
-  scope:  string
   redirectUri:  string
+  scope?:  string
   logoutEndpoint?:  string
+  logoutRedirect?:  string
 }

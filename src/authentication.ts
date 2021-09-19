@@ -1,35 +1,29 @@
-// @ts-ignore
-import axios from 'axios'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { AuthConfig, TTokenData } from "./Types"
 
 const codeVerifierStorageKey = "PKCE_code_verifier"
 
 export function logout(authConfig: AuthConfig) {
-  window.location.href = `${authConfig.logoutEndpoint}?post_logout_redirect_uri=${authConfig.redirectUri}`
+  location.href = `${authConfig.logoutEndpoint}?post_logout_redirect_uri=${authConfig.logoutRedirect|| authConfig.redirectUri}`
 }
 
 export async function login(authConfig: AuthConfig) {
-  console.log(authConfig)
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(20)
-  window.localStorage.setItem(codeVerifierStorageKey, codeVerifier)
+  localStorage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   generateCodeChallenge(codeVerifier).then((codeChallenge) => {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
-    console.log(authConfig)
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: authConfig.clientId,
-      scope: authConfig.scope,
+      scope: authConfig.scope || "",
       redirect_id: authConfig.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
-    window.location.replace(
-      `${authConfig.authorizationEndpoint}?${params.toString()}`,
-    )
+    location.replace(`${authConfig.authorizationEndpoint}?${params.toString()}`)
   })
 }
 
@@ -53,26 +47,29 @@ export const getTokens = (authConfig: AuthConfig): Promise<any> => {
   const formData = new FormData()
   formData.append('grant_type', 'authorization_code')
   formData.append('code', authCode)
-  formData.append('scope', authConfig.scope)
+  formData.append('scope', authConfig.scope || "")
   formData.append('client_id', authConfig.clientId)
   formData.append('redirect_uri', authConfig.redirectUri)
   formData.append('code_verifier', codeVerifier)
 
-  return axios.post(authConfig.tokenEndpoint, formData)
-    .then((response)=> response.data)
+  return fetch(authConfig.tokenEndpoint, {
+    method: 'POST',
+    body: formData
+  })
+    .then((response) =>response.json())
 
 }
 
-export const getAccessTokenFromRefreshToken = ({authConfig, refreshToken}: any) => {
+export const getAccessTokenFromRefreshToken = ({ authConfig, refreshToken }: any) => {
   const params = new URLSearchParams({
     client_id: authConfig.clientId,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
   })
-
-  return axios
-    .post(authConfig.tokenEndpoint, params)
-    .then((response: any) => response.data)
+  let url = new URL(authConfig.tokenEndpoint)
+  url.search = params.toString()
+  return fetch(url.toString(), {method: 'POST'})
+    .then((response: any) => response.json())
     .catch((error: any) => {
       console.error(`Failed to fetch AccessToken with RefreshToken: ${error}`)
     })
