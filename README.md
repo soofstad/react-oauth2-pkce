@@ -67,6 +67,20 @@ ReactDOM.render(
 )
 ```
 
+## Install
+
+The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
+
+```react
+npm install react-oauth2-code-pkce
+```
+
+and import
+
+```react
+import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+```
+
 ## Contribute
 
 You are welcome to create issues and pull requests :)
