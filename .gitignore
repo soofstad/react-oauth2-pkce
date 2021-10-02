@@ -2,3 +2,6 @@ node_modules
 /src/dist/
 .idea
 log.txt
+/yarn.lock
+/src/react-app-env.d.ts
+/tsconfig.json

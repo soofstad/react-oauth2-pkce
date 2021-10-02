@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+import { AuthProvider, AuthContext } from "./AuthContext"
 
 const authConfig = {
   clientId: '97a6b5bd-63fb-42c6-bb75-7e5de2394ba0',
