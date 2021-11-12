@@ -14,6 +14,7 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo(): JSX.Element {
+  // @ts-ignore
   const { tokenData, token, idToken, logOut } = useContext(AuthContext)
 
   return (
@@ -66,6 +67,7 @@ ReactDOM.render(
         </p>
       </div>
       <AuthProvider authConfig={authConfig}>
+        {/* @ts-ignore*/}
         <LoginInfo/>
       </AuthProvider>
     </div>, document.getElementById('root'),
