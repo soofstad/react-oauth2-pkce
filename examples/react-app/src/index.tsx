@@ -1,19 +1,20 @@
 import React, { useContext } from 'react'
+// @ts-ignore
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
 
-const authConfig = {
-  clientId: '97a6b5bd-63fb-42c6-bb75-7e5de2394ba0',
+const authConfig: TAuthConfig = {
+  clientId: 'f462a430-56f0-4a00-800a-6f578da7e943',
   authorizationEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
-  scope: 'api://97a6b5bd-63fb-42c6-bb75-7e5de2394ba0/dmss_test_scope',
+  scope: 'User.Read',
   redirectUri: 'http://localhost/',
   logoutEndpoint: '',
   logoutRedirect: '',
 }
 
-function LoginInfo() {
-  const { tokenData, token, logOut } = useContext(AuthContext)
+function LoginInfo(): JSX.Element {
+  const { tokenData, token, idToken, logOut } = useContext(AuthContext)
 
   return (
       <>

@@ -1,6 +1,6 @@
-import { AuthConfig } from "./Types"
+import { TAuthConfig } from "./Types"
 
-export function validateAuthConfig(authConfig: AuthConfig) {
+export function validateAuthConfig(authConfig: TAuthConfig) {
   if(authConfig.clientId === "" || null || undefined)
     throw "ClientId must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
   if(authConfig.authorizationEndpoint === "" || null || undefined)

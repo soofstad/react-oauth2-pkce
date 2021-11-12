@@ -18,16 +18,16 @@ Long version;
 ```javascript
 import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
 
-const authConfig = {
+const authConfig: TAuthConfig = {
   clientId: 'myClientID',
   authorizationEndpoint: 'myAuthEndpoint',
   tokenEndpoint: 'myTokenEndpoint',
   // Where ever your application is running. Must match whats configured in authorization server
   redirectUri: 'http://localhost:3000/',
   // Optional
-  scope: 'someScope',
+  scope: 'someScope openid',
   // Optional
   logoutEndpoint: '',
   // Optional
@@ -35,7 +35,7 @@ const authConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut } = useContext(AuthContext)
+  const { tokenData, token, idToken, logOut } = useContext(AuthContext)
 
   return (
       <>

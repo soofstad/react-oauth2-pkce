@@ -10,7 +10,7 @@ export interface IAuthProvider {
   children: ReactChildren
 }
 
-export type AuthConfig = {
+export type TAuthConfig = {
   clientId:  string
   authorizationEndpoint:  string
   tokenEndpoint: string

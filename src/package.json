@@ -1,6 +1,6 @@
 {
   "name": "react-oauth2-code-pkce",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Plug-and-play react package for OAuth2 Authorization Code flow with PKCE",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

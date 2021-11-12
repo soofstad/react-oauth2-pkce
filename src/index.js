@@ -1,19 +1,19 @@
 import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { AuthProvider, AuthContext } from "./AuthContext"
+import { AuthProvider, AuthContext, TAuthConfig } from "./AuthContext"
 
 const authConfig = {
-  clientId: '97a6b5bd-63fb-42c6-bb75-7e5de2394ba0',
+  clientId: 'f462a430-56f0-4a00-800a-6f578da7e943',
   authorizationEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
-  scope: 'api://97a6b5bd-63fb-42c6-bb75-7e5de2394ba0/dmss_test_scope',
+  scope: 'User.Read openid',
   redirectUri: 'http://localhost/',
   logoutEndpoint: '',
   logoutRedirect: '',
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut } = useContext(AuthContext)
+  const { tokenData, token, logOut, idToken} = useContext(AuthContext)
 
   return (
       <>
@@ -32,7 +32,7 @@ function LoginInfo() {
                   {token}</pre>
               </div>
               <div>
-                <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
+                <h4>Login Information from Access Token and IdToken if any)</h4>
                 <pre style={{
                   width: '400px',
                   margin: "10px",

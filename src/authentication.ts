@@ -1,15 +1,11 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { AuthConfig, TTokenData } from "./Types"
+import { TAuthConfig, TTokenData } from "./Types"
 
 const codeVerifierStorageKey = "PKCE_code_verifier"
 
-export function logout(authConfig: AuthConfig) {
-  location.href = `${authConfig.logoutEndpoint}?post_logout_redirect_uri=${authConfig.logoutRedirect|| authConfig.redirectUri}`
-}
-
-export async function login(authConfig: AuthConfig) {
+export async function login(authConfig: TAuthConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
-  const codeVerifier = generateRandomString(20)
+  const codeVerifier = generateRandomString(40)
   localStorage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
@@ -27,7 +23,7 @@ export async function login(authConfig: AuthConfig) {
   })
 }
 
-export const getTokens = (authConfig: AuthConfig): Promise<any> => {
+export const getTokens = (authConfig: TAuthConfig): Promise<any> => {
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -54,7 +50,7 @@ export const getTokens = (authConfig: AuthConfig): Promise<any> => {
 
   return fetch(authConfig.tokenEndpoint, {
     method: 'POST',
-    body: formData
+    body: formData,
   })
     .then((response) =>response.json())
 
@@ -68,7 +64,7 @@ export const getAccessTokenFromRefreshToken = ({ authConfig, refreshToken }: any
   })
   let url = new URL(authConfig.tokenEndpoint)
   url.search = params.toString()
-  return fetch(url.toString(), {method: 'POST'})
+  return fetch(url.toString(), { method: 'POST' })
     .then((response: any) => response.json())
     .catch((error: any) => {
       console.error(`Failed to fetch AccessToken with RefreshToken: ${error}`)
