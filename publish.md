@@ -3,8 +3,8 @@
 # Bump version in './src/package.json'
 git commit -m "foo"
 git tag v?.?.? -m "A Message"
-git push
+git push --tags
 cd src
-tsc --build
+tsc --skipLibCheck
 npm publish
 ```
