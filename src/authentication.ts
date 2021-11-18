@@ -15,7 +15,7 @@ export async function login(authConfig: TAuthConfig) {
       response_type: 'code',
       client_id: authConfig.clientId,
       scope: authConfig.scope || "",
-      redirect_id: authConfig.redirectUri,
+      redirect_uri: authConfig.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
