@@ -35,7 +35,7 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idToken, logOut } = useContext(AuthContext)
+  const { tokenData, token, idToken, logOut, error } = useContext(AuthContext)
 
   return (
       <>

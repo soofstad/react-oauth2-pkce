@@ -8,28 +8,27 @@ export const AuthContext = createContext({})
 
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
-  const [refreshToken, setRefreshToken] = useLocalStorage<any>('ROCP_refreshToken', null)
-  const [token, setToken] = useLocalStorage<any>('ROCP_token', null)
-  const [idToken, setIdToken] = useLocalStorage<any>('ROCP_idToken', null)
-  const [loginInProgress, setLoginInProgress] = useLocalStorage<Boolean>('ROCP_loginInProgress', false)
+  const [refreshToken, setRefreshToken] = useLocalStorage<string | null>('ROCP_refreshToken', null)
+  const [token, setToken] = useLocalStorage<string | null>('ROCP_token', null)
+  const [idToken, setIdToken] = useLocalStorage<string | null>('ROCP_idToken', null)
+  const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData>()
+  const [error, setError] = useState<string | null>(null)
 
   validateAuthConfig(authConfig)
 
-  function logOut(){
+  function logOut() {
     setRefreshToken(null)
     setToken(null)
     setIdToken(null)
     setTokenData(undefined)
-    // @ts-ignore
     setLoginInProgress(false)
   }
 
-  function handleTokenResponse(response: any){
+  function handleTokenResponse(response: any) {
     setRefreshToken(response.refresh_token)
     setToken(response.access_token)
     setIdToken(response?.id_token)
-    // @ts-ignore
     setLoginInProgress(false)
     setTokenData(decodeToken(response.access_token))
   }
@@ -39,17 +38,25 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now..."
-        // Clearing all site data...
+        const error_description = urlParams.get('error_description')
+        if (error_description) {
+          console.error(error_description)
+          setError(error_description)
+        }
         logOut()
         location.reload()
       } else { // Request token from auth server with the auth code
         getTokens(authConfig).then((response: any) => {
-          handleTokenResponse(response)
-          history.replaceState(null, "", location.pathname)  // Clear ugly url params
+          if (!response.ok) {
+            console.error(response.body.error_description)
+            setError(response.body.error_description)
+          } else {
+            handleTokenResponse(response.body)
+            history.replaceState(null, "", location.pathname)  // Clear ugly url params
+          }
         })
       }
     } else if (!token) {  // First page visit
-      // @ts-ignore
       setLoginInProgress(true)
       login(authConfig)
     } else if (refreshToken) {  // A refresh token is stored in client
@@ -60,7 +67,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           })
           .catch((error: any) => {  // For any reason we failed to get a new token with the refreshToken, login again
             console.error(error)
-            // @ts-ignore
             setLoginInProgress(true)
             login(authConfig)
           })
@@ -71,6 +77,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ tokenData, token, idToken, logOut }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error}}>{children}</AuthContext.Provider>
   )
 }

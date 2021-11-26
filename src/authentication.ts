@@ -52,7 +52,10 @@ export const getTokens = (authConfig: TAuthConfig): Promise<any> => {
     method: 'POST',
     body: formData,
   })
-    .then((response) =>response.json())
+    .then((response) =>response.json().then((body:Object)=>({ok:response.ok, body:body})))
+    .catch((error:Error)=>{
+      console.log(error)
+    })
 
 }
 
@@ -75,7 +78,7 @@ export const getAccessTokenFromRefreshToken = ({ authConfig, refreshToken }: any
  * Decodes the the base64 encoded JWT. Returns a TToken.
  */
 export const decodeToken = (token: string): TTokenData => {
-  var base64Url = token.split('.')[1]
+  let base64Url = token.split('.')[1]
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
   const jsonPayload = decodeURIComponent(
     atob(base64)

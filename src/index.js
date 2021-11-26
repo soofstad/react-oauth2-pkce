@@ -7,13 +7,13 @@ const authConfig = {
   authorizationEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
   scope: 'User.Read openid',
-  redirectUri: 'http://localhost/',
+  redirectUri: 'http://localhost:8080/',
   logoutEndpoint: '',
   logoutRedirect: '',
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut, idToken} = useContext(AuthContext)
+  const { tokenData, token, logOut, idToken, error} = useContext(AuthContext)
 
   return (
       <>
@@ -47,6 +47,7 @@ function LoginInfo() {
             </> :
             <div>You are not logged in</div>
         }
+        {error && <div>{error}</div>}
       </>
   )
 
