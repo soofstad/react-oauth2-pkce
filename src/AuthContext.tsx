@@ -38,13 +38,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now..."
-        const error_description = urlParams.get('error_description')
-        if (error_description) {
-          console.error(error_description)
-          setError(error_description)
-        }
+        const error_description = urlParams.get('error_description') || 'Bad authorization state. Refreshing the page might solve the issue.'
+        console.error(error_description)
+        setError(error_description)
         logOut()
-        location.reload()
       } else { // Request token from auth server with the auth code
         getTokens(authConfig).then((response: any) => {
           if (!response.ok) {
