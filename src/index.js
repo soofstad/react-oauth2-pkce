@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { AuthProvider, AuthContext, TAuthConfig } from "./AuthContext"
+import { AuthContext, AuthProvider } from "./AuthContext"
 
 const authConfig = {
   clientId: 'f462a430-56f0-4a00-800a-6f578da7e943',
@@ -10,10 +10,13 @@ const authConfig = {
   redirectUri: 'http://localhost:8080/',
   logoutEndpoint: '',
   logoutRedirect: '',
+  // Example to redirect back to original path after login has completed
+  preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
+  postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut, idToken, error} = useContext(AuthContext)
+  const { tokenData, token, logOut, idToken, error } = useContext(AuthContext)
 
   return (
       <>
@@ -43,7 +46,7 @@ function LoginInfo() {
                 }}>
                   {JSON.stringify(tokenData, null, 2)}</pre>
               </div>
-              <button onClick={()=>logOut()}>Logout</button>
+              <button onClick={() => logOut()}>Logout</button>
             </> :
             <div>You are not logged in</div>
         }

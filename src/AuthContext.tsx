@@ -28,7 +28,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: any) {
     setRefreshToken(response.refresh_token)
     setToken(response.access_token)
-    setIdToken(response?.id_token)
+    setIdToken(response?.id_token || "None")
     setLoginInProgress(false)
     setTokenData(decodeToken(response.access_token))
   }
@@ -50,6 +50,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           } else {
             handleTokenResponse(response.body)
             history.replaceState(null, "", location.pathname)  // Clear ugly url params
+            // Call any postLogin function in authConfig
+            if (authConfig?.postLogin) authConfig.postLogin()
           }
         })
       }
@@ -74,6 +76,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error}}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error }}>{children}</AuthContext.Provider>
   )
 }

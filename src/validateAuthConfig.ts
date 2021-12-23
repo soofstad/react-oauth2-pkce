@@ -1,12 +1,17 @@
 import { TAuthConfig } from "./Types"
 
+function stringIsUnset(value: any){
+  const unset = ["", undefined, null]
+  return unset.includes(value)
+}
+
 export function validateAuthConfig(authConfig: TAuthConfig) {
-  if(authConfig.clientId === "" || null || undefined)
-    throw "ClientId must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
-  if(authConfig.authorizationEndpoint === "" || null || undefined)
-    throw "authorizationEndpoint must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
-  if(authConfig.tokenEndpoint === "" || null || undefined)
-    throw "tokenEndpoint must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
-  if(authConfig.redirectUri === "" || null || undefined)
-    throw "redirectUri must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+  if(stringIsUnset(authConfig?.clientId))
+    throw "'clientId' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+  if(stringIsUnset(authConfig?.authorizationEndpoint))
+    throw "'authorizationEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+  if(stringIsUnset(authConfig?.tokenEndpoint))
+    throw "'tokenEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+  if(stringIsUnset(authConfig?.redirectUri))
+    throw "'redirectUri' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
 }

@@ -19,6 +19,8 @@ export async function login(authConfig: TAuthConfig) {
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
+    // Call any preLogin function in authConfig
+    if (authConfig?.preLogin) authConfig.preLogin()
     location.replace(`${authConfig.authorizationEndpoint}?${params.toString()}`)
   })
 }
@@ -52,8 +54,8 @@ export const getTokens = (authConfig: TAuthConfig): Promise<any> => {
     method: 'POST',
     body: formData,
   })
-    .then((response) =>response.json().then((body:Object)=>({ok:response.ok, body:body})))
-    .catch((error:Error)=>{
+    .then((response) => response.json().then((body: Object) => ({ ok: response.ok, body: body })))
+    .catch((error: Error) => {
       console.log(error)
     })
 

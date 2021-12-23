@@ -6,7 +6,7 @@ export type TTokenData = {
 }
 
 export interface IAuthProvider {
-  authConfig: any,
+  authConfig: TAuthConfig,
   children: ReactChildren
 }
 
@@ -18,4 +18,6 @@ export type TAuthConfig = {
   scope?:  string
   logoutEndpoint?:  string
   logoutRedirect?:  string
+  preLogin?: Function
+  postLogin?: Function
 }
