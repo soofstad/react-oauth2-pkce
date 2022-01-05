@@ -25,7 +25,7 @@ export async function login(authConfig: TAuthConfig) {
   })
 }
 
-export const getTokens = (authConfig: TAuthConfig): Promise<any> => {
+export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -54,26 +54,38 @@ export const getTokens = (authConfig: TAuthConfig): Promise<any> => {
     method: 'POST',
     body: formData,
   })
-    .then((response) => response.json().then((body: Object) => ({ ok: response.ok, body: body })))
-    .catch((error: Error) => {
-      console.log(error)
-    })
+    .then((response) => response.json().then((body: any): any => {
+        if (!response.ok) {
+          console.error(body.error_description)
+          throw body.error_description
+        }
+        return body
+      },
+    ))
 
 }
 
-export const getAccessTokenFromRefreshToken = ({ authConfig, refreshToken }: any) => {
-  const params = new URLSearchParams({
-    client_id: authConfig.clientId,
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
+export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshToken: string }) => {
+  const { authConfig, refreshToken } = props
+  const formData = new FormData()
+  formData.append('grant_type', 'refresh_token')
+  formData.append('refresh_token', refreshToken)
+  formData.append('scope', authConfig.scope || "")
+  formData.append('client_id', authConfig.clientId)
+  formData.append('redirect_uri', authConfig.redirectUri)
+
+  return fetch(authConfig.tokenEndpoint, {
+    method: 'POST',
+    body: formData,
   })
-  let url = new URL(authConfig.tokenEndpoint)
-  url.search = params.toString()
-  return fetch(url.toString(), { method: 'POST' })
-    .then((response: any) => response.json())
-    .catch((error: any) => {
-      console.error(`Failed to fetch AccessToken with RefreshToken: ${error}`)
-    })
+    .then((response) => response.json().then((body: any): any => {
+        if (!response.ok) {
+          console.error(body.error_description)
+          throw body.error_description
+        }
+        return body
+      },
+    ))
 }
 
 /**
@@ -96,10 +108,10 @@ export const decodeToken = (token: string): TTokenData => {
 
 /**
  * Check if the Access Token has expired by looking at the 'exp' JWT header.
- * Will return True if the token has expired, OR there is less than 30min until it expires.
+ * Will return True if the token has expired, OR there is less than 10min until it expires.
  */
 export const tokenExpired = (token: string): Boolean => {
-  const bufferTimeInMilliseconds = 30 * 60 * 1000 // minutes * seconds * toMilliseconds
+  const bufferTimeInMilliseconds = 10 * 60 * 1000 // minutes * seconds * toMilliseconds
   const { exp } = decodeToken(token)
   const expirationTimeWithBuffer = new Date(exp * 1000 - bufferTimeInMilliseconds)
   return new Date() > expirationTimeWithBuffer

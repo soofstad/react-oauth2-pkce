@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react'
-import { decodeToken, getAccessTokenFromRefreshToken, getTokens, login, tokenExpired } from "./authentication"
+import { decodeToken, fetchWithRefreshToken, fetchTokens, login, tokenExpired } from "./authentication"
 import useLocalStorage from "./Hooks"
 import { IAuthProvider, TTokenData } from "./Types"
 import { validateAuthConfig } from './validateAuthConfig'
@@ -14,6 +14,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData>()
   const [error, setError] = useState<string | null>(null)
+
+  let interval: any
 
   validateAuthConfig(authConfig)
 
@@ -33,6 +35,31 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setTokenData(decodeToken(response.access_token))
   }
 
+  function refreshAccessToken() {
+    if (refreshToken) {
+      if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
+        fetchWithRefreshToken({ authConfig, refreshToken })
+          .then((result: any) => handleTokenResponse(result))
+          .catch((error: Error) => {
+            console.log(error)
+            setError(error.message)
+          })
+      } else {  // The client still has a valid token
+        setTokenData(decodeToken(token))
+      }
+    } else { // No refresh_token
+      console.error("Tried to refresh token without a refresh token. Clearing state...")
+      setError('Bad authorization state. Refreshing the page might solve the issue.')
+    }
+  }
+
+  // Register the 'check for soon expiring access token' interval (Every minute)
+  useEffect(() => {
+    interval = setInterval(() => refreshAccessToken(), 60000)
+    return () => clearInterval(interval)
+  }, [token]) // This token dependency removes the old, and registers a new Interval when a new token is fetched.
+
+  // Runs once on page load
   useEffect(() => {
     if (loginInProgress) {  // The client has been redirected back from the Auth endpoint with an auth code
       const urlParams = new URLSearchParams(window.location.search)
@@ -43,35 +70,23 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         setError(error_description)
         logOut()
       } else { // Request token from auth server with the auth code
-        getTokens(authConfig).then((response: any) => {
-          if (!response.ok) {
-            console.error(response.body.error_description)
-            setError(response.body.error_description)
-          } else {
-            handleTokenResponse(response.body)
+        fetchTokens(authConfig)
+          .then((tokens: any) => {
+            handleTokenResponse(tokens)
             history.replaceState(null, "", location.pathname)  // Clear ugly url params
             // Call any postLogin function in authConfig
             if (authConfig?.postLogin) authConfig.postLogin()
-          }
-        })
+          })
+          .catch((error: string) => {
+            console.error(error)
+            setError(error)
+          })
       }
     } else if (!token) {  // First page visit
       setLoginInProgress(true)
       login(authConfig)
-    } else if (refreshToken) {  // A refresh token is stored in client
-      if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
-        getAccessTokenFromRefreshToken({ authConfig, refreshToken })
-          .then(({ response }: any) => {
-            handleTokenResponse(response)
-          })
-          .catch((error: any) => {  // For any reason we failed to get a new token with the refreshToken, login again
-            console.error(error)
-            setLoginInProgress(true)
-            login(authConfig)
-          })
-      } else {  // The client still has a valid token
-        setTokenData(decodeToken(token))
-      }
+    } else {
+      refreshAccessToken() // Check if token should be updated and sets tokenData
     }
   }, [])
 
