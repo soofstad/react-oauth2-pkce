@@ -13,6 +13,14 @@ Long version;
 <https://oauth.net/2/pkce/>  
 <https://datatracker.ietf.org/doc/html/rfc7636>
 
+## Features
+
+- Authorization server agnostic, works equally well with all OAuth2 auth servers following the OAuth2 spec
+- Supports OpenID Connect (idTokens)
+- Pre- and Post login callbacks
+- Silently refreshes short lived access tokens in the background
+- Decodes JWT's
+
 ## Example
 
 ```javascript
