@@ -1,5 +1,12 @@
 import React, { createContext, useEffect, useState } from 'react'
-import { decodeToken, fetchWithRefreshToken, fetchTokens, login, tokenExpired } from "./authentication"
+import {
+  decodeToken,
+  fetchWithRefreshToken,
+  fetchTokens,
+  login,
+  tokenExpired,
+  errorMessageForExpiredRefreshToken,
+} from "./authentication"
 import useLocalStorage from "./Hooks"
 import { IAuthProvider, TTokenData } from "./Types"
 import { validateAuthConfig } from './validateAuthConfig'
@@ -40,9 +47,13 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
         fetchWithRefreshToken({ authConfig, refreshToken })
           .then((result: any) => handleTokenResponse(result))
-          .catch((error: Error) => {
+          .catch((error: string) => {
             console.log(error)
-            setError(error.message)
+            setError(error)
+            if(errorMessageForExpiredRefreshToken(error)){
+              logOut()
+              login(authConfig)
+            }
           })
       } else {  // The client still has a valid token
         setTokenData(decodeToken(token))

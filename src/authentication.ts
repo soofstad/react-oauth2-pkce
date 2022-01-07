@@ -2,6 +2,8 @@ import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { TAuthConfig, TTokenData } from "./Types"
 
 const codeVerifierStorageKey = "PKCE_code_verifier"
+// [ AzureAD,]
+export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ["AADSTS700084"]
 
 export async function login(authConfig: TAuthConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
@@ -115,4 +117,14 @@ export const tokenExpired = (token: string): Boolean => {
   const { exp } = decodeToken(token)
   const expirationTimeWithBuffer = new Date(exp * 1000 - bufferTimeInMilliseconds)
   return new Date() > expirationTimeWithBuffer
+}
+
+export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean =>{
+  let expired: boolean = false
+  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode:string) =>{
+    if (errorMessage.includes(errorCode)) {
+      expired = true
+    }
+  })
+  return expired
 }
