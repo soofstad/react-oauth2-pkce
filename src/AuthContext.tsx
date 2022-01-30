@@ -48,7 +48,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         fetchWithRefreshToken({ authConfig, refreshToken })
           .then((result: any) => handleTokenResponse(result))
           .catch((error: string) => {
-            console.log(error)
             setError(error)
             if(errorMessageForExpiredRefreshToken(error)){
               logOut()
@@ -59,7 +58,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         setTokenData(decodeToken(token))
       }
     } else { // No refresh_token
-      console.error("Tried to refresh token without a refresh token. Clearing state...")
+      console.error("Tried to refresh token without a refresh token.")
       setError('Bad authorization state. Refreshing the page might solve the issue.')
     }
   }
@@ -89,7 +88,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             if (authConfig?.postLogin) authConfig.postLogin()
           })
           .catch((error: string) => {
-            console.error(error)
             setError(error)
           })
       }

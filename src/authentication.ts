@@ -27,6 +27,26 @@ export async function login(authConfig: TAuthConfig) {
   })
 }
 
+function postWithFormData(tokenEndpoint: string, formData: FormData){
+  return fetch(tokenEndpoint, {
+    method: 'POST',
+    body: formData,
+  })
+    .then((response) => response.json()
+      .then((body: any): any => {
+        if (!response.ok) {
+          console.error(body.error_description)
+          throw body.error_description
+        }
+        return body
+      },
+    ))
+  .catch((error: any)=>{
+      console.error(error)
+      throw error?.message || error
+    })
+}
+
 export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   /*
     The browser has been redirected from the authentication endpoint with
@@ -52,19 +72,7 @@ export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   formData.append('redirect_uri', authConfig.redirectUri)
   formData.append('code_verifier', codeVerifier)
 
-  return fetch(authConfig.tokenEndpoint, {
-    method: 'POST',
-    body: formData,
-  })
-    .then((response) => response.json().then((body: any): any => {
-        if (!response.ok) {
-          console.error(body.error_description)
-          throw body.error_description
-        }
-        return body
-      },
-    ))
-
+  return postWithFormData(authConfig.tokenEndpoint, formData)
 }
 
 export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshToken: string }) => {
@@ -76,18 +84,7 @@ export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshT
   formData.append('client_id', authConfig.clientId)
   formData.append('redirect_uri', authConfig.redirectUri)
 
-  return fetch(authConfig.tokenEndpoint, {
-    method: 'POST',
-    body: formData,
-  })
-    .then((response) => response.json().then((body: any): any => {
-        if (!response.ok) {
-          console.error(body.error_description)
-          throw body.error_description
-        }
-        return body
-      },
-    ))
+  return postWithFormData(authConfig.tokenEndpoint, formData)
 }
 
 /**

@@ -18,6 +18,15 @@ const authConfig = {
 function LoginInfo() {
   const { tokenData, token, logOut, idToken, error } = useContext(AuthContext)
 
+  if (error) {
+    return (
+        <>
+          <div style={{ color: "red" }}>An error occurred during authentication: {error}</div>
+          <button onClick={() => logOut()}>Logout</button>
+        </>
+    )
+  }
+
   return (
       <>
         {token ?
