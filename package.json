@@ -7,8 +7,8 @@
     "react-scripts": "4.0.3"
   },
   "scripts": {
-    "start": "PORT=8080 react-scripts start",
-    "build": "react-scripts build"
+    "start": "PORT=80 react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build"
   },
   "devDependencies": {
     "@types/react": "^17.0.21",

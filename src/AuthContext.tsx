@@ -54,8 +54,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
               login(authConfig)
             }
           })
-      } else {  // The client still has a valid token
-        setTokenData(decodeToken(token))
       }
     } else { // No refresh_token
       console.error("Tried to refresh token without a refresh token.")
@@ -95,7 +93,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       setLoginInProgress(true)
       login(authConfig)
     } else {
-      refreshAccessToken() // Check if token should be updated and sets tokenData
+      setTokenData(decodeToken(token))
+      refreshAccessToken() // Check if token should be updated
     }
   }, [])
 
