@@ -1,4 +1,4 @@
-import { ReactChildren } from "react"
+import { ReactNode } from "react"
 
 export type TTokenData = {
   exp: number
@@ -7,7 +7,7 @@ export type TTokenData = {
 
 export interface IAuthProvider {
   authConfig: TAuthConfig,
-  children: ReactChildren
+  children: ReactNode
 }
 
 export type TAuthConfig = {
