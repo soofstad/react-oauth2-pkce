@@ -13,6 +13,7 @@ const authConfig = {
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
   postLogin: () => location.replace(localStorage.getItem('preLoginPath') || ''),
+  decodeToken: true,
 }
 
 function LoginInfo() {

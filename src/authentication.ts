@@ -1,11 +1,11 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TAuthConfig, TTokenData } from "./Types"
+import { TInternalConfig, TTokenData } from "./Types"
 
 const codeVerifierStorageKey = "PKCE_code_verifier"
 // [ AzureAD,]
 export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ["AADSTS700084"]
 
-export async function login(authConfig: TAuthConfig) {
+export async function login(config: TInternalConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(40)
   localStorage.setItem(codeVerifierStorageKey, codeVerifier)
@@ -15,39 +15,39 @@ export async function login(authConfig: TAuthConfig) {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
     const params = new URLSearchParams({
       response_type: 'code',
-      client_id: authConfig.clientId,
-      scope: authConfig.scope || "",
-      redirect_uri: authConfig.redirectUri,
+      client_id: config.clientId,
+      scope: config.scope,
+      redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
     // Call any preLogin function in authConfig
-    if (authConfig?.preLogin) authConfig.preLogin()
-    location.replace(`${authConfig.authorizationEndpoint}?${params.toString()}`)
+    config.preLogin()
+    location.replace(`${config.authorizationEndpoint}?${params.toString()}`)
   })
 }
 
-function postWithFormData(tokenEndpoint: string, formData: FormData){
+function postWithFormData(tokenEndpoint: string, formData: FormData) {
   return fetch(tokenEndpoint, {
     method: 'POST',
     body: formData,
   })
     .then((response) => response.json()
       .then((body: any): any => {
-        if (!response.ok) {
-          console.error(body.error_description)
-          throw body.error_description
-        }
-        return body
-      },
-    ))
-  .catch((error: any)=>{
+          if (!response.ok) {
+            console.error(body.error_description)
+            throw body.error_description
+          }
+          return body
+        },
+      ))
+    .catch((error: any) => {
       console.error(error)
       throw error?.message || error
     })
 }
 
-export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
+export const fetchTokens = (config: TInternalConfig): Promise<any> => {
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -67,58 +67,68 @@ export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   const formData = new FormData()
   formData.append('grant_type', 'authorization_code')
   formData.append('code', authCode)
-  formData.append('scope', authConfig.scope || "")
-  formData.append('client_id', authConfig.clientId)
-  formData.append('redirect_uri', authConfig.redirectUri)
+  formData.append('scope', config.scope)
+  formData.append('client_id', config.clientId)
+  formData.append('redirect_uri', config.redirectUri)
   formData.append('code_verifier', codeVerifier)
 
-  return postWithFormData(authConfig.tokenEndpoint, formData)
+  return postWithFormData(config.tokenEndpoint, formData)
 }
 
-export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshToken: string }) => {
-  const { authConfig, refreshToken } = props
+export const fetchWithRefreshToken = (props: { config: TInternalConfig, refreshToken: string }) => {
+  const { config, refreshToken } = props
   const formData = new FormData()
   formData.append('grant_type', 'refresh_token')
   formData.append('refresh_token', refreshToken)
-  formData.append('scope', authConfig.scope || "")
-  formData.append('client_id', authConfig.clientId)
-  formData.append('redirect_uri', authConfig.redirectUri)
+  formData.append('scope', config.scope)
+  formData.append('client_id', config.clientId)
+  formData.append('redirect_uri', config.redirectUri)
 
-  return postWithFormData(authConfig.tokenEndpoint, formData)
+  return postWithFormData(config.tokenEndpoint, formData)
 }
 
 /**
- * Decodes the the base64 encoded JWT. Returns a TToken.
+ * Decodes the base64 encoded JWT. Returns a TToken.
  */
-export const decodeToken = (token: string): TTokenData => {
-  let base64Url = token.split('.')[1]
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-      })
-      .join(''),
-  )
+export const decodeJWT = (token: string): TTokenData | null => {
+  try {
+    let base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        })
+        .join(''),
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    console.error(e)
+    console.error("Failed to decode the access token.\n\tIs it a proper Java Web Token?\n\t" +
+      "You can disable JWT decoding by setting the 'decodeToken' value to 'false' the configuration.")
+    return null
+  }
 
-  return JSON.parse(jsonPayload)
 }
+
+// Returns epoch time (in seconds) for when the token will expire
+export const timeOfExpire = (validTimeDelta: number) => Math.round(Date.now() / 1000 + validTimeDelta)
 
 /**
- * Check if the Access Token has expired by looking at the 'exp' JWT header.
- * Will return True if the token has expired, OR there is less than 10min until it expires.
+ * Check if the Access Token has expired.
+ * Will return True if the token has expired, OR there is less than 5min until it expires.
  */
-export const tokenExpired = (token: string): Boolean => {
-  const bufferTimeInMilliseconds = 10 * 60 * 1000 // minutes * seconds * toMilliseconds
-  const { exp } = decodeToken(token)
-  const expirationTimeWithBuffer = new Date(exp * 1000 - bufferTimeInMilliseconds)
-  return new Date() > expirationTimeWithBuffer
+export function tokenExpired(tokenExpire: number): Boolean {
+  const now = Math.round(Date.now()) / 1000
+  const bufferTimeInSeconds = 5 * 60 // minutes * seconds
+  const nowWithBuffer = now + bufferTimeInSeconds
+  return nowWithBuffer >= tokenExpire
 }
 
-export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean =>{
+export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {
   let expired: boolean = false
-  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode:string) =>{
+  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode: string) => {
     if (errorMessage.includes(errorCode)) {
       expired = true
     }

@@ -1,57 +1,75 @@
 import React, { createContext, useEffect, useState } from 'react'
 import {
-  decodeToken,
+  decodeJWT,
   errorMessageForExpiredRefreshToken,
   fetchTokens,
   fetchWithRefreshToken,
   login,
+  timeOfExpire,
   tokenExpired,
 } from "./authentication"
 import useLocalStorage from "./Hooks"
-import { IAuthContext, IAuthProvider, TTokenData } from "./Types"
+import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from "./Types"
 import { validateAuthConfig } from './validateAuthConfig'
 
 export const AuthContext = createContext<IAuthContext>({ token: '', logOut: () => null, error: null })
 
-
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [refreshToken, setRefreshToken] = useLocalStorage<string | null>('ROCP_refreshToken', null)
   const [token, setToken] = useLocalStorage<string | null>('ROCP_token', null)
+  const [tokenExpire, setTokenExpire] = useLocalStorage<string | null>('ROCP_tokenExpire', null)
   const [idToken, setIdToken] = useLocalStorage<string | null>('ROCP_idToken', null)
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
-  const [tokenData, setTokenData] = useState<TTokenData>()
+  const [tokenData, setTokenData] = useState<TTokenData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   let interval: any
 
-  validateAuthConfig(authConfig)
+  // Set default values and override from passed config
+  const {
+    decodeToken = true,
+    scope = "",
+    preLogin = () => null,
+    postLogin = () => null,
+  } = authConfig
+
+  const config: TInternalConfig = {
+    decodeToken: decodeToken,
+    scope: scope,
+    preLogin: preLogin,
+    postLogin: postLogin,
+    ...authConfig,
+  }
+
+  validateAuthConfig(config)
 
   function logOut() {
     setRefreshToken(null)
     setToken(null)
     setIdToken(null)
-    setTokenData(undefined)
+    setTokenData(null)
     setLoginInProgress(false)
   }
 
-  function handleTokenResponse(response: any) {
-    setRefreshToken(response.refresh_token)
+  function handleTokenResponse(response: TTokenResponse) {
+    setRefreshToken(response?.refresh_token)
     setToken(response.access_token)
-    setIdToken(response?.id_token || "None")
+    setTokenExpire(timeOfExpire(response.expires_in))
+    setIdToken(response?.id_token)
     setLoginInProgress(false)
-    setTokenData(decodeToken(response.access_token))
+    if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
   }
 
   function refreshAccessToken() {
     if (refreshToken) {
-      if (tokenExpired(token)) { // The client has an expired token. Will try to get a new one with the refreshToken
-        fetchWithRefreshToken({ authConfig, refreshToken })
+      if (tokenExpired(tokenExpire)) { // The client has an expired token. Will try to get a new one with the refreshToken
+        fetchWithRefreshToken({ config, refreshToken })
           .then((result: any) => handleTokenResponse(result))
           .catch((error: string) => {
             setError(error)
             if (errorMessageForExpiredRefreshToken(error)) {
               logOut()
-              login(authConfig)
+              login(config)
             }
           })
       }
@@ -78,12 +96,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         setError(error_description)
         logOut()
       } else { // Request token from auth server with the auth code
-        fetchTokens(authConfig)
+        fetchTokens(config)
           .then((tokens: any) => {
             handleTokenResponse(tokens)
             history.replaceState(null, "", location.pathname)  // Clear ugly url params
             // Call any postLogin function in authConfig
-            if (authConfig?.postLogin) authConfig.postLogin()
+            config.postLogin()
           })
           .catch((error: string) => {
             setError(error)
@@ -91,9 +109,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       }
     } else if (!token) {  // First page visit
       setLoginInProgress(true)
-      login(authConfig)
+      login(config)
     } else {
-      setTokenData(decodeToken(token))
+      if (decodeToken) setTokenData(decodeJWT(token))
       refreshAccessToken() // Check if token should be updated
     }
   }, [])

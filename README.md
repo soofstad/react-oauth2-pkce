@@ -32,7 +32,7 @@ const authConfig: TAuthConfig = {
   clientId: 'myClientID',
   authorizationEndpoint: 'myAuthEndpoint',
   tokenEndpoint: 'myTokenEndpoint',
-  // Where ever your application is running. Must match configuration on authorization server
+  // Whereever your application is running. Must match configuration on authorization server
   redirectUri: 'http://localhost:3000/',
   // Optional
   scope: 'someScope openid',
@@ -43,6 +43,9 @@ const authConfig: TAuthConfig = {
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
   postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
+  // Wether or not to try and decode the access token.
+  // Stops errors from being printed in the console for non-JWT access tokens, etc. from Github
+  decodeToken: true
 }
 
 function LoginInfo() {
@@ -82,20 +85,20 @@ ReactDOM.render(
 
 The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
 
-```react
+```bash
 npm install react-oauth2-code-pkce
 ```
 
 and import
 
-```react
+```javascript
 import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
 ```
 ## Develop
 
 1. Update the 'authConfig' object in `src/index.js` with config from your authorization server and application
-2. Install node_modules -> `$ yarn install`
-3. Run -> `$ yarn start`
+2. Install node_modules -> `$ yarn install`
+3. Run -> `$ yarn start`
 ## Contribute
 
 You are welcome to create issues and pull requests :)
