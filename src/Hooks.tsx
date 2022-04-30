@@ -6,7 +6,6 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
       const item = localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.log(error)
       return initialValue
     }
   })

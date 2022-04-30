@@ -5,6 +5,15 @@ export type TTokenData = {
   [x: string]: unknown
 }
 
+export type TTokenResponse = {
+  access_token: string
+  expires_in: number
+  scope: string
+  token_type: string
+  refresh_token?: string
+  id_token?: string
+}
+
 export interface IAuthProvider {
   authConfig: TAuthConfig
   children: ReactNode
@@ -18,8 +27,10 @@ export interface IAuthContext {
   idToken?: string
 }
 
+
+// Input from users of the package, some optional values
 export type TAuthConfig = {
-  clientId: string
+clientId: string
   authorizationEndpoint: string
   tokenEndpoint: string
   redirectUri: string
@@ -28,6 +39,8 @@ export type TAuthConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
+  postLogin?: () => void
+  decodeToken?: boolean
 }
 
 export type TTokenResponse = {
@@ -40,4 +53,16 @@ export type TTokenResponse = {
 export type TAzureADErrorResponse = {
   error_description: string
   [k: string]: unknown
+}
+
+// The AuthProviders internal config type. All values will be set by user provided, or default values
+export type TInternalConfig = {
+  clientId:  string
+  authorizationEndpoint:  string
+  tokenEndpoint: string
+  redirectUri:  string
+  scope:  string
+  preLogin: Function
+  postLogin: Function
+  decodeToken: boolean
 }
