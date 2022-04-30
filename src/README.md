@@ -13,29 +13,43 @@ Long version;
 <https://oauth.net/2/pkce/>  
 <https://datatracker.ietf.org/doc/html/rfc7636>
 
+## Features
+
+- Authorization server agnostic, works equally well with all OAuth2 auth servers following the OAuth2 spec
+- Supports OpenID Connect (idTokens)
+- Pre- and Post login callbacks
+- Silently refreshes short lived access tokens in the background
+- Decodes JWT's
+
 ## Example
 
 ```javascript
 import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
 
-const authConfig = {
+const authConfig: TAuthConfig = {
   clientId: 'myClientID',
   authorizationEndpoint: 'myAuthEndpoint',
   tokenEndpoint: 'myTokenEndpoint',
-  // Where ever your application is running. Must match whats configured in authorization server
+  // Whereever your application is running. Must match configuration on authorization server
   redirectUri: 'http://localhost:3000/',
   // Optional
-  scope: 'someScope',
+  scope: 'someScope openid',
   // Optional
   logoutEndpoint: '',
   // Optional
-  logoutRedirect: ''
+  logoutRedirect: '',
+  // Example to redirect back to original path after login has completed
+  preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
+  postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
+  // Wether or not to try and decode the access token. 
+  // Stops errors from being printed in the console for non-JWT access tokens, etc. from Github
+  decodeToken: true
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut } = useContext(AuthContext)
+  const { tokenData, token, idToken, logOut, error } = useContext(AuthContext)
 
   return (
       <>
@@ -67,6 +81,24 @@ ReactDOM.render(
 )
 ```
 
+## Install
+
+The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
+
+```bash
+npm install react-oauth2-code-pkce
+```
+
+and import
+
+```javascript
+import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+```
+## Develop
+
+1. Update the 'authConfig' object in `src/index.js` with config from your authorization server and application
+2. Install node_modules -> `$ yarn install`
+3. Run -> `$ yarn start`
 ## Contribute
 
 You are welcome to create issues and pull requests :)
