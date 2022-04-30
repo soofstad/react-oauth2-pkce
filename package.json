@@ -2,17 +2,17 @@
   "name": "package-development",
   "version": "0.1.0",
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "PORT=80 react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build"
+    "start": "PORT=80 react-scripts start",
+    "build": "react-scripts build"
   },
   "devDependencies": {
     "@types/react": "^17.0.21",
-    "typescript": "^4.4.3"
+    "typescript": "^4.6.4"
   },
   "browserslist": {
     "production": [

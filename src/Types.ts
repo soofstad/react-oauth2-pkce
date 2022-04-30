@@ -10,6 +10,14 @@ export interface IAuthProvider {
   children: ReactNode
 }
 
+export interface IAuthContext {
+  token: string
+  logOut: ()=>void,
+  error: any
+  tokenData?: TTokenData|null,
+  idToken?: string,
+}
+
 export type TAuthConfig = {
   clientId:  string
   authorizationEndpoint:  string

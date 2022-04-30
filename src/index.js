@@ -1,18 +1,18 @@
 import React, { useContext } from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from "./AuthContext"
 
 const authConfig = {
-  clientId: 'f462a430-56f0-4a00-800a-6f578da7e943',
+  clientId: '97a6b5bd-63fb-42c6-bb75-7e5de2394ba0',
   authorizationEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
-  scope: 'User.Read openid',
-  redirectUri: 'http://localhost:8080/',
+  scope: 'api://97a6b5bd-63fb-42c6-bb75-7e5de2394ba0/dmss',
+  redirectUri: 'http://localhost/',
   logoutEndpoint: '',
   logoutRedirect: '',
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
-  postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
+  postLogin: () => location.replace(localStorage.getItem('preLoginPath') || ''),
 }
 
 function LoginInfo() {
@@ -65,8 +65,10 @@ function LoginInfo() {
 
 }
 
+const container = document.getElementById('root')
+const root = createRoot(container)
 
-ReactDOM.render(
+root.render(
     <div>
       <div>
         <h1>Demo using the 'react-oauth2-code-pkce' package</h1>
@@ -80,5 +82,5 @@ ReactDOM.render(
       <AuthProvider authConfig={authConfig}>
         <LoginInfo/>
       </AuthProvider>
-    </div>, document.getElementById('root'),
+    </div>
 )

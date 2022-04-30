@@ -1,17 +1,17 @@
 import React, { createContext, useEffect, useState } from 'react'
 import {
   decodeToken,
-  fetchWithRefreshToken,
+  errorMessageForExpiredRefreshToken,
   fetchTokens,
+  fetchWithRefreshToken,
   login,
   tokenExpired,
-  errorMessageForExpiredRefreshToken,
 } from "./authentication"
 import useLocalStorage from "./Hooks"
-import { IAuthProvider, TTokenData } from "./Types"
+import { IAuthContext, IAuthProvider, TTokenData } from "./Types"
 import { validateAuthConfig } from './validateAuthConfig'
 
-export const AuthContext = createContext({})
+export const AuthContext = createContext<IAuthContext>({ token: '', logOut: () => null, error: null })
 
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
@@ -49,7 +49,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           .then((result: any) => handleTokenResponse(result))
           .catch((error: string) => {
             setError(error)
-            if(errorMessageForExpiredRefreshToken(error)){
+            if (errorMessageForExpiredRefreshToken(error)) {
               logOut()
               login(authConfig)
             }
