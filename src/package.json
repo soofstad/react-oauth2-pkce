@@ -1,6 +1,6 @@
 {
   "name": "react-oauth2-code-pkce",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Plug-and-play react package for OAuth2 Authorization Code flow with PKCE",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     "typescript": "^4.4.3"
   },
   "peerDependencies": {
-    "react": "17.0.2"
+    "react": "^17.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
