@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-ast
+        language_version: python3.10
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: trailing-whitespace
+        exclude: ^.*\.(lock)$||^docs\/
+      - id: mixed-line-ending
+        exclude: ^.*\.(lock)$||^docs\/
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        files: ^src/.*\.(ts|tsx|js|css|html|json)$
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: 'v8.18.0'
+    hooks:
+      - id: eslint
+        additional_dependencies:
+          - eslint
+          - eslint-config-prettier # turns off all rules that might conflict with prettier
+          - eslint-plugin-jsx-a11y # checks accessibility rules on jsx elements
+          - eslint-plugin-prettier # runs prettier as an eslint rule
+          - eslint-plugin-react # react specific linting rules
+          - eslint-plugin-react-hooks # enforces the rules of hooks
+        files: ^src/.*\.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
+        types: [file]

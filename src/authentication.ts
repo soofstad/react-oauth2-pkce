@@ -1,9 +1,9 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TAuthConfig, TTokenData } from "./Types"
+import { TAuthConfig, TAzureADErrorResponse, TTokenData, TTokenResponse } from './Types'
 
-const codeVerifierStorageKey = "PKCE_code_verifier"
+const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
-export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ["AADSTS700084"]
+export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ['AADSTS700084']
 
 export async function login(authConfig: TAuthConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
@@ -16,38 +16,44 @@ export async function login(authConfig: TAuthConfig) {
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: authConfig.clientId,
-      scope: authConfig.scope || "",
+      scope: authConfig.scope || '',
       redirect_uri: authConfig.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
     })
     // Call any preLogin function in authConfig
     if (authConfig?.preLogin) authConfig.preLogin()
-    location.replace(`${authConfig.authorizationEndpoint}?${params.toString()}`)
+    window.location.replace(`${authConfig.authorizationEndpoint}?${params.toString()}`)
   })
 }
 
-function postWithFormData(tokenEndpoint: string, formData: FormData){
+// This is called a "type predicate". Which allow use to know which kind of response we got, in a type safe way.
+function isTokenResponse(body: TAzureADErrorResponse | TTokenResponse): body is TTokenResponse {
+  return (body as TTokenResponse).access_token !== undefined
+}
+
+function postWithFormData(tokenEndpoint: string, formData: FormData): Promise<TTokenResponse> {
   return fetch(tokenEndpoint, {
     method: 'POST',
     body: formData,
   })
-    .then((response) => response.json()
-      .then((body: any): any => {
-        if (!response.ok) {
+    .then((response) =>
+      response.json().then((body: TAzureADErrorResponse | TTokenResponse): TTokenResponse => {
+        if (isTokenResponse(body)) {
+          return body
+        } else {
           console.error(body.error_description)
           throw body.error_description
         }
-        return body
-      },
-    ))
-  .catch((error: any)=>{
+      })
+    )
+    .catch((error: Error) => {
       console.error(error)
-      throw error?.message || error
+      throw error.message
     })
 }
 
-export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
+export const fetchTokens = (authConfig: TAuthConfig): Promise<TTokenResponse> => {
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -58,16 +64,16 @@ export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   const codeVerifier = window.localStorage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
-    throw "Parameter 'code' not found in URL. \nHas authentication taken place?"
+    throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
   }
   if (!codeVerifier) {
-    throw "Can't get tokens without the CodeVerifier. \nHas authentication taken place?"
+    throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
   }
 
   const formData = new FormData()
   formData.append('grant_type', 'authorization_code')
   formData.append('code', authCode)
-  formData.append('scope', authConfig.scope || "")
+  formData.append('scope', authConfig.scope || '')
   formData.append('client_id', authConfig.clientId)
   formData.append('redirect_uri', authConfig.redirectUri)
   formData.append('code_verifier', codeVerifier)
@@ -75,12 +81,15 @@ export const fetchTokens = (authConfig: TAuthConfig): Promise<any> => {
   return postWithFormData(authConfig.tokenEndpoint, formData)
 }
 
-export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshToken: string }) => {
+export const fetchWithRefreshToken = (props: {
+  authConfig: TAuthConfig
+  refreshToken: string
+}): Promise<TTokenResponse> => {
   const { authConfig, refreshToken } = props
   const formData = new FormData()
   formData.append('grant_type', 'refresh_token')
   formData.append('refresh_token', refreshToken)
-  formData.append('scope', authConfig.scope || "")
+  formData.append('scope', authConfig.scope || '')
   formData.append('client_id', authConfig.clientId)
   formData.append('redirect_uri', authConfig.redirectUri)
 
@@ -91,7 +100,7 @@ export const fetchWithRefreshToken = (props: { authConfig: TAuthConfig, refreshT
  * Decodes the the base64 encoded JWT. Returns a TToken.
  */
 export const decodeToken = (token: string): TTokenData => {
-  let base64Url = token.split('.')[1]
+  const base64Url = token.split('.')[1]
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
   const jsonPayload = decodeURIComponent(
     atob(base64)
@@ -99,7 +108,7 @@ export const decodeToken = (token: string): TTokenData => {
       .map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
       })
-      .join(''),
+      .join('')
   )
 
   return JSON.parse(jsonPayload)
@@ -109,16 +118,16 @@ export const decodeToken = (token: string): TTokenData => {
  * Check if the Access Token has expired by looking at the 'exp' JWT header.
  * Will return True if the token has expired, OR there is less than 10min until it expires.
  */
-export const tokenExpired = (token: string): Boolean => {
+export const tokenExpired = (token: string): boolean => {
   const bufferTimeInMilliseconds = 10 * 60 * 1000 // minutes * seconds * toMilliseconds
   const { exp } = decodeToken(token)
   const expirationTimeWithBuffer = new Date(exp * 1000 - bufferTimeInMilliseconds)
   return new Date() > expirationTimeWithBuffer
 }
 
-export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean =>{
-  let expired: boolean = false
-  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode:string) =>{
+export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {
+  let expired = false
+  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode: string) => {
     if (errorMessage.includes(errorCode)) {
       expired = true
     }
