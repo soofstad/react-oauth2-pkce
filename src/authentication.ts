@@ -1,11 +1,11 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TInternalConfig, TTokenData, TAzureADErrorResponse, TTokenResponse  } from "./Types"
+import { TInternalConfig, TTokenData, TAzureADErrorResponse, TTokenResponse } from './Types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
 export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ['AADSTS700084']
 
-export async function login(config: TInternalConfig) {
+export async function logIn(config: TInternalConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(40)
   localStorage.setItem(codeVerifierStorageKey, codeVerifier)
@@ -36,20 +36,20 @@ function postWithFormData(tokenEndpoint: string, formData: FormData): Promise<TT
   return fetch(tokenEndpoint, {
     method: 'POST',
     body: formData,
-  })
-    .then((response: Response) =>{
-      if(!response.ok){
-        throw Error(response.statusText)
+  }).then((response: Response) => {
+    if (!response.ok) {
+      console.error(response)
+      throw Error(response.statusText)
+    }
+    return response.json().then((body: TAzureADErrorResponse | TTokenResponse): TTokenResponse => {
+      if (isTokenResponse(body)) {
+        return body
+      } else {
+        console.error(body)
+        throw Error(body.error_description)
       }
-      return response.json().then((body: TAzureADErrorResponse | TTokenResponse): TTokenResponse => {
-        if (isTokenResponse(body)) {
-          return body
-        } else {
-          console.error(body.error_description)
-          throw body.error_description
-        }
-      })
-    )
+    })
+  })
 }
 
 export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> => {
@@ -81,7 +81,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
 }
 
 export const fetchWithRefreshToken = (props: {
-  config: TInternalConfigConfig
+  config: TInternalConfig
   refreshToken: string
 }): Promise<TTokenResponse> => {
   const { config, refreshToken } = props
@@ -98,7 +98,7 @@ export const fetchWithRefreshToken = (props: {
 /**
  * Decodes the base64 encoded JWT. Returns a TToken.
  */
-export const decodeJWT = (token: string): TTokenData | null => {
+export const decodeJWT = (token: string): TTokenData => {
   try {
     const base64Url = token.split('.')[1]
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -108,16 +108,16 @@ export const decodeJWT = (token: string): TTokenData | null => {
         .map(function (c) {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
         })
-        .join(''),
+        .join('')
     )
     return JSON.parse(jsonPayload)
   } catch (e) {
     console.error(e)
-    console.error("Failed to decode the access token.\n\tIs it a proper Java Web Token?\n\t" +
-      "You can disable JWT decoding by setting the 'decodeToken' value to 'false' the configuration.")
-    return null
+    throw Error(
+      'Failed to decode the access token.\n\tIs it a proper Java Web Token?\n\t' +
+        "You can disable JWT decoding by setting the 'decodeToken' value to 'false' the configuration."
+    )
   }
-
 }
 
 // Returns epoch time (in seconds) for when the token will expire
@@ -133,7 +133,6 @@ export function tokenExpired(tokenExpire: number): boolean {
   const nowWithBuffer = now + bufferTimeInSeconds
   return nowWithBuffer >= tokenExpire
 }
-
 
 export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {
   let expired = false

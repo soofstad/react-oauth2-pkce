@@ -3,18 +3,14 @@ import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from './AuthContext'
 
 const authConfig = {
-  clientId: '97a6b5bd-63fb-42c6-bb75-7e5de2394ba0',
-  authorizationEndpoint:
-    'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
-  tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
-  scope: 'api://97a6b5bd-63fb-42c6-bb75-7e5de2394ba0/dmss',
-  redirectUri: 'http://localhost/',
-  logoutEndpoint: '',
-  logoutRedirect: '',
+  clientId: 'c43524cc7d3c82b05a47',
+  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+  tokenEndpoint: 'http://localhost:5000/api/token',
+  redirectUri: 'http://localhost:3000/',
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
-  decodeToken: true
+  decodeToken: false,
 }
 
 function LoginInfo() {
@@ -48,21 +44,24 @@ function LoginInfo() {
               {token}
             </pre>
           </div>
-          <div>
-            <h4>Login Information from Access Token and IdToken if any)</h4>
-            <pre
-              style={{
-                width: '400px',
-                margin: '10px',
-                padding: '5px',
-                border: 'black 2px solid',
-                wordBreak: 'break-all',
-                whiteSpace: 'break-spaces',
-              }}
-            >
-              {JSON.stringify(tokenData, null, 2)}
-            </pre>
-          </div>
+          {authConfig.decodeToken && (
+            <div>
+              <h4>Login Information from Access Token and IdToken (if any)</h4>
+              <pre
+                style={{
+                  width: '400px',
+                  margin: '10px',
+                  padding: '5px',
+                  border: 'black 2px solid',
+                  wordBreak: 'break-all',
+                  whiteSpace: 'break-spaces',
+                }}
+              >
+                {JSON.stringify(tokenData, null, 2)}
+              </pre>
+            </div>
+          )}
+
           <button onClick={() => logOut()}>Logout</button>
         </>
       ) : (

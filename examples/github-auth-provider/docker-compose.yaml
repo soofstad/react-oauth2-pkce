@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  api:
+    build: ./github-auth-proxy
+    restart: unless-stopped
+    volumes:
+      - ./github-auth-proxy:/code
+    environment:
+      CLIENT_ID: c43524cc7d3c82b05a47
+      CLIENT_SECRET: ${CLIENT_SECRET}
+    ports:
+      - "5000:5000"
+  web:
+    build: ./web-app
+    restart: unless-stopped
+    volumes:
+      - ./web-app/src:/app/src
+    ports:
+      - "3000:3000"

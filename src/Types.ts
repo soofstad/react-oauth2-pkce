@@ -7,10 +7,11 @@ export type TTokenData = {
 
 export type TTokenResponse = {
   access_token: string
-  expires_in: number
   scope: string
   token_type: string
+  expires_in?: number
   refresh_token?: string
+  refresh_token_expires_in?: number
   id_token?: string
 }
 
@@ -27,10 +28,9 @@ export interface IAuthContext {
   idToken?: string
 }
 
-
 // Input from users of the package, some optional values
 export type TAuthConfig = {
-clientId: string
+  clientId: string
   authorizationEndpoint: string
   tokenEndpoint: string
   redirectUri: string
@@ -39,15 +39,7 @@ clientId: string
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  postLogin?: () => void
   decodeToken?: boolean
-}
-
-export type TTokenResponse = {
-  access_token: string
-  refresh_token: string
-  expires_in: number
-  id_token?: string
 }
 
 export type TAzureADErrorResponse = {
@@ -57,12 +49,12 @@ export type TAzureADErrorResponse = {
 
 // The AuthProviders internal config type. All values will be set by user provided, or default values
 export type TInternalConfig = {
-  clientId:  string
-  authorizationEndpoint:  string
+  clientId: string
+  authorizationEndpoint: string
   tokenEndpoint: string
-  redirectUri:  string
-  scope:  string
-  preLogin: Function
-  postLogin: Function
+  redirectUri: string
+  scope: string
+  preLogin?: () => void
+  postLogin?: () => void
   decodeToken: boolean
 }
