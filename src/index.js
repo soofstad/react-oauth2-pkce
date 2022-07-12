@@ -3,14 +3,16 @@ import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from './AuthContext'
 
 const authConfig = {
-  clientId: 'c43524cc7d3c82b05a47',
-  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-  tokenEndpoint: 'http://localhost:5000/api/token',
+  clientId: '6559ce69-219d-4e82-b6ed-889a861c7c94',
+  authorizationEndpoint:
+    'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
+  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
   redirectUri: 'http://localhost:3000/',
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
-  decodeToken: false,
+  decodeToken: true,
+  scope: 'User.read',
 }
 
 function LoginInfo() {

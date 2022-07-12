@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  web:
+    build: ./web-app
+    restart: unless-stopped
+    volumes:
+      - ./web-app/src:/app/src
+    ports:
+      - "3000:3000"

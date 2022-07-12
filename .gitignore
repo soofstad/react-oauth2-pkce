@@ -1,4 +1,5 @@
 node_modules
+.venv
 /src/dist/
 .idea
 log.txt
@@ -7,3 +8,4 @@ log.txt
 /src/yarn.lock
 .env
 __pycache__
+/examples/microsoft-auth-provider/web-app/yarn.lock
