@@ -4,13 +4,15 @@ import {
   errorMessageForExpiredRefreshToken,
   fetchTokens,
   fetchWithRefreshToken,
-  login,
+  logIn,
   timeOfExpire,
   tokenExpired,
-} from "./authentication"
+} from './authentication'
 import useLocalStorage from './Hooks'
-import { IAuthContext, IAuthProvider, TTokenData, TInternalConfig, TTokenResponse } from './Types'
+import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
+
+const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -19,9 +21,13 @@ export const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
-  const [refreshToken, setRefreshToken] = useLocalStorage<string | null>('ROCP_refreshToken', null)
+  const [refreshToken, setRefreshToken] = useLocalStorage<string | undefined>('ROCP_refreshToken', undefined)
+  const [refreshTokenExpire, setRefreshTokenExpire] = useLocalStorage<number>(
+    'ROCP_refreshTokenExpire',
+    timeOfExpire(FALLBACK_EXPIRE_TIME)
+  )
   const [token, setToken] = useLocalStorage<string>('ROCP_token', '')
-  const [tokenExpire, setTokenExpire] = useLocalStorage<string | null>('ROCP_tokenExpire', null)
+  const [tokenExpire, setTokenExpire] = useLocalStorage<number>('ROCP_tokenExpire', timeOfExpire(FALLBACK_EXPIRE_TIME))
   const [idToken, setIdToken] = useLocalStorage<string | undefined>('ROCP_idToken', undefined)
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
@@ -30,12 +36,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   let interval: any
 
   // Set default values and override from passed config
-  const {
-    decodeToken = true,
-    scope = "",
-    preLogin = () => null,
-    postLogin = () => null,
-  } = authConfig
+  const { decodeToken = true, scope = '', preLogin = () => null, postLogin = () => null } = authConfig
 
   const config: TInternalConfig = {
     decodeToken: decodeToken,
@@ -48,39 +49,46 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   validateAuthConfig(config)
 
   function logOut() {
-    setRefreshToken(null)
+    setRefreshToken(undefined)
     setToken('')
+    setTokenExpire(timeOfExpire(FALLBACK_EXPIRE_TIME))
+    setRefreshTokenExpire(timeOfExpire(FALLBACK_EXPIRE_TIME))
     setIdToken(undefined)
     setTokenData(undefined)
     setLoginInProgress(false)
   }
 
   function handleTokenResponse(response: TTokenResponse) {
-    setRefreshToken(response.refresh_token)
+    setRefreshToken(response?.refresh_token)
     setToken(response.access_token)
-    setTokenExpire(timeOfExpire(response.expires_in))
+    setTokenExpire(timeOfExpire(response.expires_in || FALLBACK_EXPIRE_TIME))
+    setRefreshTokenExpire(timeOfExpire(response.refresh_token_expires_in || FALLBACK_EXPIRE_TIME))
     setIdToken(response?.id_token)
     setLoginInProgress(false)
-    if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
+    try {
+      if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
+    } catch (e) {
+      setError((e as Error).message)
+    }
   }
 
   function refreshAccessToken() {
-    if (refreshToken) {
-      if (token && tokenExpired(tokenExpire)) { // The client has an expired token. Will try to get a new one with the refreshToken
+    if (token && tokenExpired(tokenExpire)) {
+      if (refreshToken && !tokenExpired(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
           .then((result: any) => handleTokenResponse(result))
           .catch((error: string) => {
             setError(error)
             if (errorMessageForExpiredRefreshToken(error)) {
               logOut()
-              login(config)
+              logIn(config)
             }
           })
+      } else {
+        // The refresh token has expired. Need to log in from scratch.
+        logOut()
+        logIn(config)
       }
-    } else {
-      // No refresh_token
-      console.error('Tried to refresh access_token without a refresh_token.')
-      setError('Bad authorization state. Refreshing the page might solve the issue.')
     }
   }
 
@@ -118,9 +126,15 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     } else if (!token) {
       // First page visit
       setLoginInProgress(true)
-      login(config)
+      logIn(config)
     } else {
-      if (decodeToken) setTokenData(decodeJWT(token))
+      if (decodeToken) {
+        try {
+          setTokenData(decodeJWT(token))
+        } catch (e) {
+          setError((e as Error).message)
+        }
+      }
       refreshAccessToken() // Check if token should be updated
     }
   }, []) // eslint-disable-line

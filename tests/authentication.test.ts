@@ -6,8 +6,9 @@ test('decode a JWT token', () => {
 })
 
 test('decode a non-JWT token', () => {
-  const tokenData = decodeJWT("somethingStringWhateverThis is not a JWT")
-  expect(tokenData).toBe(null)
+  expect(() => {
+    decodeJWT("somethingStringWhateverThis is not a JWT")
+  }).toThrow()
 })
 
 test('check if expired token has expired', () => {

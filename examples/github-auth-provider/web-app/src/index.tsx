@@ -4,13 +4,14 @@ import ReactDOM from 'react-dom'
 import { AuthContext, AuthProvider, TAuthConfig, IAuthContext } from "react-oauth2-code-pkce"
 
 const authConfig: TAuthConfig = {
-  clientId: 'f462a430-56f0-4a00-800a-6f578da7e943',
-  authorizationEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/authorize',
-  tokenEndpoint: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/oauth2/v2.0/token',
-  scope: 'User.Read',
-  redirectUri: 'http://localhost/',
-  logoutEndpoint: '',
-  logoutRedirect: '',
+  clientId: 'c43524cc7d3c82b05a47',
+  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+  tokenEndpoint: 'http://localhost:5000/api/token',
+  redirectUri: 'http://localhost:3000/',
+  // Example to redirect back to original path after login has completed
+  preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
+  postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
+  decodeToken: false,
 }
 
 function LoginInfo(): JSX.Element {

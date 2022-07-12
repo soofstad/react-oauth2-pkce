@@ -4,5 +4,6 @@ node_modules
 log.txt
 /yarn.lock
 /src/react-app-env.d.ts
-/tsconfig.json
 /src/yarn.lock
+.env
+__pycache__
