@@ -2,12 +2,12 @@
   "name": "package-development",
   "version": "0.1.0",
   "dependencies": {
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "PORT=80 react-scripts start",
+    "start": "PORT=80 react-scripts start ./src/index.js",
     "build": "react-scripts build"
   },
   "devDependencies": {
