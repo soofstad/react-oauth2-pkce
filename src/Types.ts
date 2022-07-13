@@ -1,8 +1,7 @@
 import { ReactNode } from 'react'
 
 export type TTokenData = {
-  exp: number
-  [x: string]: unknown
+  [x: string]: any
 }
 
 export type TTokenResponse = {

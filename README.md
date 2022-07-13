@@ -20,6 +20,7 @@ Long version;
 - Pre- and Post login callbacks
 - Silently refreshes short lived access tokens in the background
 - Decodes JWT's
+- A total of ~440 lines of code, easy for anyone to audit.
 
 ## Example
 
