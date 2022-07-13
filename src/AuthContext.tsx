@@ -85,7 +85,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (token && epochTimeIsPast(tokenExpire)) {
       if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
-          .then((result: any) => handleTokenResponse(result))
+          .then((result: TTokenResponse) => handleTokenResponse(result))
           .catch((error: string) => {
             setError(error)
             if (errorMessageForExpiredRefreshToken(error)) {
