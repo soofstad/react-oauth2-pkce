@@ -25,7 +25,11 @@
     "oauth2",
     "pkce",
     "code",
-    "flow"
+    "flow",
+    "azure",
+    "github",
+    "keycloak",
+    "microsoft"
   ],
   "author": "Stig Oskar Ofstad",
   "license": "MIT",
