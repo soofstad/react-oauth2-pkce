@@ -121,17 +121,16 @@ export const decodeJWT = (token: string): TTokenData => {
 }
 
 // Returns epoch time (in seconds) for when the token will expire
-export const timeOfExpire = (validTimeDelta: number) => Math.round(Date.now() / 1000 + validTimeDelta)
+export const epochAtSecondsFromNow = (secondsFromNow: number) => Math.round(Date.now() / 1000 + secondsFromNow)
 
 /**
  * Check if the Access Token has expired.
  * Will return True if the token has expired, OR there is less than 5min until it expires.
  */
-export function tokenExpired(tokenExpire: number): boolean {
+export function epochTimeIsPast(timestamp: number): boolean {
   const now = Math.round(Date.now()) / 1000
-  const bufferTimeInSeconds = 5 * 60 // minutes * seconds
-  const nowWithBuffer = now + bufferTimeInSeconds
-  return nowWithBuffer >= tokenExpire
+  const nowWithBuffer = now + 120
+  return nowWithBuffer >= timestamp
 }
 
 export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {

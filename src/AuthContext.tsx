@@ -5,8 +5,8 @@ import {
   fetchTokens,
   fetchWithRefreshToken,
   logIn,
-  timeOfExpire,
-  tokenExpired,
+  epochAtSecondsFromNow,
+  epochTimeIsPast,
 } from './authentication'
 import useLocalStorage from './Hooks'
 import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
@@ -24,10 +24,13 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [refreshToken, setRefreshToken] = useLocalStorage<string | undefined>('ROCP_refreshToken', undefined)
   const [refreshTokenExpire, setRefreshTokenExpire] = useLocalStorage<number>(
     'ROCP_refreshTokenExpire',
-    timeOfExpire(FALLBACK_EXPIRE_TIME)
+    epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME)
   )
   const [token, setToken] = useLocalStorage<string>('ROCP_token', '')
-  const [tokenExpire, setTokenExpire] = useLocalStorage<number>('ROCP_tokenExpire', timeOfExpire(FALLBACK_EXPIRE_TIME))
+  const [tokenExpire, setTokenExpire] = useLocalStorage<number>(
+    'ROCP_tokenExpire',
+    epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME)
+  )
   const [idToken, setIdToken] = useLocalStorage<string | undefined>('ROCP_idToken', undefined)
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
@@ -51,19 +54,25 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function logOut() {
     setRefreshToken(undefined)
     setToken('')
-    setTokenExpire(timeOfExpire(FALLBACK_EXPIRE_TIME))
-    setRefreshTokenExpire(timeOfExpire(FALLBACK_EXPIRE_TIME))
+    setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
+    setRefreshTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
     setIdToken(undefined)
     setTokenData(undefined)
     setLoginInProgress(false)
   }
 
   function handleTokenResponse(response: TTokenResponse) {
-    setRefreshToken(response?.refresh_token)
     setToken(response.access_token)
-    setTokenExpire(timeOfExpire(response.expires_in || FALLBACK_EXPIRE_TIME))
-    setRefreshTokenExpire(timeOfExpire(response.refresh_token_expires_in || FALLBACK_EXPIRE_TIME))
-    setIdToken(response?.id_token)
+    setRefreshToken(response.refresh_token)
+    setTokenExpire(epochAtSecondsFromNow(response.expires_in || FALLBACK_EXPIRE_TIME))
+    // If there is no refresh_token_expire, use access_token_expire + 10min.
+    // If no access_token_expire, assume double the fallback expire time
+    let refreshTokenExpire = response.refresh_token_expires_in || 2 * FALLBACK_EXPIRE_TIME
+    if (!response.refresh_token_expires_in && response.expires_in) {
+      refreshTokenExpire = response.expires_in + FALLBACK_EXPIRE_TIME
+    }
+    setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpire))
+    setIdToken(response.id_token)
     setLoginInProgress(false)
     try {
       if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
@@ -73,8 +82,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function refreshAccessToken() {
-    if (token && tokenExpired(tokenExpire)) {
-      if (refreshToken && !tokenExpired(refreshTokenExpire)) {
+    if (token && epochTimeIsPast(tokenExpire)) {
+      if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
           .then((result: any) => handleTokenResponse(result))
           .catch((error: string) => {
@@ -86,7 +95,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           })
       } else {
         // The refresh token has expired. Need to log in from scratch.
-        logOut()
+        setLoginInProgress(true)
         logIn(config)
       }
     }
