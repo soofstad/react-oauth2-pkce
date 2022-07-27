@@ -1,12 +1,5 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import {
-  TInternalConfig,
-  TTokenData,
-  TAzureADErrorResponse,
-  TTokenResponse,
-  FormEncoding,
-  TTokenRequest,
-} from './Types'
+import { TInternalConfig, TTokenData, TAzureADErrorResponse, TTokenResponse, TTokenRequest } from './Types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
@@ -47,23 +40,14 @@ function buildUrlEncodedRequest(tokenRequest: TTokenRequest): string {
   return s
 }
 
-function buildMultiPartRequest(tokenRequest: TTokenRequest): FormData {
-  const formData = new FormData()
-  for (const pair of Object.entries(tokenRequest)) {
-    formData.set(pair[0], pair[1])
-  }
-  return formData
-}
-
 function postWithFormData(
   tokenEndpoint: string,
-  tokenRequest: TTokenRequest,
-  encoding: FormEncoding
+  tokenRequest: TTokenRequest
 ): Promise<TTokenResponse> {
   return fetch(tokenEndpoint, {
     method: 'POST',
-    body: encoding === 'url-encoded' ? buildUrlEncodedRequest(tokenRequest) : buildMultiPartRequest(tokenRequest),
-    headers: encoding === 'url-encoded' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {},
+    body: buildUrlEncodedRequest(tokenRequest),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   }).then((response: Response) => {
     if (!response.ok) {
       console.error(response)
@@ -105,7 +89,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
   }
-  return postWithFormData(config.tokenEndpoint, tokenRequest, config.tokenPostEncoding)
+  return postWithFormData(config.tokenEndpoint, tokenRequest)
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -120,7 +104,7 @@ export const fetchWithRefreshToken = (props: {
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
   }
-  return postWithFormData(config.tokenEndpoint, tokenRequest, config.tokenPostEncoding)
+  return postWithFormData(config.tokenEndpoint, tokenRequest)
 }
 
 /**

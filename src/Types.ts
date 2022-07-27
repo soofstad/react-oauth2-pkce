@@ -47,7 +47,6 @@ export type TAuthConfig = {
   clientId: string
   authorizationEndpoint: string
   tokenEndpoint: string
-  tokenPostEncoding: FormEncoding
   redirectUri: string
   scope?: string
   logoutEndpoint?: string
@@ -67,12 +66,9 @@ export type TInternalConfig = {
   clientId: string
   authorizationEndpoint: string
   tokenEndpoint: string
-  tokenPostEncoding: FormEncoding
   redirectUri: string
   scope: string
   preLogin?: () => void
   postLogin?: () => void
   decodeToken: boolean
 }
-
-export type FormEncoding = 'multi-part' | 'url-encoded'
