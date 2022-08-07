@@ -20,11 +20,15 @@ repos:
         files: ^src/.*\.(ts|tsx|js|css|html|json)$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.18.0'
+    rev: 'v8.21.0'
     hooks:
       - id: eslint
         additional_dependencies:
           - eslint
+          - eslint-config-react-app
+          - typescript
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
           - eslint-config-prettier # turns off all rules that might conflict with prettier
           - eslint-plugin-jsx-a11y # checks accessibility rules on jsx elements
           - eslint-plugin-prettier # runs prettier as an eslint rule
