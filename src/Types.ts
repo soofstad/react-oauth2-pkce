@@ -6,11 +6,11 @@ interface TTokenRqBase {
   client_id: string
   redirect_uri: string
 }
-interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
+export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
   code: string
   code_verifier: string
 }
-interface TTokenRequestForRefresh extends TTokenRqBase {
+export interface TTokenRequestForRefresh extends TTokenRqBase {
   refresh_token: string
 }
 export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh

@@ -1,5 +1,13 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TInternalConfig, TTokenData, TAzureADErrorResponse, TTokenResponse, TTokenRequest } from './Types'
+import {
+  TInternalConfig,
+  TTokenData,
+  TAzureADErrorResponse,
+  TTokenResponse,
+  TTokenRequest,
+  TTokenRequestWithCodeAndVerifier,
+  TTokenRequestForRefresh,
+} from './Types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
@@ -40,10 +48,7 @@ function buildUrlEncodedRequest(tokenRequest: TTokenRequest): string {
   return s
 }
 
-function postWithFormData(
-  tokenEndpoint: string,
-  tokenRequest: TTokenRequest
-): Promise<TTokenResponse> {
+function postWithXForm(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
   return fetch(tokenEndpoint, {
     method: 'POST',
     body: buildUrlEncodedRequest(tokenRequest),
@@ -81,7 +86,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
   }
 
-  const tokenRequest: TTokenRequest = {
+  const tokenRequest: TTokenRequestWithCodeAndVerifier = {
     grant_type: 'authorization_code',
     code: authCode,
     scope: config.scope,
@@ -89,7 +94,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
   }
-  return postWithFormData(config.tokenEndpoint, tokenRequest)
+  return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -97,14 +102,14 @@ export const fetchWithRefreshToken = (props: {
   refreshToken: string
 }): Promise<TTokenResponse> => {
   const { config, refreshToken } = props
-  const tokenRequest: TTokenRequest = {
+  const tokenRequest: TTokenRequestForRefresh = {
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
     scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
   }
-  return postWithFormData(config.tokenEndpoint, tokenRequest)
+  return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
 
 /**
