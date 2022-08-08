@@ -29,7 +29,8 @@
     "azure",
     "github",
     "keycloak",
-    "microsoft"
+    "microsoft",
+    "fusionauth"
   ],
   "author": "Stig Oskar Ofstad",
   "license": "MIT",

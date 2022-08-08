@@ -9,7 +9,7 @@ import {
   epochTimeIsPast,
 } from './authentication'
 import useLocalStorage from './Hooks'
-import { IAuthContext, IAuthProvider, TInternalConfig, FormEncoding, TTokenData, TTokenResponse } from './Types'
+import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
 
 const FALLBACK_EXPIRE_TIME = 600 // 10minutes
@@ -39,19 +39,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   let interval: any
 
   // Set default values and override from passed config
-  const {
-    decodeToken = true,
-    tokenPostEncoding = 'multi-part',
-    scope = '',
-    preLogin = () => null,
-    postLogin = () => null,
-  } = authConfig
+  const { decodeToken = true, scope = '', preLogin = () => null, postLogin = () => null } = authConfig
 
   const config: TInternalConfig = {
     ...authConfig,
     decodeToken: decodeToken,
     scope: scope,
-    tokenPostEncoding: tokenPostEncoding,
     preLogin: preLogin,
     postLogin: postLogin,
   }
