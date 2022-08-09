@@ -42,11 +42,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const { decodeToken = true, scope = '', preLogin = () => null, postLogin = () => null } = authConfig
 
   const config: TInternalConfig = {
+    ...authConfig,
     decodeToken: decodeToken,
     scope: scope,
     preLogin: preLogin,
     postLogin: postLogin,
-    ...authConfig,
   }
 
   validateAuthConfig(config)

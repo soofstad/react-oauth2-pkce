@@ -1,5 +1,20 @@
 import { ReactNode } from 'react'
 
+interface TTokenRqBase {
+  grant_type: string
+  scope: string
+  client_id: string
+  redirect_uri: string
+}
+export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
+  code: string
+  code_verifier: string
+}
+export interface TTokenRequestForRefresh extends TTokenRqBase {
+  refresh_token: string
+}
+export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh
+
 export type TTokenData = {
   [x: string]: any
 }

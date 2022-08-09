@@ -1,5 +1,13 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import { TInternalConfig, TTokenData, TAzureADErrorResponse, TTokenResponse } from './Types'
+import {
+  TInternalConfig,
+  TTokenData,
+  TAzureADErrorResponse,
+  TTokenResponse,
+  TTokenRequest,
+  TTokenRequestWithCodeAndVerifier,
+  TTokenRequestForRefresh,
+} from './Types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
@@ -7,7 +15,7 @@ export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ['AADSTS700084']
 
 export async function logIn(config: TInternalConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
-  const codeVerifier = generateRandomString(40)
+  const codeVerifier = generateRandomString(96)
   localStorage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
@@ -32,10 +40,19 @@ function isTokenResponse(body: TAzureADErrorResponse | TTokenResponse): body is 
   return (body as TTokenResponse).access_token !== undefined
 }
 
-function postWithFormData(tokenEndpoint: string, formData: FormData): Promise<TTokenResponse> {
+function buildUrlEncodedRequest(tokenRequest: TTokenRequest): string {
+  let s = ''
+  for (const pair of Object.entries(tokenRequest)) {
+    s += (s ? '&' : '') + pair[0] + '=' + encodeURIComponent(pair[1])
+  }
+  return s
+}
+
+function postWithXForm(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
   return fetch(tokenEndpoint, {
     method: 'POST',
-    body: formData,
+    body: buildUrlEncodedRequest(tokenRequest),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   }).then((response: Response) => {
     if (!response.ok) {
       console.error(response)
@@ -69,15 +86,15 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
   }
 
-  const formData = new FormData()
-  formData.append('grant_type', 'authorization_code')
-  formData.append('code', authCode)
-  formData.append('scope', config.scope)
-  formData.append('client_id', config.clientId)
-  formData.append('redirect_uri', config.redirectUri)
-  formData.append('code_verifier', codeVerifier)
-
-  return postWithFormData(config.tokenEndpoint, formData)
+  const tokenRequest: TTokenRequestWithCodeAndVerifier = {
+    grant_type: 'authorization_code',
+    code: authCode,
+    scope: config.scope,
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
+    code_verifier: codeVerifier,
+  }
+  return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -85,14 +102,14 @@ export const fetchWithRefreshToken = (props: {
   refreshToken: string
 }): Promise<TTokenResponse> => {
   const { config, refreshToken } = props
-  const formData = new FormData()
-  formData.append('grant_type', 'refresh_token')
-  formData.append('refresh_token', refreshToken)
-  formData.append('scope', config.scope)
-  formData.append('client_id', config.clientId)
-  formData.append('redirect_uri', config.redirectUri)
-
-  return postWithFormData(config.tokenEndpoint, formData)
+  const tokenRequest: TTokenRequestForRefresh = {
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+    scope: config.scope,
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
+  }
+  return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
 
 /**
