@@ -3,9 +3,6 @@ on:
   push:
     tags:
       - v*
-defaults:
-  run:
-    working-directory: ./src
 
 jobs:
   publish:
@@ -17,7 +14,7 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install
-      - run: tsc --skipLibCheck
-      - run: npm publish
+      - run: cd src && tsc --skipLibCheck
+      - run: cd src && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
