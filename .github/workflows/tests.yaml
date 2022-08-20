@@ -25,4 +25,4 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install
       - run: yarn test
-      - run: cd src && tsc --skipLibCheck
+      - run: cd src && tsc

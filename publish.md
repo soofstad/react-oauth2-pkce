@@ -6,6 +6,6 @@ git commit -m "foo"
 git tag v?.?.? -m "A Message"
 git push --tags
 cd src
-tsc --skipLibCheck
+tsc
 npm publish
 ```
