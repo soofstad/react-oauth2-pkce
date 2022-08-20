@@ -35,17 +35,17 @@ export async function logIn(config: TInternalConfig) {
   })
 }
 
-// This is called a "type predicate". Which allow use to know which kind of response we got, in a type safe way.
+// This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
 function isTokenResponse(body: TAzureADErrorResponse | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
 }
 
 function buildUrlEncodedRequest(tokenRequest: TTokenRequest): string {
-  let s = ''
-  for (const pair of Object.entries(tokenRequest)) {
-    s += (s ? '&' : '') + pair[0] + '=' + encodeURIComponent(pair[1])
+  let queryString = ''
+  for (const [key, value] of Object.entries(tokenRequest)) {
+    queryString += (queryString ? '&' : '') + key + '=' + encodeURIComponent(value)
   }
-  return s
+  return queryString
 }
 
 function postWithXForm(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {

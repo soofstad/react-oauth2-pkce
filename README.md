@@ -44,7 +44,7 @@ const authConfig: TAuthConfig = {
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
   postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
-  // Wether or not to try and decode the access token.
+  // Whether or not to try and decode the access token.
   // Stops errors from being printed in the console for non-JWT access tokens, etc. from Github
   decodeToken: true
 }
