@@ -40,6 +40,7 @@ export interface IAuthContext {
   error: string | null
   tokenData?: TTokenData
   idToken?: string
+  loginInProgress: boolean
 }
 
 // Input from users of the package, some optional values

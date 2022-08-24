@@ -23,6 +23,7 @@ repos:
     rev: 'v8.21.0'
     hooks:
       - id: eslint
+        args: [--fix]
         additional_dependencies:
           - eslint
           - eslint-config-react-app

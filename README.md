@@ -50,28 +50,42 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idToken, logOut, error } = useContext(AuthContext)
+  const { tokenData, token, logOut, error, loginInProgress } = useContext(AuthContext)
+  
+  // Stops the webpage from flickering while logging in
+  if (loginInProgress) return null  
+
+  if (error) {
+    return (
+      <>
+        <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
+        <button onClick={() => logOut()}>Logout</button>
+      </>
+    )
+  }
+
+  if (!token)
+    return (
+      <>
+        <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
+        <button onClick={() => window.location.reload()}>Login</button>
+      </>
+    )
 
   return (
-      <>
-        {token ?
-            <>
-              <div>
-                <h4>Access Token (JWT)</h4>
-                <pre>{token}</pre>
-              </div>
-              <div>
-                <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
-                <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-              </div>
-            </> :
-            <div>You are not logged in</div>
-        }
-      </>
+    <>
+      <div>
+        <h4>Access Token (JWT)</h4>
+        <pre>{token}</pre>
+      </div>
+      <div>
+        <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
+        <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+      </div>
+    </> 
   )
 
 }
-
 
 ReactDOM.render(
     <div>
