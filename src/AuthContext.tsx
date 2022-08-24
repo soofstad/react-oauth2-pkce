@@ -1,12 +1,12 @@
 import React, { createContext, useEffect, useState } from 'react' // eslint-disable-line
 import {
   decodeJWT,
+  epochAtSecondsFromNow,
+  epochTimeIsPast,
   errorMessageForExpiredRefreshToken,
   fetchTokens,
   fetchWithRefreshToken,
   logIn,
-  epochAtSecondsFromNow,
-  epochTimeIsPast,
 } from './authentication'
 import useLocalStorage from './Hooks'
 import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
@@ -18,6 +18,7 @@ export const AuthContext = createContext<IAuthContext>({
   token: '',
   logOut: () => null,
   error: null,
+  loginInProgress: false,
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
@@ -148,5 +149,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
   }, []) // eslint-disable-line
 
-  return <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error, loginInProgress }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
