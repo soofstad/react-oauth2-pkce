@@ -28,6 +28,7 @@ export async function logIn(config: TInternalConfig) {
       redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
+      prompt: config.prompt ? "True" : "False"
     })
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
@@ -93,6 +94,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
+    prompt: config.prompt ? "True" : "False"
   }
   return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
@@ -108,6 +110,7 @@ export const fetchWithRefreshToken = (props: {
     scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
+    prompt: config.prompt ? "True" : "False"
   }
   return postWithXForm(config.tokenEndpoint, tokenRequest)
 }
