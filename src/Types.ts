@@ -55,6 +55,7 @@ export type TAuthConfig = {
   preLogin?: () => void
   postLogin?: () => void
   decodeToken?: boolean
+  extraAuthParameters?: {[key: string]: string|boolean|number}
 }
 
 export type TAzureADErrorResponse = {
