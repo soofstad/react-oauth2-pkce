@@ -4,7 +4,7 @@ Plug-and-play react package for OAuth2 Authorization Code flow with PKCE
 
 Adhering to the RFCs recommendations, cryptographically sound, and with __zero__ dependencies!  
 
-## What is OAuth2 Authorization Code flow with PKCE?
+## What is OAuth2 Authorization Code flow with Proof Key for Code Exchange (PKCE)?
 
 Short version;  
 The modern and secure way to do authentication for mobile and web applications!
@@ -15,12 +15,12 @@ Long version;
 
 ## Features
 
-- Authorization server agnostic, works equally well with all OAuth2 auth servers following the OAuth2 spec
+- Authorization provider agnostic. Works equally well with all OAuth2 authentication servers following the OAuth2 spec
 - Supports OpenID Connect (idTokens)
 - Pre- and Post login callbacks
 - Silently refreshes short lived access tokens in the background
 - Decodes JWT's
-- A total of ~440 lines of code, easy for anyone to audit.
+- A total of ~440 lines of code, easy for anyone to audit and understand
 
 ## Example
 
@@ -33,20 +33,8 @@ const authConfig: TAuthConfig = {
   clientId: 'myClientID',
   authorizationEndpoint: 'myAuthEndpoint',
   tokenEndpoint: 'myTokenEndpoint',
-  // Whereever your application is running. Must match configuration on authorization server
   redirectUri: 'http://localhost:3000/',
-  // Optional
   scope: 'someScope openid',
-  // Optional
-  logoutEndpoint: '',
-  // Optional
-  logoutRedirect: '',
-  // Example to redirect back to original path after login has completed
-  preLogin: () => localStorage.setItem('preLoginPath', location.pathname),
-  postLogin: () => location.replace(localStorage.getItem('preLoginPath')),
-  // Whether or not to try and decode the access token.
-  // Stops errors from being printed in the console for non-JWT access tokens, etc. from Github
-  decodeToken: true
 }
 
 function LoginInfo() {
@@ -54,7 +42,6 @@ function LoginInfo() {
   
   // Stops the webpage from flickering while logging in
   if (loginInProgress) return null  
-
   if (error) {
     return (
       <>
@@ -63,7 +50,6 @@ function LoginInfo() {
       </>
     )
   }
-
   if (!token)
     return (
       <>
@@ -71,7 +57,6 @@ function LoginInfo() {
         <button onClick={() => window.location.reload()}>Login</button>
       </>
     )
-
   return (
     <>
       <div>
@@ -84,7 +69,6 @@ function LoginInfo() {
       </div>
     </> 
   )
-
 }
 
 ReactDOM.render(
@@ -109,11 +93,41 @@ and import
 ```javascript
 import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
 ```
+
+## All configuration parameters
+
+```typescript
+type TAuthConfig = {
+  // For required parameters, refer to the auth providers documentation
+  clientId: string  // Required
+  authorizationEndpoint: string  // Required
+  tokenEndpoint: string  // Required
+  redirectUri: string  // Required
+  scope?: string  // default: ''
+  // Which URL to call for logging out of the auth provider
+  logoutEndpoint?: string  // default: null
+  // Should be used by the auth provider to decide which URL to redirect
+  // the user to after logout
+  logoutRedirect?: string  // default: null
+  // Optionally provide a callback function to run just __before__ the
+  // user is redirected to the auth server for login
+  preLogin?: () => void  // default: () => null
+  // Optionally provide a callback function to run just __after__ the
+  // user has been redirected back from the auth server
+  postLogin?: () => void  // default: () => null
+  // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
+  // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
+  decodeToken?: boolean  // default: true
+}
+
+```
+
 ## Develop
 
 1. Update the 'authConfig' object in `src/index.js` with config from your authorization server and application
 2. Install node_modules -> `$ yarn install`
 3. Run -> `$ yarn start`
+
 ## Contribute
 
 You are welcome to create issues and pull requests :)
