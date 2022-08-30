@@ -12,6 +12,9 @@ const authConfig = {
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: true,
   scope: 'User.read',
+  extraAuthParameters: {
+    prompt: true,
+  },
 }
 
 function LoginInfo() {
