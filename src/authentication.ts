@@ -93,6 +93,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
+    ...config.extraAuthParams,
   }
   return postWithXForm(config.tokenEndpoint, tokenRequest)
 }

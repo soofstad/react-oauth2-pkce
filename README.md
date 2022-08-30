@@ -15,10 +15,10 @@ Long version;
 
 ## Features
 
-- Authorization provider agnostic. Works equally well with all OAuth2 authentication servers following the OAuth2 spec
+- Authorization provider-agnostic. Works equally well with all OAuth2 authentication servers following the OAuth2 spec
 - Supports OpenID Connect (idTokens)
-- Pre- and Post login callbacks
-- Silently refreshes short lived access tokens in the background
+- Pre- and Post-login callbacks
+- Silently refreshes short-lived access tokens in the background
 - Decodes JWT's
 - A total of ~440 lines of code, easy for anyone to audit and understand
 
@@ -42,6 +42,7 @@ function LoginInfo() {
   
   // Stops the webpage from flickering while logging in
   if (loginInProgress) return null  
+  
   if (error) {
     return (
       <>
@@ -109,15 +110,17 @@ type TAuthConfig = {
   // Should be used by the auth provider to decide which URL to redirect
   // the user to after logout
   logoutRedirect?: string  // default: null
-  // Optionally provide a callback function to run just __before__ the
+  // Optionally provide a callback function to run _before_ the
   // user is redirected to the auth server for login
   preLogin?: () => void  // default: () => null
-  // Optionally provide a callback function to run just __after__ the
+  // Optionally provide a callback function to run _after_ the
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
   // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
   // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
   decodeToken?: boolean  // default: true
+  // Can be used to provide any non-standard parameters to the authorization request
+  extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
 }
 
 ```

@@ -17,7 +17,7 @@ repos:
     rev: v2.7.1
     hooks:
       - id: prettier
-        files: ^src/.*\.(ts|tsx|js|css|html|json)$
+        files: \.(ts|tsx|js|css|html|json)$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: 'v8.21.0'

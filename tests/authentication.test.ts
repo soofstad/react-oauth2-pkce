@@ -1,13 +1,16 @@
-import { decodeJWT, epochAtSecondsFromNow, epochTimeIsPast } from "../src/authentication"
+import { decodeJWT, epochAtSecondsFromNow, epochTimeIsPast } from '../src/authentication'
 
 test('decode a JWT token', () => {
-  const tokenData = decodeJWT('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Sfl')
+  const tokenData = decodeJWT(
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Sfl'
+  )
   expect(tokenData?.name).toBe('John Doe')
 })
 
 test('decode a non-JWT token', () => {
+  console.error = jest.fn()
   expect(() => {
-    decodeJWT("somethingStringWhateverThis is not a JWT")
+    decodeJWT('somethingStringWhateverThis is not a JWT')
   }).toThrow()
 })
 
