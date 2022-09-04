@@ -57,7 +57,7 @@ const AuthConsumer = () => {
   return <div>{tokenData?.name}</div>
 }
 
-describe('Redirected to app with auth code', () => {
+describe('make auth request with extra parameters', () => {
   const wrapper = ({ children }: any) => <AuthProvider authConfig={authConfig}>{children}</AuthProvider>
 
   // Setting up a state similar to what it would be just after redirect back from auth provider

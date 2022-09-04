@@ -12,13 +12,11 @@ const authConfig = {
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: true,
   scope: 'User.read',
-  extraAuthParameters: {
-    prompt: true,
-  },
+  autoLogin: false,
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut, error, loginInProgress } = useContext(AuthContext)
+  const { tokenData, token, login, logOut, error, loginInProgress } = useContext(AuthContext)
 
   if (loginInProgress) return null
 
@@ -35,7 +33,7 @@ function LoginInfo() {
     return (
       <>
         <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-        <button onClick={() => window.location.reload()}>Login</button>
+        <button onClick={() => login()}>Login</button>
       </>
     )
   return (
