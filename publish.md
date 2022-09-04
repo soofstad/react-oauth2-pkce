@@ -2,10 +2,7 @@
 
 ```bash
 # Bump version in './src/package.json'
-git commit -m "foo"
+git commit -m "bump version"
 git tag v?.?.? -m "A Message"
 git push --tags
-cd src
-tsc
-npm publish
 ```
