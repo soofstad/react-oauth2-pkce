@@ -62,10 +62,11 @@ function LoginInfo(): JSX.Element {
           </div>
           <button onClick={() => logOut()}>Logout</button>
         </>
-      ) : (<>
-        <div>You are not logged in.</div>
-        <button onClick={()=>login()}>Login</button>
-      </>
+      ) : (
+        <>
+          <div>You are not logged in.</div>
+          <button onClick={() => login()}>Login</button>
+        </>
       )}
     </>
   )
