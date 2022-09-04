@@ -37,6 +37,7 @@ export interface IAuthProvider {
 export interface IAuthContext {
   token: string
   logOut: () => void
+  login: () => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
@@ -55,6 +56,7 @@ export type TAuthConfig = {
   preLogin?: () => void
   postLogin?: () => void
   decodeToken?: boolean
+  autoLogin?: boolean
   extraAuthParams?: { [key: string]: string | boolean | number }
 }
 
@@ -73,5 +75,6 @@ export type TInternalConfig = {
   preLogin?: () => void
   postLogin?: () => void
   decodeToken: boolean
+  autoLogin: boolean
   extraAuthParams?: { [key: string]: string | boolean | number }
 }

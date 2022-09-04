@@ -16,6 +16,7 @@ const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
+  login: () => null,
   logOut: () => null,
   error: null,
   loginInProgress: false,
@@ -39,11 +40,18 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   let interval: any
 
-  // Set default values and override from passed config
-  const { decodeToken = true, scope = '', preLogin = () => null, postLogin = () => null } = authConfig
+  // Set default values for internal config object
+  const {
+    autoLogin = true,
+    decodeToken = true,
+    scope = '',
+    preLogin = () => null,
+    postLogin = () => null,
+  } = authConfig
 
   const config: TInternalConfig = {
     ...authConfig,
+    autoLogin: autoLogin,
     decodeToken: decodeToken,
     scope: scope,
     preLogin: preLogin,
@@ -60,6 +68,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setIdToken(undefined)
     setTokenData(undefined)
     setLoginInProgress(false)
+  }
+  function login() {
+    setLoginInProgress(true)
+    logIn(config)
   }
 
   function handleTokenResponse(response: TTokenResponse) {
@@ -135,8 +147,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       }
     } else if (!token) {
       // First page visit
-      setLoginInProgress(true)
-      logIn(config)
+      if (config.autoLogin) logIn(config)
     } else {
       if (decodeToken) {
         try {
@@ -150,7 +161,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, []) // eslint-disable-line
 
   return (
-    <AuthContext.Provider value={{ tokenData, token, idToken, logOut, error, loginInProgress }}>
+    <AuthContext.Provider value={{ tokenData, token, idToken, login, logOut, error, loginInProgress }}>
       {children}
     </AuthContext.Provider>
   )

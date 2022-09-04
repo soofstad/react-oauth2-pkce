@@ -38,7 +38,14 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, logOut, error, loginInProgress } = useContext(AuthContext)
+  const { 
+    tokenData, 
+    token, 
+    login, 
+    logOut, 
+    error, 
+    loginInProgress 
+  } = useContext(AuthContext)
   
   // Stops the webpage from flickering while logging in
   if (loginInProgress) return null  
@@ -46,7 +53,9 @@ function LoginInfo() {
   if (error) {
     return (
       <>
-        <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
+        <div style={{ color: 'red' }}>
+          An error occurred during authentication: {error}
+        </div>
         <button onClick={() => logOut()}>Logout</button>
       </>
     )
@@ -54,8 +63,10 @@ function LoginInfo() {
   if (!token)
     return (
       <>
-        <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-        <button onClick={() => window.location.reload()}>Login</button>
+        <div style={{ backgroundColor: 'red' }}>
+          You are not logged in
+        </div>
+        <button onClick={() => login()}>Login</button>
       </>
     )
   return (
@@ -119,6 +130,9 @@ type TAuthConfig = {
   // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
   // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
   decodeToken?: boolean  // default: true
+  // By default, it will automatically redirect the user to the login server if not already logged in.
+  // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
+  autoLogin?: boolean  // default: true
   // Can be used to provide any non-standard parameters to the authorization request
   extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
 }
