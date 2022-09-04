@@ -15,7 +15,7 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo(): JSX.Element {
-  const { tokenData, token, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
+  const { tokenData, token, login, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
 
   if (error) {
     return (
@@ -62,8 +62,10 @@ function LoginInfo(): JSX.Element {
           </div>
           <button onClick={() => logOut()}>Logout</button>
         </>
-      ) : (
-        <div>You are not logged in. Refresh page to login.</div>
+      ) : (<>
+        <div>You are not logged in.</div>
+        <button onClick={()=>login()}>Login</button>
+      </>
       )}
     </>
   )

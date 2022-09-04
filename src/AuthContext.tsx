@@ -6,7 +6,7 @@ import {
   errorMessageForExpiredRefreshToken,
   fetchTokens,
   fetchWithRefreshToken,
-  logIn,
+  redirectToLogin,
 } from './authentication'
 import useLocalStorage from './Hooks'
 import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
@@ -69,9 +69,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setTokenData(undefined)
     setLoginInProgress(false)
   }
+
   function login() {
     setLoginInProgress(true)
-    logIn(config)
+    redirectToLogin(config)
   }
 
   function handleTokenResponse(response: TTokenResponse) {
@@ -103,13 +104,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             setError(error)
             if (errorMessageForExpiredRefreshToken(error)) {
               logOut()
-              logIn(config)
+              redirectToLogin(config)
             }
           })
       } else {
         // The refresh token has expired. Need to log in from scratch.
-        setLoginInProgress(true)
-        logIn(config)
+        login()
       }
     }
   }
@@ -147,7 +147,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       }
     } else if (!token) {
       // First page visit
-      if (config.autoLogin) logIn(config)
+      if (config.autoLogin) login()
     } else {
       if (decodeToken) {
         try {

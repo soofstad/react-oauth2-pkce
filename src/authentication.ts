@@ -13,7 +13,7 @@ const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
 export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ['AADSTS700084']
 
-export async function logIn(config: TInternalConfig) {
+export async function redirectToLogin(config: TInternalConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
   localStorage.setItem(codeVerifierStorageKey, codeVerifier)
