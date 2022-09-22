@@ -57,7 +57,10 @@ export type TAuthConfig = {
   postLogin?: () => void
   decodeToken?: boolean
   autoLogin?: boolean
+  // TODO: Remove in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }
+  extraAuthParameters?: { [key: string]: string | boolean | number }
+  extraTokenParameters?: { [key: string]: string | boolean | number }
 }
 
 export type TAzureADErrorResponse = {
@@ -76,5 +79,8 @@ export type TInternalConfig = {
   postLogin?: () => void
   decodeToken: boolean
   autoLogin: boolean
+  // TODO: Remove in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }
+  extraAuthParameters?: { [key: string]: string | boolean | number }
+  extraTokenParameters?: { [key: string]: string | boolean | number }
 }

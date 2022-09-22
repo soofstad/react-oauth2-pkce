@@ -12,7 +12,6 @@ const authConfig = {
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: true,
   scope: 'User.read',
-  // autoLogin: false,
 }
 
 function LoginInfo() {

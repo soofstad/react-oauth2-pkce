@@ -28,6 +28,7 @@ export async function redirectToLogin(config: TInternalConfig) {
       redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
+      ...config.extraAuthParameters,
     })
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
@@ -93,7 +94,9 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
+    // TODO: Remove in 2.0
     ...config.extraAuthParams,
+    ...config.extraTokenParameters,
   }
   return postWithXForm(config.tokenEndpoint, tokenRequest)
 }

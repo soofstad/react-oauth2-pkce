@@ -31,8 +31,8 @@ import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
 
 const authConfig: TAuthConfig = {
   clientId: 'myClientID',
-  authorizationEndpoint: 'myAuthEndpoint',
-  tokenEndpoint: 'myTokenEndpoint',
+  authorizationEndpoint: 'https://myAuthProvider.com/auth',
+  tokenEndpoint: 'https://myAuthProvider.com/token',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
 }
@@ -133,7 +133,11 @@ type TAuthConfig = {
   // By default, it will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
   autoLogin?: boolean  // default: true
-  // Can be used to provide any non-standard parameters to the authorization request
+  // Can be used to provide any non-standard parameters to the authentication request
+  extraAuthParameters?: { [key: string]: string | boolean | number }  // default: null
+  // Can be used to provide any non-standard parameters to the token request
+  extraTokenParameters?: { [key: string]: string | boolean | number } // default: null
+  // Superseded by 'extraTokenParameters' options. Will be deprecated in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
 }
 

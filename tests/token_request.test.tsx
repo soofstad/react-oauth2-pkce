@@ -50,6 +50,11 @@ const authConfig: TAuthConfig = {
     prompt: true,
     client_id: 'anotherClientId',
   },
+  extraTokenParameters: {
+    prompt: true,
+    client_id: 'anotherClientId',
+    testKey: 'test Value',
+  },
 }
 
 const AuthConsumer = () => {
@@ -57,7 +62,7 @@ const AuthConsumer = () => {
   return <div>{tokenData?.name}</div>
 }
 
-describe('make auth request with extra parameters', () => {
+describe('make token request with extra parameters', () => {
   const wrapper = ({ children }: any) => <AuthProvider authConfig={authConfig}>{children}</AuthProvider>
 
   // Setting up a state similar to what it would be just after redirect back from auth provider
@@ -72,13 +77,13 @@ describe('make auth request with extra parameters', () => {
     writable: true,
     value: location,
   })
-  it('calls the auth endpoint with these parameters', async () => {
+  it('calls the token endpoint with these parameters', async () => {
     await act(async () => {
       render(<AuthConsumer />, { wrapper })
     })
 
     expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
-      body: 'grant_type=authorization_code&code=1234&scope=someScope%20openid&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&code_verifier=arandomstring&prompt=true',
+      body: 'grant_type=authorization_code&code=1234&scope=someScope%20openid&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&code_verifier=arandomstring&prompt=true&testKey=test%20Value',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
