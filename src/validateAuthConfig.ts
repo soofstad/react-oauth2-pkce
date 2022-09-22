@@ -18,4 +18,14 @@ export function validateAuthConfig(config: TInternalConfig) {
     )
   if (stringIsUnset(config?.redirectUri))
     throw Error("'redirectUri' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
+  if (config?.extraAuthParams)
+    console.warn(
+      "The 'extraAuthParams' configuration parameter will be deprecated. You should use " +
+        "'extraTokenParameters' instead."
+    )
+  if (config?.extraAuthParams && config?.extraTokenParameters)
+    console.warn(
+      "Using both 'extraAuthParams' and 'extraTokenParameters' is not recommended. " +
+        "They do the same thing, and you should only use 'extraTokenParameters'"
+    )
 }
