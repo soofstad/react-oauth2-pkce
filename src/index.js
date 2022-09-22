@@ -7,11 +7,13 @@ const authConfig = {
   authorizationEndpoint:
     'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
-  redirectUri: 'http://localhost:3000/', // Example to redirect back to original path after login has completed
+  logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
+  redirectUri: 'http://localhost:3000/',
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: true,
   scope: 'User.read',
+  autoLogin: false,
 }
 
 function LoginInfo() {

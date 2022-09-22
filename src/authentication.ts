@@ -1,13 +1,13 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import {
   TInternalConfig,
-  TTokenData,
   TAzureADErrorResponse,
   TTokenResponse,
   TTokenRequest,
   TTokenRequestWithCodeAndVerifier,
   TTokenRequestForRefresh,
 } from './Types'
+import { postWithXForm } from './httpUtils'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 // [ AzureAD,]
@@ -41,24 +41,8 @@ function isTokenResponse(body: TAzureADErrorResponse | TTokenResponse): body is 
   return (body as TTokenResponse).access_token !== undefined
 }
 
-function buildUrlEncodedRequest(tokenRequest: TTokenRequest): string {
-  let queryString = ''
-  for (const [key, value] of Object.entries(tokenRequest)) {
-    queryString += (queryString ? '&' : '') + key + '=' + encodeURIComponent(value)
-  }
-  return queryString
-}
-
-function postWithXForm(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
-  return fetch(tokenEndpoint, {
-    method: 'POST',
-    body: buildUrlEncodedRequest(tokenRequest),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  }).then((response: Response) => {
-    if (!response.ok) {
-      console.error(response)
-      throw Error(response.statusText)
-    }
+function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
+  return postWithXForm(tokenEndpoint, tokenRequest).then((response) => {
     return response.json().then((body: TAzureADErrorResponse | TTokenResponse): TTokenResponse => {
       if (isTokenResponse(body)) {
         return body
@@ -98,7 +82,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     ...config.extraAuthParams,
     ...config.extraTokenParameters,
   }
-  return postWithXForm(config.tokenEndpoint, tokenRequest)
+  return postTokenRequest(config.tokenEndpoint, tokenRequest)
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -106,52 +90,26 @@ export const fetchWithRefreshToken = (props: {
   refreshToken: string
 }): Promise<TTokenResponse> => {
   const { config, refreshToken } = props
-  const tokenRequest: TTokenRequestForRefresh = {
+  const refreshRequest: TTokenRequestForRefresh = {
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
     scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
   }
-  return postWithXForm(config.tokenEndpoint, tokenRequest)
+  return postTokenRequest(config.tokenEndpoint, refreshRequest)
 }
 
-/**
- * Decodes the base64 encoded JWT. Returns a TToken.
- */
-export const decodeJWT = (token: string): TTokenData => {
-  try {
-    const base64Url = token.split('.')[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        })
-        .join('')
-    )
-    return JSON.parse(jsonPayload)
-  } catch (e) {
-    console.error(e)
-    throw Error(
-      'Failed to decode the access token.\n\tIs it a proper Java Web Token?\n\t' +
-        "You can disable JWT decoding by setting the 'decodeToken' value to 'false' the configuration."
-    )
-  }
-}
-
-// Returns epoch time (in seconds) for when the token will expire
-export const epochAtSecondsFromNow = (secondsFromNow: number) => Math.round(Date.now() / 1000 + secondsFromNow)
-
-/**
- * Check if the Access Token has expired.
- * Will return True if the token has expired, OR there is less than 5min until it expires.
- */
-export function epochTimeIsPast(timestamp: number): boolean {
-  const now = Math.round(Date.now()) / 1000
-  const nowWithBuffer = now + 120
-  return nowWithBuffer >= timestamp
+export function redirectToLogout(config: TInternalConfig, token: string) {
+  const params = new URLSearchParams({
+    token: token,
+    // TODO: Add config param for token type
+    token_type_hint: 'refresh_token',
+    client_id: config.clientId,
+    // TODO: Add extra logout params
+    post_logout_redirect_uri: config.redirectUri,
+  })
+  window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
 export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {

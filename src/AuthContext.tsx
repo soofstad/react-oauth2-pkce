@@ -1,16 +1,16 @@
 import React, { createContext, useEffect, useState } from 'react' // eslint-disable-line
 import {
-  decodeJWT,
-  epochAtSecondsFromNow,
-  epochTimeIsPast,
   errorMessageForExpiredRefreshToken,
   fetchTokens,
   fetchWithRefreshToken,
+  redirectToLogout,
   redirectToLogin,
 } from './authentication'
 import useLocalStorage from './Hooks'
 import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
+import { epochAtSecondsFromNow, epochTimeIsPast } from './timeUtils'
+import { decodeJWT } from './decodeJWT'
 
 const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
@@ -68,6 +68,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setIdToken(undefined)
     setTokenData(undefined)
     setLoginInProgress(false)
+    if (config?.logoutEndpoint && refreshToken) redirectToLogout(config, refreshToken)
   }
 
   function login() {
