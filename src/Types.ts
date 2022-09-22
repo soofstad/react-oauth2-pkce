@@ -6,13 +6,16 @@ interface TTokenRqBase {
   client_id: string
   redirect_uri: string
 }
+
 export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
   code: string
   code_verifier: string
 }
+
 export interface TTokenRequestForRefresh extends TTokenRqBase {
   refresh_token: string
 }
+
 export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh
 
 export type TTokenData = {
@@ -75,6 +78,7 @@ export type TInternalConfig = {
   tokenEndpoint: string
   redirectUri: string
   scope: string
+  logoutEndpoint?: string
   preLogin?: () => void
   postLogin?: () => void
   decodeToken: boolean

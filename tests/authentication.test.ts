@@ -1,4 +1,5 @@
-import { decodeJWT, epochAtSecondsFromNow, epochTimeIsPast } from '../src/authentication'
+import { decodeJWT } from '../src/decodeJWT'
+import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
 
 test('decode a JWT token', () => {
   const tokenData = decodeJWT(

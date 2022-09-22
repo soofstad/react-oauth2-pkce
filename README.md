@@ -110,10 +110,13 @@ import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
 
 ```typescript
 type TAuthConfig = {
-  // For required parameters, refer to the auth providers documentation
+  // Id of your app at the authentication provider
   clientId: string  // Required
+  // URL for the authentication endpoint at the authentication provider
   authorizationEndpoint: string  // Required
+  // URL for the token endpoint at the authentication provider
   tokenEndpoint: string  // Required
+  // Which URL the auth provider should redirect the user after loging out
   redirectUri: string  // Required
   scope?: string  // default: ''
   // Which URL to call for logging out of the auth provider
