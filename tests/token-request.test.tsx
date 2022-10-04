@@ -1,29 +1,8 @@
-/**
- * @jest-environment jsdom
- */
 import React, { useContext } from 'react'
 import { AuthProvider } from '../src/AuthContext'
 import { TAuthConfig, TTokenResponse } from '../src/Types'
-import { act, render } from '@testing-library/react'
-import { TextDecoder, TextEncoder } from 'util'
-import crypto from 'crypto'
+import { act, render, waitFor } from '@testing-library/react'
 import { AuthContext } from '../src'
-
-global.TextEncoder = TextEncoder
-// @ts-ignore
-global.TextDecoder = TextDecoder
-
-// @ts-ignore
-delete window.location
-// @ts-ignore
-window.location = { replace: jest.fn() }
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    subtle: crypto.webcrypto.subtle,
-    getRandomValues: crypto.webcrypto.getRandomValues,
-  },
-})
 
 // @ts-ignore
 global.fetch = jest.fn(() =>
@@ -69,25 +48,22 @@ describe('make token request with extra parameters', () => {
   localStorage.setItem('ROCP_loginInProgress', 'true')
   localStorage.setItem('PKCE_code_verifier', 'arandomstring')
 
-  const location = {
-    ...window.location,
-    search: '?code=1234',
-  }
-  Object.defineProperty(window, 'location', {
-    writable: true,
-    value: location,
-  })
   it('calls the token endpoint with these parameters', async () => {
+    // Have been redirected back with a code in query params
+    window.location.search = '?code=1234'
+
     await act(async () => {
       render(<AuthConsumer />, { wrapper })
     })
 
-    expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
-      body: 'grant_type=authorization_code&code=1234&scope=someScope%20openid&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&code_verifier=arandomstring&prompt=true&testKey=test%20Value',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method: 'POST',
-    })
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
+        body: 'grant_type=authorization_code&code=1234&scope=someScope%20openid&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&code_verifier=arandomstring&prompt=true&testKey=test%20Value',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+      })
+    )
   })
 })

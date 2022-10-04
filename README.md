@@ -22,6 +22,60 @@ Long version;
 - Decodes JWT's
 - A total of ~440 lines of code, easy for anyone to audit and understand
 
+## Install
+
+The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
+
+```bash
+npm install react-oauth2-code-pkce
+```
+
+and import
+
+```javascript
+import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+```
+
+## All configuration parameters
+
+```typescript
+type TAuthConfig = {
+  // Id of your app at the authentication provider
+  clientId: string  // Required
+  // URL for the authentication endpoint at the authentication provider
+  authorizationEndpoint: string  // Required
+  // URL for the token endpoint at the authentication provider
+  tokenEndpoint: string  // Required
+  // Which URL the auth provider should redirect the user after loging out
+  redirectUri: string  // Required
+  scope?: string  // default: ''
+  // Which URL to call for logging out of the auth provider
+  logoutEndpoint?: string  // default: null
+  // Should be used by the auth provider to decide which URL to redirect
+  // the user to after logout
+  logoutRedirect?: string  // default: null
+  // Optionally provide a callback function to run _before_ the
+  // user is redirected to the auth server for login
+  preLogin?: () => void  // default: () => null
+  // Optionally provide a callback function to run _after_ the
+  // user has been redirected back from the auth server
+  postLogin?: () => void  // default: () => null
+  // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
+  // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
+  decodeToken?: boolean  // default: true
+  // By default, it will automatically redirect the user to the login server if not already logged in.
+  // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
+  autoLogin?: boolean  // default: true
+  // Can be used to provide any non-standard parameters to the authentication request
+  extraAuthParameters?: { [key: string]: string | boolean | number }  // default: null
+  // Can be used to provide any non-standard parameters to the token request
+  extraTokenParameters?: { [key: string]: string | boolean | number } // default: null
+  // Superseded by 'extraTokenParameters' options. Will be deprecated in 2.0
+  extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
+}
+
+```
+
 ## Example
 
 ```javascript
@@ -92,59 +146,7 @@ ReactDOM.render(
 )
 ```
 
-## Install
-
-The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
-
-```bash
-npm install react-oauth2-code-pkce
-```
-
-and import
-
-```javascript
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
-```
-
-## All configuration parameters
-
-```typescript
-type TAuthConfig = {
-  // Id of your app at the authentication provider
-  clientId: string  // Required
-  // URL for the authentication endpoint at the authentication provider
-  authorizationEndpoint: string  // Required
-  // URL for the token endpoint at the authentication provider
-  tokenEndpoint: string  // Required
-  // Which URL the auth provider should redirect the user after loging out
-  redirectUri: string  // Required
-  scope?: string  // default: ''
-  // Which URL to call for logging out of the auth provider
-  logoutEndpoint?: string  // default: null
-  // Should be used by the auth provider to decide which URL to redirect
-  // the user to after logout
-  logoutRedirect?: string  // default: null
-  // Optionally provide a callback function to run _before_ the
-  // user is redirected to the auth server for login
-  preLogin?: () => void  // default: () => null
-  // Optionally provide a callback function to run _after_ the
-  // user has been redirected back from the auth server
-  postLogin?: () => void  // default: () => null
-  // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
-  // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
-  decodeToken?: boolean  // default: true
-  // By default, it will automatically redirect the user to the login server if not already logged in.
-  // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
-  autoLogin?: boolean  // default: true
-  // Can be used to provide any non-standard parameters to the authentication request
-  extraAuthParameters?: { [key: string]: string | boolean | number }  // default: null
-  // Can be used to provide any non-standard parameters to the token request
-  extraTokenParameters?: { [key: string]: string | boolean | number } // default: null
-  // Superseded by 'extraTokenParameters' options. Will be deprecated in 2.0
-  extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
-}
-
-```
+For more examples for different auth providers, see `./examples/`
 
 ## Develop
 
