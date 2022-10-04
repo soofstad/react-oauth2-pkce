@@ -9,7 +9,8 @@
   "scripts": {
     "start": "ESLINT_NO_DEV_ERRORS='true' react-scripts start ./src/index.js",
     "build": "react-scripts build",
-    "test": "jest"
+    "test": "jest --silent",
+    "test:watch": "jest --silent --watch"
   },
   "devDependencies": {
     "@testing-library/react": "^13.3.0",
@@ -19,10 +20,10 @@
     "eslint-config-prettier": ">=8.5.0",
     "eslint-config-react-app": ">=7.0.1",
     "eslint-plugin-prettier": ">=4.2.1",
-    "jest": "^28",
-    "jest-environment-jsdom": "^29.0.1",
+    "jest": "^27.5.1",
+    "jest-environment-jsdom": "^27.5.1",
     "prettier": ">=2.7.1",
-    "ts-jest": ">=27.1.4",
+    "ts-jest": "^27.1.4",
     "typescript": ">=4.6.4"
   },
   "browserslist": {

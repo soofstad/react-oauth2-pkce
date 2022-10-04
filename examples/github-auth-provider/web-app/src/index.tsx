@@ -6,12 +6,14 @@ import { AuthContext, AuthProvider, TAuthConfig, IAuthContext } from 'react-oaut
 const authConfig: TAuthConfig = {
   clientId: 'c43524cc7d3c82b05a47',
   authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+  logoutEndpoint: 'https://github.com/login/oauth/logout',
   tokenEndpoint: 'http://localhost:5000/api/token',
   redirectUri: 'http://localhost:3000/',
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: false,
+  autoLogin: false,
 }
 
 function LoginInfo(): JSX.Element {

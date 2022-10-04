@@ -1,11 +1,11 @@
 node_modules
 .venv
-/src/dist/
+dist
 .idea
 log.txt
-/yarn.lock
 /src/react-app-env.d.ts
-/src/yarn.lock
 .env
 __pycache__
-/examples/microsoft-auth-provider/web-app/yarn.lock
+yarn.lock
+package-lock.json
+yarn-error.log

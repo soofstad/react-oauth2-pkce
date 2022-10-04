@@ -14,10 +14,11 @@ const authConfig: TAuthConfig = {
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   decodeToken: true,
   scope: 'User.read',
+  autoLogin: false,
 }
 
 function LoginInfo(): JSX.Element {
-  const { tokenData, token, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
+  const { tokenData, token, logOut, idToken, error, login }: IAuthContext = useContext(AuthContext)
 
   if (error) {
     return (
@@ -31,9 +32,35 @@ function LoginInfo(): JSX.Element {
   return (
     <>
       {token ? (
-        <>
-          <div>
-            <h4>Access Token (JWT)</h4>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            color: 'lightgrey',
+            fontFamily: 'sans-serif',
+          }}
+        >
+          <div
+            style={{
+              padding: '10px',
+              margin: '10px',
+              border: '1px solid white',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <p>Welcome, John Doe!</p>
+
+            <button style={{ width: '100px' }} onClick={() => logOut()}>
+              Logout
+            </button>
+
+            <p>Use this token to authenticate yourself</p>
             <pre
               style={{
                 width: '400px',
@@ -47,25 +74,37 @@ function LoginInfo(): JSX.Element {
               {token}
             </pre>
           </div>
-          <div>
-            <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
-            <pre
-              style={{
-                width: '400px',
-                margin: '10px',
-                padding: '5px',
-                border: 'black 2px solid',
-                wordBreak: 'break-all',
-                whiteSpace: 'break-spaces',
-              }}
-            >
-              {JSON.stringify(tokenData, null, 2)}
-            </pre>
-          </div>
-          <button onClick={() => logOut()}>Logout</button>
-        </>
+        </div>
       ) : (
-        <div>You are not logged in. Refresh page to login.</div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            color: 'lightgrey',
+            fontFamily: 'sans-serif',
+          }}
+        >
+          <div
+            style={{
+              padding: '10px',
+              margin: '10px',
+              border: '1px solid white',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <p>Please login to continue</p>
+
+            <button style={{ width: '100px' }} onClick={() => login()}>
+              Login
+            </button>
+          </div>
+        </div>
       )}
     </>
   )
@@ -73,18 +112,19 @@ function LoginInfo(): JSX.Element {
 
 ReactDOM.render(
   <div>
-    <div>
-      <h1>Demo using the 'react-oauth2-code-pkce' package</h1>
-      <p>
-        Github:{' '}
-        <a href="https://github.com/soofstad/react-oauth2-pkce">https://github.com/soofstad/react-oauth2-pkce</a>
-      </p>
-      <p>
-        NPM:{' '}
-        <a href="https://www.npmjs.com/package/react-oauth2-code-pkce">
-          https://www.npmjs.com/package/react-oauth2-code-pkce
-        </a>
-      </p>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        color: 'lightgrey',
+        fontFamily: 'sans-serif',
+      }}
+    >
+      <h1 style={{ paddingRight: '5px' }}>Demo using</h1>
+      <h1 style={{ fontFamily: 'monospace' }}> react-oauth2-code-pkce</h1>
     </div>
     <AuthProvider authConfig={authConfig}>
       {/* @ts-ignore*/}
