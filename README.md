@@ -1,10 +1,10 @@
-# react-oauth2-pkce &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/soofstad/react-oauth2-pkce/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/react-oauth2-code-pkce)](https://www.npmjs.com/package/react-oauth2-code-pkce) ![CI](https://github.com/soofstad/react-oauth2-pkce/actions/workflows/tests.yaml/badge.svg)
+# react-oauth2-code-pkce &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/soofstad/react-oauth2-pkce/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/react-oauth2-code-pkce)](https://www.npmjs.com/package/react-oauth2-code-pkce) ![CI](https://github.com/soofstad/react-oauth2-pkce/actions/workflows/tests.yaml/badge.svg)
 
-Plug-and-play react package for OAuth2 Authorization Code flow with PKCE
+React package for OAuth2 Authorization Code flow with PKCE
 
 Adhering to the RFCs recommendations, cryptographically sound, and with __zero__ dependencies!  
 
-## What is OAuth2 Authorization Code flow with Proof Key for Code Exchange (PKCE)?
+## What is OAuth2 Authorization Code Flow with Proof Key for Code Exchange?
 
 Short version;  
 The modern and secure way to do authentication for mobile and web applications!
@@ -22,6 +22,39 @@ Long version;
 - Decodes JWT's
 - A total of ~440 lines of code, easy for anyone to audit and understand
 
+## Example
+
+```tsx
+import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
+
+const authConfig: TAuthConfig = {
+  clientId: 'myClientID',
+  authorizationEndpoint: 'https://myAuthProvider.com/auth',
+  tokenEndpoint: 'https://myAuthProvider.com/token',
+  redirectUri: 'http://localhost:3000/',
+  scope: 'someScope openid',
+}
+
+const UserInfo = (): JSX.Element => {
+    const {token, tokenData} = useContext<IAuthContext>(AuthContext)
+
+    return <>
+        <h4>Access Token</h4>
+        <pre>{token}</pre>
+        <h4>User Information from JWT</h4>
+        <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+    </>
+}
+
+ReactDOM.render(<AuthProvider authConfig={authConfig}>
+        <UserInfo/>
+    </AuthProvider>
+    , document.getElementById('root'),
+)
+```
+
+For more advanced examples, see `./examples/`
+
 ## Install
 
 The package is available on npmjs.com here; https://www.npmjs.com/package/react-oauth2-code-pkce
@@ -30,13 +63,32 @@ The package is available on npmjs.com here; https://www.npmjs.com/package/react-
 npm install react-oauth2-code-pkce
 ```
 
-and import
+## IAuthContext values
 
-```javascript
-import { AuthContext, AuthProvider } from "react-oauth2-code-pkce"
+The `IAuthContext` interface that the `AuthContext` returns when called with `useContext()` provides these values;
+
+```typescript
+interface IAuthContext {
+  // The access token. This is what you will use for authentication against protected API's
+  token: string
+  // An object with all the properties encoded in the token (username, email, etc)
+  tokenData?: TTokenData
+  // Login the user
+  login: () => void  
+  // Logout the user from the auth provider
+  logOut: () => void
+  // Keep any errors that occured during login or token fetching/refreshing. 
+  error: string | null
+  // The idToken, if also that was returned along with the access token
+  idToken?: string
+  // If the <AuthProvider> is done fetching tokens or not. Usefull for controlling page rendering
+  loginInProgress: boolean
+}
 ```
 
 ## All configuration parameters
+
+The `<AuthProvider>` takes a `config` object that supports these parameters;
 
 ```typescript
 type TAuthConfig = {
@@ -75,78 +127,6 @@ type TAuthConfig = {
 }
 
 ```
-
-## Example
-
-```javascript
-import React, { useContext } from 'react'
-import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
-
-const authConfig: TAuthConfig = {
-  clientId: 'myClientID',
-  authorizationEndpoint: 'https://myAuthProvider.com/auth',
-  tokenEndpoint: 'https://myAuthProvider.com/token',
-  redirectUri: 'http://localhost:3000/',
-  scope: 'someScope openid',
-}
-
-function LoginInfo() {
-  const { 
-    tokenData, 
-    token, 
-    login, 
-    logOut, 
-    error, 
-    loginInProgress 
-  } = useContext(AuthContext)
-  
-  // Stops the webpage from flickering while logging in
-  if (loginInProgress) return null  
-  
-  if (error) {
-    return (
-      <>
-        <div style={{ color: 'red' }}>
-          An error occurred during authentication: {error}
-        </div>
-        <button onClick={() => logOut()}>Logout</button>
-      </>
-    )
-  }
-  if (!token)
-    return (
-      <>
-        <div style={{ backgroundColor: 'red' }}>
-          You are not logged in
-        </div>
-        <button onClick={() => login()}>Login</button>
-      </>
-    )
-  return (
-    <>
-      <div>
-        <h4>Access Token (JWT)</h4>
-        <pre>{token}</pre>
-      </div>
-      <div>
-        <h4>Login Information from Access Token (Base64 decoded JWT)</h4>
-        <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-      </div>
-    </> 
-  )
-}
-
-ReactDOM.render(
-    <div>
-      <AuthProvider authConfig={authConfig}>
-        <LoginInfo/>
-      </AuthProvider>
-    </div>, document.getElementById('root'),
-)
-```
-
-For more examples for different auth providers, see `./examples/`
 
 ## Develop
 
