@@ -18,6 +18,7 @@ Long version;
 - Authorization provider-agnostic. Works equally well with all OAuth2 authentication servers following the OAuth2 spec
 - Supports OpenID Connect (idTokens)
 - Pre- and Post-login callbacks
+- Session expired callback
 - Silently refreshes short-lived access tokens in the background
 - Decodes JWT's
 - A total of ~440 lines of code, easy for anyone to audit and understand
@@ -112,6 +113,9 @@ type TAuthConfig = {
   // Optionally provide a callback function to run _after_ the
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
+  // Optional callback function for the 'refreshTokenExpired' event.
+  // You likely want to display a message saying the user need to login again
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined
   // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
   // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
   decodeToken?: boolean  // default: true
