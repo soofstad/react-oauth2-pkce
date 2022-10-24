@@ -58,12 +58,17 @@ export type TAuthConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
   // TODO: Remove in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }
   extraAuthParameters?: { [key: string]: string | boolean | number }
   extraTokenParameters?: { [key: string]: string | boolean | number }
+}
+
+export type TRefreshTokenExpiredEvent = {
+  login: () => void
 }
 
 export type TAzureADErrorResponse = {
@@ -81,6 +86,7 @@ export type TInternalConfig = {
   logoutEndpoint?: string
   preLogin?: () => void
   postLogin?: () => void
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken: boolean
   autoLogin: boolean
   // TODO: Remove in 2.0

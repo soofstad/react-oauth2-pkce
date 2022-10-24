@@ -7,7 +7,14 @@ import {
   redirectToLogin,
 } from './authentication'
 import useLocalStorage from './Hooks'
-import { IAuthContext, IAuthProvider, TInternalConfig, TTokenData, TTokenResponse } from './Types'
+import {
+  IAuthContext,
+  IAuthProvider,
+  TRefreshTokenExpiredEvent,
+  TInternalConfig,
+  TTokenData,
+  TTokenResponse,
+} from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
 import { epochAtSecondsFromNow, epochTimeIsPast } from './timeUtils'
 import { decodeJWT } from './decodeJWT'
@@ -47,6 +54,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     scope = '',
     preLogin = () => null,
     postLogin = () => null,
+    onRefreshTokenExpire = undefined,
   } = authConfig
 
   const config: TInternalConfig = {
@@ -56,11 +64,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     scope: scope,
     preLogin: preLogin,
     postLogin: postLogin,
+    onRefreshTokenExpire: onRefreshTokenExpire,
   }
 
   validateAuthConfig(config)
 
-  function logOut() {
+  function clearStorage() {
     setRefreshToken(undefined)
     setToken('')
     setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
@@ -68,6 +77,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setIdToken(undefined)
     setTokenData(undefined)
     setLoginInProgress(false)
+  }
+
+  function logOut() {
+    clearStorage()
     if (config?.logoutEndpoint && refreshToken) redirectToLogout(config, refreshToken)
   }
 
@@ -96,7 +109,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
   }
 
-  function refreshAccessToken() {
+  function refreshAccessToken(initial = false) {
     if (token && epochTimeIsPast(tokenExpire)) {
       if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
@@ -109,8 +122,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             }
           })
       } else {
-        // The refresh token has expired. Need to log in from scratch.
-        login()
+        if (initial) return login()
+
+        if (onRefreshTokenExpire) onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
+        else login() // TODO Breaking change - remove automatic login during ongoing session
       }
     }
   }
@@ -157,7 +172,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           setError((e as Error).message)
         }
       }
-      refreshAccessToken() // Check if token should be updated
+      refreshAccessToken(true) // Check if token should be updated
     }
   }, []) // eslint-disable-line
 
