@@ -26,7 +26,7 @@ function LoginInfo() {
     return (
       <>
         <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
-        <button onClick={() => logOut()}>Logout</button>
+        <button onClick={logOut}>Logout</button>
       </>
     )
   }
@@ -35,13 +35,13 @@ function LoginInfo() {
     return (
       <>
         <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-        <button onClick={() => login()}>Login</button>
+        <button onClick={login}>Login</button>
       </>
     )
   return (
     <>
       <div>
-        <button onClick={() => logOut()}>Logout</button>
+        <button onClick={logOut}>Logout</button>
         <h4>Access Token (JWT)</h4>
         <pre
           style={{
