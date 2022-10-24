@@ -11,6 +11,7 @@ const authConfig = {
   redirectUri: 'http://localhost:3000/',
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
+  onRefreshTokenExpire: (event) => window.confirm('Tokens have expired. Log in?') && event.login(),
   decodeToken: true,
   scope: 'User.read',
   autoLogin: false,
