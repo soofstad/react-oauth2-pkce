@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -19,6 +19,16 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
       console.log(`Failed to store value '${value}' for key '${key}'`)
     }
   }
+
+  useEffect(() => {
+    const storageEventHandler = (event: StorageEvent) => {
+      if (event.storageArea === localStorage && event.key === key) {
+        setStoredValue(JSON.parse(event.newValue ?? '') as T)
+      }
+    }
+    window.addEventListener('storage', storageEventHandler, false)
+    return () => window.removeEventListener('storage', storageEventHandler, false)
+  })
 
   return [storedValue, setValue]
 }
