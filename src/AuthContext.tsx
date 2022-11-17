@@ -92,10 +92,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
     setRefreshToken(response.refresh_token)
-    setTokenExpire(epochAtSecondsFromNow(response.expires_in || FALLBACK_EXPIRE_TIME))
+    setTokenExpire(epochAtSecondsFromNow(response.expires_in ?? FALLBACK_EXPIRE_TIME))
     // If there is no refresh_token_expire, use access_token_expire + 10min.
     // If no access_token_expire, assume double the fallback expire time
-    let refreshTokenExpire = response.refresh_token_expires_in || 2 * FALLBACK_EXPIRE_TIME
+    let refreshTokenExpire = response.refresh_token_expires_in ?? 2 * FALLBACK_EXPIRE_TIME
     if (!response.refresh_token_expires_in && response.expires_in) {
       refreshTokenExpire = response.expires_in + FALLBACK_EXPIRE_TIME
     }
@@ -109,16 +109,17 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
   }
 
-  function refreshAccessToken(initial = false) {
+  function refreshAccessToken(initial = false): void {
     if (token && epochTimeIsPast(tokenExpire)) {
       if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
           .then((result: TTokenResponse) => handleTokenResponse(result))
-          .catch((error: string) => {
-            setError(error)
-            if (errorMessageForExpiredRefreshToken(error)) {
-              logOut()
-              redirectToLogin(config)
+          .catch((error: Error) => {
+            console.error(error)
+            setError(error.message)
+            if (initial) login() // If the attempt to get a new token failed during page load, do a full login.
+            if (errorMessageForExpiredRefreshToken(error.message)) {
+              if (onRefreshTokenExpire) onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
             }
           })
       } else {

@@ -1,0 +1,5 @@
+# Each line is a file pattern followed by one or more owners.
+# Order matter. If two rules match the same file, only the last one is used
+
+# Repo owners
+*      @soofstad

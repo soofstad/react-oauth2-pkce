@@ -7,7 +7,7 @@
     "react-scripts": ">=5.0.1"
   },
   "scripts": {
-    "start": "ESLINT_NO_DEV_ERRORS='true' react-scripts start ./src/index.js",
+    "start": "ESLINT_NO_DEV_ERRORS='true' react-scripts start",
     "build": "react-scripts build",
     "test": "jest --silent",
     "test:watch": "jest --silent --watch"
