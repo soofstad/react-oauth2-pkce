@@ -6,11 +6,9 @@ const authConfig = {
   clientId: '6559ce69-219d-4e82-b6ed-889a861c7c94',
   authorizationEndpoint:
     'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
-  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
-  logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
-  redirectUri: 'http://localhost:3000/',
-  preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
-  postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
+  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token', // logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
+  redirectUri: 'http://localhost:3000/', // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
+  // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   onRefreshTokenExpire: (event) => window.confirm('Tokens have expired. Log in?') && event.login(),
   decodeToken: true,
   scope: 'User.read',
@@ -22,43 +20,13 @@ function LoginInfo() {
 
   if (loginInProgress) return null
 
-  if (error) {
-    return (
-      <>
-        <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
-        <button onClick={logOut}>Logout</button>
-      </>
-    )
-  }
-
-  if (!token)
-    return (
-      <>
-        <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-        <button onClick={login}>Login</button>
-      </>
-    )
   return (
     <>
-      <div>
-        <button onClick={logOut}>Logout</button>
-        <h4>Access Token (JWT)</h4>
-        <pre
-          style={{
-            width: '400px',
-            margin: '10px',
-            padding: '5px',
-            border: 'black 2px solid',
-            wordBreak: 'break-all',
-            whiteSpace: 'break-spaces',
-          }}
-        >
-          {token}
-        </pre>
-      </div>
-      {authConfig.decodeToken && (
-        <div>
-          <h4>Login Information from Access Token and IdToken (if any)</h4>
+      {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
+      {token ? (
+        <>
+          <button onClick={logOut}>Logout</button>
+          <h4>Access Token (JWT)</h4>
           <pre
             style={{
               width: '400px',
@@ -69,9 +37,31 @@ function LoginInfo() {
               whiteSpace: 'break-spaces',
             }}
           >
-            {JSON.stringify(tokenData, null, 2)}
+            {token}
           </pre>
-        </div>
+          {authConfig.decodeToken && (
+            <div>
+              <h4>Login Information from Access Token and IdToken (if any)</h4>
+              <pre
+                style={{
+                  width: '400px',
+                  margin: '10px',
+                  padding: '5px',
+                  border: 'black 2px solid',
+                  wordBreak: 'break-all',
+                  whiteSpace: 'break-spaces',
+                }}
+              >
+                {JSON.stringify(tokenData, null, 2)}
+              </pre>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
+          <button onClick={login}>Login</button>
+        </>
       )}
     </>
   )
