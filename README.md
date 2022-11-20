@@ -54,7 +54,9 @@ ReactDOM.render(<AuthProvider authConfig={authConfig}>
 )
 ```
 
-For more advanced examples, see `./examples/`
+For more advanced examples, see `./examples/`.  
+For instance, it's recommended to add a "Session expired"-callback like so:  
+`onRefreshTokenExpire: (event) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),`
 
 ## Install
 
@@ -72,15 +74,15 @@ The `IAuthContext` interface that the `AuthContext` returns when called with `us
 interface IAuthContext {
   // The access token. This is what you will use for authentication against protected API's
   token: string
-  // An object with all the properties encoded in the token (username, email, etc)
+  // An object with all the properties encoded in the token (username, email, etc.)
   tokenData?: TTokenData
   // Login the user
   login: () => void  
   // Logout the user from the auth provider
   logOut: () => void
-  // Keep any errors that occured during login or token fetching/refreshing. 
+  // Keeps any errors that occured during login or token fetching/refreshing. 
   error: string | null
-  // The idToken, if also that was returned along with the access token
+  // The idToken, if it was returned along with the access token
   idToken?: string
   // If the <AuthProvider> is done fetching tokens or not. Usefull for controlling page rendering
   loginInProgress: boolean
@@ -101,6 +103,7 @@ type TAuthConfig = {
   tokenEndpoint: string  // Required
   // Which URL the auth provider should redirect the user after loging out
   redirectUri: string  // Required
+  // Which scopes to request for the auth token
   scope?: string  // default: ''
   // Which URL to call for logging out of the auth provider
   logoutEndpoint?: string  // default: null
@@ -114,12 +117,12 @@ type TAuthConfig = {
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
   // Optional callback function for the 'refreshTokenExpired' event.
-  // You likely want to display a message saying the user need to login again
+  // You likely want to display a message saying the user need to login again. A page refresh is enough.
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined
   // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
   // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
   decodeToken?: boolean  // default: true
-  // By default, it will automatically redirect the user to the login server if not already logged in.
+  // By default, the package will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
   autoLogin?: boolean  // default: true
   // Can be used to provide any non-standard parameters to the authentication request

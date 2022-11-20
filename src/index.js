@@ -9,7 +9,8 @@ const authConfig = {
   tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token', // logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
   redirectUri: 'http://localhost:3000/', // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
-  onRefreshTokenExpire: (event) => window.confirm('Tokens have expired. Log in?') && event.login(),
+  onRefreshTokenExpire: (event) =>
+    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
   decodeToken: true,
   scope: 'User.read',
   autoLogin: false,

@@ -9,6 +9,8 @@ const authConfig: TAuthConfig = {
     'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
   tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
   redirectUri: 'http://localhost:3000/',
+  onRefreshTokenExpire: (event) =>
+    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
