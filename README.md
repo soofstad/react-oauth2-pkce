@@ -56,7 +56,7 @@ ReactDOM.render(<AuthProvider authConfig={authConfig}>
 
 For more advanced examples, see `./examples/`.  
 For instance, it's recommended to add a "Session expired"-callback like so:  
-`onRefreshTokenExpire: (event) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),`
+`onRefreshTokenExpire: (event) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),`.
 
 ## Install
 
@@ -134,6 +134,19 @@ type TAuthConfig = {
 }
 
 ```
+
+## Known issues
+
+### The page randomly refreshes in the middle of a session
+
+This will happen if you haven't provided a callback-function for the `onRefreshTokenExpire` config parameter, and the refresh token expires.
+You probably want to implement some kind of "alert/message/banner", saying that the session has expired and that the user needs to login again.
+Either by refreshing the page, or clicking a "Login-button".
+
+### After redirect back from auth provider with `?code`, no token request is made
+
+If you are using libraries that intercept any `fetch()`-requests made. For example `@tanstack/react-query`. That can cause
+issues for the _AuthProviders_ token fetching. This can be solved by _not_ wrapping the `<AuthProvider>` in any such library.
 
 ## Develop
 
