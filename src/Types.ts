@@ -84,6 +84,7 @@ export type TInternalConfig = {
   redirectUri: string
   scope: string
   logoutEndpoint?: string
+  logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
