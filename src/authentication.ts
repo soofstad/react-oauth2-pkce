@@ -1,7 +1,6 @@
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import {
   TInternalConfig,
-  TAzureADErrorResponse,
   TTokenResponse,
   TTokenRequest,
   TTokenRequestWithCodeAndVerifier,
@@ -10,8 +9,6 @@ import {
 import { postWithXForm } from './httpUtils'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
-// [ AzureAD,]
-export const EXPIRED_REFRESH_TOKEN_ERROR_CODES = ['AADSTS700084']
 
 export async function redirectToLogin(config: TInternalConfig) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
@@ -37,18 +34,17 @@ export async function redirectToLogin(config: TInternalConfig) {
 }
 
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
-function isTokenResponse(body: TAzureADErrorResponse | TTokenResponse): body is TTokenResponse {
+function isTokenResponse(body: any | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
 }
 
 function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
   return postWithXForm(tokenEndpoint, tokenRequest).then((response) => {
-    return response.json().then((body: TAzureADErrorResponse | TTokenResponse): TTokenResponse => {
+    return response.json().then((body: TTokenResponse | any): TTokenResponse => {
       if (isTokenResponse(body)) {
         return body
       } else {
-        console.error(body)
-        throw Error(body.error_description)
+        throw Error(body)
       }
     })
   })
@@ -110,14 +106,4 @@ export function redirectToLogout(config: TInternalConfig, token: string) {
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
   })
   window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
-}
-
-export const errorMessageForExpiredRefreshToken = (errorMessage: string): boolean => {
-  let expired = false
-  EXPIRED_REFRESH_TOKEN_ERROR_CODES.forEach((errorCode: string) => {
-    if (errorMessage.includes(errorCode)) {
-      expired = true
-    }
-  })
-  return expired
 }

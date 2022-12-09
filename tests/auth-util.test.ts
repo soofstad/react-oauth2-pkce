@@ -1,5 +1,27 @@
 import { decodeJWT } from '../src/decodeJWT'
 import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
+import { TInternalConfig } from '../src/Types'
+import { fetchWithRefreshToken } from '../src/authentication'
+import { FetchError } from '../src/errors'
+
+const authConfig: TInternalConfig = {
+  autoLogin: false,
+  decodeToken: false,
+  clientId: 'myClientID',
+  authorizationEndpoint: 'myAuthEndpoint',
+  tokenEndpoint: 'myTokenEndpoint',
+  redirectUri: 'http://localhost:3000/',
+  scope: 'someScope openid',
+  extraAuthParams: {
+    prompt: true,
+    client_id: 'anotherClientId',
+  },
+  extraTokenParameters: {
+    prompt: true,
+    client_id: 'anotherClientId',
+    testKey: 'test Value',
+  },
+}
 
 test('decode a JWT token', () => {
   const tokenData = decodeJWT(
@@ -31,4 +53,24 @@ test('check if still valid token outside buffer has expired', () => {
   const willExpireAt = epochAtSecondsFromNow(301) // Will expire in 5min
   const hasExpired = epochTimeIsPast(willExpireAt)
   expect(hasExpired).toBe(false)
+})
+
+test('failed refresh fetch raises FetchError', () => {
+  // @ts-ignore
+  global.fetch = jest.fn(() =>
+    Promise.resolve<any>({
+      ok: false,
+      status: 400,
+      statusText: 'Bad request',
+      text: async () => 'Failed to refresh token error body',
+    })
+  )
+  fetchWithRefreshToken({ config: authConfig, refreshToken: '' }).catch((error: unknown) => {
+    if (error instanceof FetchError) {
+      expect(error.status).toBe(400)
+      expect(error.message).toBe('Failed to refresh token error body')
+    } else {
+      throw new Error('This is the wrong error type')
+    }
+  })
 })

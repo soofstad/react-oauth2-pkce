@@ -71,11 +71,6 @@ export type TRefreshTokenExpiredEvent = {
   login: () => void
 }
 
-export type TAzureADErrorResponse = {
-  error_description: string
-  [k: string]: unknown
-}
-
 // The AuthProviders internal config type. All values will be set by user provided, or default values
 export type TInternalConfig = {
   clientId: string
