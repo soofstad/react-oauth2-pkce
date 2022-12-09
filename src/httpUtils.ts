@@ -1,4 +1,5 @@
 import { TTokenRequest } from './Types'
+import { FetchError } from './errors'
 
 function buildUrlEncodedRequest(request: TTokenRequest): string {
   let queryString = ''
@@ -8,15 +9,15 @@ function buildUrlEncodedRequest(request: TTokenRequest): string {
   return queryString
 }
 
-export function postWithXForm(url: string, request: TTokenRequest): Promise<Response> {
+export async function postWithXForm(url: string, request: TTokenRequest): Promise<Response> {
   return fetch(url, {
     method: 'POST',
     body: buildUrlEncodedRequest(request),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  }).then((response: Response) => {
+  }).then(async (response: Response) => {
     if (!response.ok) {
-      console.error(response)
-      throw Error(response.statusText)
+      const responseBody = await response.text()
+      throw new FetchError(response.status, response.statusText, responseBody)
     }
     return response
   })

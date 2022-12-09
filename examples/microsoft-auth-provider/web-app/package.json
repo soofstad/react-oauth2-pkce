@@ -4,7 +4,7 @@
   "dependencies": {
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-oauth2-code-pkce": ">=1.8.1",
+    "react-oauth2-code-pkce": ">=1.8.2",
     "react-scripts": "^5.0.1"
   },
   "scripts": {

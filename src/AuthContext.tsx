@@ -1,23 +1,18 @@
 import React, { createContext, useEffect, useState } from 'react' // eslint-disable-line
-import {
-  errorMessageForExpiredRefreshToken,
-  fetchTokens,
-  fetchWithRefreshToken,
-  redirectToLogout,
-  redirectToLogin,
-} from './authentication'
+import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout } from './authentication'
 import useLocalStorage from './Hooks'
 import {
   IAuthContext,
   IAuthProvider,
-  TRefreshTokenExpiredEvent,
   TInternalConfig,
+  TRefreshTokenExpiredEvent,
   TTokenData,
   TTokenResponse,
 } from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
 import { epochAtSecondsFromNow, epochTimeIsPast } from './timeUtils'
 import { decodeJWT } from './decodeJWT'
+import { FetchError } from './errors'
 
 const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
@@ -85,6 +80,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function login() {
+    clearStorage()
     setLoginInProgress(true)
     redirectToLogin(config)
   }
@@ -109,26 +105,49 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
   }
 
+  function handleExpiredRefreshToken(initial = false): void {
+    // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
+    if (initial) return login()
+    // TODO: Breaking change - remove automatic login during ongoing session
+    else if (!onRefreshTokenExpire) return login()
+    else return onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
+  }
+
   function refreshAccessToken(initial = false): void {
+    // We have a token, but it has expired
     if (token && epochTimeIsPast(tokenExpire)) {
+      // We have a refreshToken, and it is not expired
       if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
         fetchWithRefreshToken({ config, refreshToken })
           .then((result: TTokenResponse) => handleTokenResponse(result))
-          .catch((error: Error) => {
-            console.error(error)
-            setError(error.message)
-            if (initial) login() // If the attempt to get a new token failed during page load, do a full login.
-            if (errorMessageForExpiredRefreshToken(error.message)) {
-              if (onRefreshTokenExpire) onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
+          .catch((error: unknown) => {
+            if (error instanceof FetchError) {
+              // If the fetch failed with status 400, assume expired refresh token
+              if (error.status === 400) {
+                return handleExpiredRefreshToken(initial)
+              }
+              // Unknown error. Set error, and login if first page load
+              else {
+                console.error(error)
+                setError(error.message)
+                if (initial) login()
+              }
+            }
+            // Unknown error. Set error, and login if first page load
+            else if (error instanceof Error) {
+              console.error(error)
+              setError(error.message)
+              if (initial) login()
             }
           })
-      } else {
-        if (initial) return login()
-
-        if (onRefreshTokenExpire) onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
-        else login() // TODO Breaking change - remove automatic login during ongoing session
+      }
+      // The refreshToken has expired
+      else {
+        return handleExpiredRefreshToken()
       }
     }
+    // The token has not expired. Do nothing
+    return
   }
 
   // Register the 'check for soon expiring access token' interval (Every minute)
@@ -158,8 +177,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             // Call any postLogin function in authConfig
             if (config?.postLogin) config.postLogin()
           })
-          .catch((error: string) => {
-            setError(error)
+          .catch((error: Error) => {
+            console.error(error)
+            setError(error.message)
           })
       }
     } else if (!token) {
