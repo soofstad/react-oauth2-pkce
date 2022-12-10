@@ -41,7 +41,7 @@ function LoginInfo(): JSX.Element {
             justifyContent: 'center',
             alignContent: 'center',
             alignItems: 'center',
-            color: 'lightgrey',
+            color: 'grey',
             fontFamily: 'sans-serif',
           }}
         >
@@ -85,7 +85,7 @@ function LoginInfo(): JSX.Element {
             justifyContent: 'center',
             alignContent: 'center',
             alignItems: 'center',
-            color: 'lightgrey',
+            color: 'grey',
             fontFamily: 'sans-serif',
           }}
         >
@@ -121,7 +121,7 @@ ReactDOM.render(
         justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center',
-        color: 'lightgrey',
+        color: 'grey',
         fontFamily: 'sans-serif',
       }}
     >
