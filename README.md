@@ -26,7 +26,7 @@ Long version;
 ## Example
 
 ```tsx
-import { AuthContext, AuthProvider, TAuthConfig } from "react-oauth2-code-pkce"
+import { AuthContext, AuthProvider, TAuthConfig, TRefreshTokenExpiredEvent } from "react-oauth2-code-pkce"
 
 const authConfig: TAuthConfig = {
   clientId: 'myClientID',
@@ -34,6 +34,7 @@ const authConfig: TAuthConfig = {
   tokenEndpoint: 'https://myAuthProvider.com/token',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
+  onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),
 }
 
 const UserInfo = (): JSX.Element => {
@@ -55,8 +56,6 @@ ReactDOM.render(<AuthProvider authConfig={authConfig}>
 ```
 
 For more advanced examples, see `./examples/`.  
-For instance, it's recommended to add a "Session expired"-callback like so:  
-`onRefreshTokenExpire: (event) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),`.
 
 ## Install
 
@@ -147,6 +146,8 @@ Either by refreshing the page, or clicking a "Login-button".
 
 If you are using libraries that intercept any `fetch()`-requests made. For example `@tanstack/react-query`. That can cause
 issues for the _AuthProviders_ token fetching. This can be solved by _not_ wrapping the `<AuthProvider>` in any such library.
+
+This could also happend if some routes in your app are not wrapped by the `<AuthProvider>`.
 
 ## Develop
 
