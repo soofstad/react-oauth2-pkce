@@ -38,6 +38,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [idToken, setIdToken] = useLocalStorage<string | undefined>('ROCP_idToken', undefined)
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
+  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
 
   let interval: any
@@ -71,6 +72,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setRefreshTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
     setIdToken(undefined)
     setTokenData(undefined)
+    setIdTokenData(undefined)
     setLoginInProgress(false)
   }
 
@@ -100,6 +102,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setLoginInProgress(false)
     try {
       if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
+      if (config.decodeToken && response.id_token) setIdTokenData(decodeJWT(response.id_token))
     } catch (e) {
       setError((e as Error).message)
     }
@@ -198,7 +201,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, []) // eslint-disable-line
 
   return (
-    <AuthContext.Provider value={{ tokenData, token, idToken, login, logOut, error, loginInProgress }}>
+    <AuthContext.Provider value={{ token, tokenData, idToken, idTokenData, login, logOut, error, loginInProgress }}>
       {children}
     </AuthContext.Provider>
   )

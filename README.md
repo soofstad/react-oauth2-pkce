@@ -73,7 +73,7 @@ The `IAuthContext` interface that the `AuthContext` returns when called with `us
 interface IAuthContext {
   // The access token. This is what you will use for authentication against protected API's
   token: string
-  // An object with all the properties encoded in the token (username, email, etc.)
+  // An object with all the properties encoded in the token (username, email, etc.), if the token is a JWT 
   tokenData?: TTokenData
   // Login the user
   login: () => void  
@@ -83,6 +83,8 @@ interface IAuthContext {
   error: string | null
   // The idToken, if it was returned along with the access token
   idToken?: string
+  // An object with all the properties encoded in the ID-token (username, groups, etc.)
+  idTokenData?: TTokenData
   // If the <AuthProvider> is done fetching tokens or not. Usefull for controlling page rendering
   loginInProgress: boolean
 }

@@ -12,12 +12,12 @@ const authConfig = {
   onRefreshTokenExpire: (event) =>
     window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
   decodeToken: true,
-  scope: 'User.read',
+  scope: 'User.read OpenId',
   autoLogin: false,
 }
 
 function LoginInfo() {
-  const { tokenData, token, login, logOut, error, loginInProgress } = useContext(AuthContext)
+  const { tokenData, token, idTokenData, login, logOut, error, loginInProgress } = useContext(AuthContext)
 
   if (loginInProgress) return null
 
@@ -42,7 +42,7 @@ function LoginInfo() {
           </pre>
           {authConfig.decodeToken && (
             <div>
-              <h4>Login Information from Access Token and IdToken (if any)</h4>
+              <h4>Login Information from Access Token</h4>
               <pre
                 style={{
                   width: '400px',

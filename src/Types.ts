@@ -44,6 +44,7 @@ export interface IAuthContext {
   error: string | null
   tokenData?: TTokenData
   idToken?: string
+  idTokenData?: TTokenData
   loginInProgress: boolean
 }
 
