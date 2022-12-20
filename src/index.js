@@ -27,22 +27,9 @@ function LoginInfo() {
       {token ? (
         <>
           <button onClick={logOut}>Logout</button>
-          <h4>Access Token (JWT)</h4>
-          <pre
-            style={{
-              width: '400px',
-              margin: '10px',
-              padding: '5px',
-              border: 'black 2px solid',
-              wordBreak: 'break-all',
-              whiteSpace: 'break-spaces',
-            }}
-          >
-            {token}
-          </pre>
-          {authConfig.decodeToken && (
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div>
-              <h4>Login Information from Access Token</h4>
+              <h4>Access Token (JWT)</h4>
               <pre
                 style={{
                   width: '400px',
@@ -53,10 +40,44 @@ function LoginInfo() {
                   whiteSpace: 'break-spaces',
                 }}
               >
-                {JSON.stringify(tokenData, null, 2)}
+                {token}
               </pre>
             </div>
-          )}
+            {authConfig.decodeToken && (
+              <>
+                <div>
+                  <h4>Login Information from Access Token</h4>
+                  <pre
+                    style={{
+                      width: '400px',
+                      margin: '10px',
+                      padding: '5px',
+                      border: 'black 2px solid',
+                      wordBreak: 'break-all',
+                      whiteSpace: 'break-spaces',
+                    }}
+                  >
+                    {JSON.stringify(tokenData, null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <h4>Login Information from ID Token</h4>
+                  <pre
+                    style={{
+                      width: '400px',
+                      margin: '10px',
+                      padding: '5px',
+                      border: 'black 2px solid',
+                      wordBreak: 'break-all',
+                      whiteSpace: 'break-spaces',
+                    }}
+                  >
+                    {JSON.stringify(idTokenData, null, 2)}
+                  </pre>
+                </div>
+              </>
+            )}
+          </div>
         </>
       ) : (
         <>

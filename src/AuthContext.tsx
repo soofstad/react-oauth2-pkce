@@ -192,6 +192,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       if (decodeToken) {
         try {
           setTokenData(decodeJWT(token))
+          if (idToken) setIdTokenData(decodeJWT(idToken))
         } catch (e) {
           setError((e as Error).message)
         }
