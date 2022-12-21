@@ -104,6 +104,7 @@ export function redirectToLogout(config: TInternalConfig, token: string) {
     client_id: config.clientId,
     // TODO: Add extra logout params
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
+    ...config.extraLogoutParameters,
   })
   window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
 }
