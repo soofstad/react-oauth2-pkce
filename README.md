@@ -130,6 +130,8 @@ type TAuthConfig = {
   extraAuthParameters?: { [key: string]: string | boolean | number }  // default: null
   // Can be used to provide any non-standard parameters to the token request
   extraTokenParameters?: { [key: string]: string | boolean | number } // default: null
+  // Can be used to provide any non-standard parameters to the logout request
+  extraLogoutParameters?: { [key: string]: string | boolean | number } // default: null
   // Superseded by 'extraTokenParameters' options. Will be deprecated in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }  // default: null
 }

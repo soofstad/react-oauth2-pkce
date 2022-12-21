@@ -66,6 +66,7 @@ export type TAuthConfig = {
   extraAuthParams?: { [key: string]: string | boolean | number }
   extraAuthParameters?: { [key: string]: string | boolean | number }
   extraTokenParameters?: { [key: string]: string | boolean | number }
+  extraLogoutParameters?: { [key: string]: string | boolean | number }
 }
 
 export type TRefreshTokenExpiredEvent = {
@@ -90,4 +91,5 @@ export type TInternalConfig = {
   extraAuthParams?: { [key: string]: string | boolean | number }
   extraAuthParameters?: { [key: string]: string | boolean | number }
   extraTokenParameters?: { [key: string]: string | boolean | number }
+  extraLogoutParameters?: { [key: string]: string | boolean | number }
 }
