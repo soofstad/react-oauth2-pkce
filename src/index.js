@@ -1,3 +1,9 @@
+// ##########################################
+// NOTE: This file is not part of the package.
+// It's only function is to help development in testing and debugging.
+// If you want to run the project locally you will need to update the authConfig object with your own auth provider
+// ##########################################
+
 import { useContext } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from './AuthContext'
@@ -6,8 +12,11 @@ const authConfig = {
   clientId: '6559ce69-219d-4e82-b6ed-889a861c7c94',
   authorizationEndpoint:
     'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
-  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token', // logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
-  redirectUri: 'http://localhost:3000/', // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
+  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
+  Endpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
+  logoutEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/logout',
+  redirectUri: 'http://localhost:3000/',
+  // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   onRefreshTokenExpire: (event) =>
     window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
@@ -26,7 +35,7 @@ function LoginInfo() {
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
       {token ? (
         <>
-          <button onClick={logOut}>Logout</button>
+          <button onClick={() => logOut('rememberThis', idTokenData.tid)}>Logout</button>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div>
               <h4>Access Token (JWT)</h4>

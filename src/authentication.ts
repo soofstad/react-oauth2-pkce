@@ -96,15 +96,25 @@ export const fetchWithRefreshToken = (props: {
   return postTokenRequest(config.tokenEndpoint, refreshRequest)
 }
 
-export function redirectToLogout(config: TInternalConfig, token: string) {
+export function redirectToLogout(
+  config: TInternalConfig,
+  token: string,
+  idToken?: string,
+  state?: string,
+  logoutHint?: string
+) {
   const params = new URLSearchParams({
     token: token,
     // TODO: Add config param for token type
     token_type_hint: 'refresh_token',
     client_id: config.clientId,
-    // TODO: Add extra logout params
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
+    ui_locales: window.navigator.languages.reduce((a: string, b: string) => a + ' ' + b),
     ...config.extraLogoutParameters,
   })
+  if (idToken) params.append('id_token_hint', idToken)
+  if (state) params.append('state', state)
+  if (logoutHint) params.append('logout_hint', logoutHint)
+
   window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
 }
