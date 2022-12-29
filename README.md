@@ -65,21 +65,24 @@ The package is available on npmjs.com here; https://www.npmjs.com/package/react-
 npm install react-oauth2-code-pkce
 ```
 
-## IAuthContext values
+## API
 
-The `IAuthContext` interface that the `AuthContext` returns when called with `useContext()` provides these values;
+### IAuthContext values
+
+The object that's returned by `useContext(AuthContext)` provides these values;
 
 ```typescript
 interface IAuthContext {
-  // The access token. This is what you will use for authentication against protected API's
+  // The access token. This is what you will use for authentication against protected Web API's
   token: string
   // An object with all the properties encoded in the token (username, email, etc.), if the token is a JWT 
   tokenData?: TTokenData
-  // Login the user
+  // Function to trigger login.
   login: () => void  
-  // Logout the user from the auth provider
-  logOut: () => void
-  // Keeps any errors that occured during login or token fetching/refreshing. 
+  // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
+  // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
+  logOut: (state?: string, logoutHint?: string) => void
+  // Keeps any errors that occured during login, token fetching/refreshing, decoding, etc.. 
   error: string | null
   // The idToken, if it was returned along with the access token
   idToken?: string
@@ -90,7 +93,17 @@ interface IAuthContext {
 }
 ```
 
-## All configuration parameters
+### Configuration parameters
+
+__react-oauth2-code-pkce__'s goal is to "just work" with any authentication provider that either
+supports the [OAuth2](https://datatracker.ietf.org/doc/html/rfc7636) or [OpenID Connect](https://openid.net/developers/specs/) (OIDC) standards.  
+However, many authentication providers are not following these standards, or have extended them. 
+With this in mind, if you are experiencing any problems, a good place to start is to see if the provider expects some custom parameters.
+If they do, these can be injected into the different calls with these configuration options;
+
+- `extraAuthParameters`
+- `extraTokenParameters`
+- `extraLogoutParameters`
 
 The `<AuthProvider>` takes a `config` object that supports these parameters;
 
@@ -138,13 +151,7 @@ type TAuthConfig = {
 
 ```
 
-## Known issues
-
-### The page randomly refreshes in the middle of a session
-
-This will happen if you haven't provided a callback-function for the `onRefreshTokenExpire` config parameter, and the refresh token expires.
-You probably want to implement some kind of "alert/message/banner", saying that the session has expired and that the user needs to login again.
-Either by refreshing the page, or clicking a "Login-button".
+## Common issues
 
 ### After redirect back from auth provider with `?code`, no token request is made
 
@@ -152,6 +159,12 @@ If you are using libraries that intercept any `fetch()`-requests made. For examp
 issues for the _AuthProviders_ token fetching. This can be solved by _not_ wrapping the `<AuthProvider>` in any such library.
 
 This could also happend if some routes in your app are not wrapped by the `<AuthProvider>`.
+
+### The page randomly refreshes in the middle of a session
+
+This will happen if you haven't provided a callback-function for the `onRefreshTokenExpire` config parameter, and the refresh token expires.
+You probably want to implement some kind of "alert/message/banner", saying that the session has expired and that the user needs to login again.
+Either by refreshing the page, or clicking a "Login-button".
 
 ## Develop
 
@@ -161,4 +174,4 @@ This could also happend if some routes in your app are not wrapped by the `<Auth
 
 ## Contribute
 
-You are welcome to create issues and pull requests :)
+You are most welcome to create issues and pull requests :)
