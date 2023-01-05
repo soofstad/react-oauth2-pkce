@@ -4,7 +4,7 @@
 // If you want to run the project locally you will need to update the authConfig object with your own auth provider
 // ##########################################
 
-import { useContext } from 'react'
+import React, { useContext } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from './AuthContext'
 
@@ -102,7 +102,7 @@ const container = document.getElementById('root')
 const root = createRoot(container)
 
 root.render(
-  <div style={{}}>
+  <React.StrictMode>
     <div>
       <h1>Demo using the &apos;react-oauth2-code-pkce&apos; package</h1>
       <p>
@@ -119,5 +119,5 @@ root.render(
     <AuthProvider authConfig={authConfig}>
       <LoginInfo />
     </AuthProvider>
-  </div>
+  </React.StrictMode>
 )
