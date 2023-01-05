@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react' // eslint-disable-line
+import React, { createContext, useEffect, useRef, useState } from 'react' // eslint-disable-line
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout } from './authentication'
 import useLocalStorage from './Hooks'
 import {
@@ -159,6 +159,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     return () => clearInterval(interval)
   }, [token]) // This token dependency removes the old, and registers a new Interval when a new token is fetched.
 
+  // This ref is used to make sure the 'fetchTokens' call is only made once.
+  // Multiple calls with the same code will, and should, return an error from the API
+  // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
+  const didFetchTokens = useRef(false)
+
   // Runs once on page load
   useEffect(() => {
     if (loginInProgress) {
@@ -171,7 +176,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         console.error(error_description)
         setError(error_description)
         logOut()
-      } else {
+      } else if (!didFetchTokens.current) {
+        didFetchTokens.current = true
         // Request token from auth server with the auth code
         fetchTokens(config)
           .then((tokens: TTokenResponse) => {
