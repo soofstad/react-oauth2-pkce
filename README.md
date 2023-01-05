@@ -115,14 +115,13 @@ type TAuthConfig = {
   authorizationEndpoint: string  // Required
   // URL for the token endpoint at the authentication provider
   tokenEndpoint: string  // Required
-  // Which URL the auth provider should redirect the user after loging out
+  // Which URL the auth provider should redirect the user after successfull authentication/login
   redirectUri: string  // Required
   // Which scopes to request for the auth token
   scope?: string  // default: ''
   // Which URL to call for logging out of the auth provider
   logoutEndpoint?: string  // default: null
-  // Should be used by the auth provider to decide which URL to redirect
-  // the user to after logout
+  // Which URL the auth provider should redirect the user to after logout
   logoutRedirect?: string  // default: null
   // Optionally provide a callback function to run _before_ the
   // user is redirected to the auth server for login
