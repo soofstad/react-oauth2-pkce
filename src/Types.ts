@@ -39,6 +39,7 @@ export interface IAuthProvider {
 
 export interface IAuthContext {
   token: string
+  refreshToken: string
   logOut: (state?: string, logoutHint?: string) => void
   login: () => void
   error: string | null
