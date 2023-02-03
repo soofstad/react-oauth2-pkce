@@ -146,7 +146,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       }
       // The refreshToken has expired
       else {
-        return handleExpiredRefreshToken()
+        return handleExpiredRefreshToken(initial)
       }
     }
     // The token has not expired. Do nothing
