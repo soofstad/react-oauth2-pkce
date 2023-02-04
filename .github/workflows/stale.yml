@@ -9,16 +9,19 @@ on:
   schedule:
   - cron: '45 20 * * *'
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   stale:
-
     runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
 
     steps:
-    - uses: actions/stale@v3
+    - uses: actions/stale@v7
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'Stale issue message'

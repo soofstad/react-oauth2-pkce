@@ -4,6 +4,9 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     uses: ./.github/workflows/tests.yaml
@@ -12,10 +15,10 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
-      - uses: actions/setup-node@v3.5.1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install
       - run: cd src && tsc
