@@ -29,6 +29,7 @@ export type TTokenResponse = {
   expires_in?: number
   refresh_token?: string
   refresh_token_expires_in?: number
+  refresh_expires_in?: number
   id_token?: string
 }
 

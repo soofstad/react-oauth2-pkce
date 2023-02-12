@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: unless-stopped
+    volumes:
+      - ./github-auth-proxy:/code
+    environment:
+      CLIENT_ID: c43524cc7d3c82b05a47
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    ports:
+      - "8080:8080"
+    command: ["start-dev"]
+  web:
+    build: ./web-app
+    restart: unless-stopped
+    volumes:
+      - ./web-app/src:/app/src
+    ports:
+      - "3000:3000"

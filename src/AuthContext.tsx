@@ -10,11 +10,9 @@ import {
   TTokenResponse,
 } from './Types'
 import { validateAuthConfig } from './validateAuthConfig'
-import { epochAtSecondsFromNow, epochTimeIsPast } from './timeUtils'
+import { epochAtSecondsFromNow, epochTimeIsPast, FALLBACK_EXPIRE_TIME, getRefreshExpiresIn } from './timeUtils'
 import { decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
-
-const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -90,14 +88,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
     setRefreshToken(response.refresh_token)
-    setTokenExpire(epochAtSecondsFromNow(response.expires_in ?? FALLBACK_EXPIRE_TIME))
-    // If there is no refresh_token_expire, use access_token_expire + 10min.
-    // If no access_token_expire, assume double the fallback expire time
-    let refreshTokenExpire = response.refresh_token_expires_in ?? 2 * FALLBACK_EXPIRE_TIME
-    if (!response.refresh_token_expires_in && response.expires_in) {
-      refreshTokenExpire = response.expires_in + FALLBACK_EXPIRE_TIME
-    }
-    setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpire))
+    const tokenExpiresIn = response.expires_in ?? FALLBACK_EXPIRE_TIME
+    setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
+    setRefreshTokenExpire(epochAtSecondsFromNow(getRefreshExpiresIn(tokenExpiresIn, response)))
     setIdToken(response.id_token)
     setLoginInProgress(false)
     try {
