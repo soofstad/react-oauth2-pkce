@@ -5,7 +5,10 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
     const item = localStorage.getItem(key)
     try {
       return item ? JSON.parse(item) : initialValue
-    } catch (error) {
+    } catch (error: any) {
+      console.warn(
+        `Failed to parse stored value for '${key}'.\nContinuing with default value.\nError: ${error.message}`
+      )
       return initialValue
     }
   })
