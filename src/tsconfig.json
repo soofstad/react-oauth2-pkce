@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",
     "module": "commonjs",
-    "lib": ["es2016", "es2017", "dom"],
+    "lib": ["ESNext", "DOM"],
     "allowJs": false,
     "jsx": "react",
     "declaration": true,
