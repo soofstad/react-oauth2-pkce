@@ -175,13 +175,15 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         fetchTokens(config)
           .then((tokens: TTokenResponse) => {
             handleTokenResponse(tokens)
-            window.history.replaceState(null, '', window.location.pathname) // Clear ugly url params
             // Call any postLogin function in authConfig
             if (config?.postLogin) config.postLogin()
           })
           .catch((error: Error) => {
             console.error(error)
             setError(error.message)
+          })
+          .finally(() => {
+            window.history.replaceState(null, '', window.location.pathname) // Clear ugly url params
           })
       }
     } else if (!token) {
