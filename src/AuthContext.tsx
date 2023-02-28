@@ -88,9 +88,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
     setRefreshToken(response.refresh_token)
-    const tokenExpiresIn = response.expires_in ?? FALLBACK_EXPIRE_TIME
+    const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? FALLBACK_EXPIRE_TIME
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
-    setRefreshTokenExpire(epochAtSecondsFromNow(getRefreshExpiresIn(tokenExpiresIn, response)))
+    const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
+    setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
     setIdToken(response.id_token)
     setLoginInProgress(false)
     try {
