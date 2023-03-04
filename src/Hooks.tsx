@@ -14,6 +14,12 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
   })
 
   const setValue = (value: T | ((val: T) => T)): void => {
+    if (!value) {
+      // Delete item if set to undefined. This avoids warning on loading invalid json
+      setStoredValue(value)
+      localStorage.removeItem(key)
+      return
+    }
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
