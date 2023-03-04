@@ -12,6 +12,7 @@ const authConfig: TInternalConfig = {
   tokenEndpoint: 'myTokenEndpoint',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
+  clearURL: false,
   extraAuthParams: {
     prompt: true,
     client_id: 'anotherClientId',

@@ -11,9 +11,9 @@ import { AuthContext, AuthProvider } from './AuthContext'
 // Get auth provider info from "https://keycloak.ofstad.xyz/realms/master/.well-known/openid-configuration"
 const authConfig = {
   clientId: 'account',
-  authorizationEndpoint: 'http://192.168.1.5:5555/realms/master/protocol/openid-connect/auth',
-  tokenEndpoint: 'http://192.168.1.5:5555/realms/master/protocol/openid-connect/token',
-  logoutEndpoint: 'http://192.168.1.5:5555/realms/master/protocol/openid-connect/logout',
+  authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
+  tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
+  logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
   // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
