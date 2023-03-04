@@ -5,10 +5,8 @@ services:
     image: quay.io/keycloak/keycloak:latest
     restart: unless-stopped
     volumes:
-      - ./github-auth-proxy:/code
+      - ./data:/opt/keycloak/data
     environment:
-      CLIENT_ID: c43524cc7d3c82b05a47
-      CLIENT_SECRET: ${CLIENT_SECRET}
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: password
     ports:
