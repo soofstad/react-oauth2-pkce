@@ -46,7 +46,7 @@ describe('make token request with extra parameters', () => {
 
   // Setting up a state similar to what it would be just after redirect back from auth provider
   localStorage.setItem('ROCP_loginInProgress', 'true')
-  localStorage.setItem('PKCE_code_verifier', 'arandomstring')
+  sessionStorage.setItem('PKCE_code_verifier', 'arandomstring')
 
   it('calls the token endpoint with these parameters', async () => {
     // Have been redirected back with a code in query params
