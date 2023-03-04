@@ -6,11 +6,11 @@ export const epochAtSecondsFromNow = (secondsFromNow: number) => Math.round(Date
 
 /**
  * Check if the Access Token has expired.
- * Will return True if the token has expired, OR there is less than 5min until it expires.
+ * Will return True if the token has expired, OR there is less than 30 seconds until it expires.
  */
 export function epochTimeIsPast(timestamp: number): boolean {
   const now = Math.round(Date.now()) / 1000
-  const nowWithBuffer = now + 120
+  const nowWithBuffer = now + 30
   return nowWithBuffer >= timestamp
 }
 

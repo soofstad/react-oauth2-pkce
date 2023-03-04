@@ -9,11 +9,12 @@ import {
 import { postWithXForm } from './httpUtils'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
+const stateStorageKey = 'ROCP_auth_state'
 
-export async function redirectToLogin(config: TInternalConfig) {
+export async function redirectToLogin(config: TInternalConfig, customState?: string) {
   // Create and store a random string in localStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
-  localStorage.setItem(codeVerifierStorageKey, codeVerifier)
+  sessionStorage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   generateCodeChallenge(codeVerifier).then((codeChallenge) => {
@@ -27,6 +28,13 @@ export async function redirectToLogin(config: TInternalConfig) {
       code_challenge_method: 'S256',
       ...config.extraAuthParameters,
     })
+
+    sessionStorage.removeItem(stateStorageKey)
+    const state = customState ?? config.state
+    if (state) {
+      sessionStorage.setItem(stateStorageKey, state)
+      params.append('state', state)
+    }
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
     window.location.replace(`${config.authorizationEndpoint}?${params.toString()}`)
@@ -58,7 +66,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
   */
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
-  const codeVerifier = window.localStorage.getItem(codeVerifierStorageKey)
+  const codeVerifier = window.sessionStorage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
     throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
@@ -117,4 +125,14 @@ export function redirectToLogout(
   if (logoutHint) params.append('logout_hint', logoutHint)
 
   window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
+}
+
+export function validateState(urlParams: URLSearchParams) {
+  const receivedState = urlParams.get('state')
+  const loadedState = sessionStorage.getItem(stateStorageKey)
+  if (receivedState !== loadedState) {
+    throw new Error(
+      '"state" value received from authentication server does no match client request. Possible cross-site request forgery'
+    )
+  }
 }

@@ -77,8 +77,9 @@ interface IAuthContext {
   token: string
   // An object with all the properties encoded in the token (username, email, etc.), if the token is a JWT 
   tokenData?: TTokenData
-  // Function to trigger login.
-  login: () => void  
+  // Function to trigger login. 
+  // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
+  login: (state?: string) => void  
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string) => void
@@ -119,6 +120,8 @@ type TAuthConfig = {
   redirectUri: string  // Required
   // Which scopes to request for the auth token
   scope?: string  // default: ''
+  // Optional state value. Will often make more sense to provide the state in a call to the 'login()' function
+  state?: string // default: null
   // Which URL to call for logging out of the auth provider
   logoutEndpoint?: string  // default: null
   // Which URL the auth provider should redirect the user to after logout
@@ -138,6 +141,8 @@ type TAuthConfig = {
   // By default, the package will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
   autoLogin?: boolean  // default: true
+  // Set to false if you need to access the urlParameters sent back from the login server.
+  clearURL?: boolean  // default: true
   // Can be used to provide any non-standard parameters to the authentication request
   extraAuthParameters?: { [key: string]: string | boolean | number }  // default: null
   // Can be used to provide any non-standard parameters to the token request

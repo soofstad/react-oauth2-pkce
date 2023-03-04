@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from 'react' // eslint-disable-line
-import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout } from './authentication'
+import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import useLocalStorage from './Hooks'
 import {
   IAuthContext,
@@ -44,6 +44,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   // Set default values for internal config object
   const {
     autoLogin = true,
+    clearURL = true,
     decodeToken = true,
     scope = '',
     preLogin = () => null,
@@ -54,6 +55,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const config: TInternalConfig = {
     ...authConfig,
     autoLogin: autoLogin,
+    clearURL: clearURL,
     decodeToken: decodeToken,
     scope: scope,
     preLogin: preLogin,
@@ -79,10 +81,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (config?.logoutEndpoint && refreshToken) redirectToLogout(config, refreshToken, idToken, state, logoutHint)
   }
 
-  function login() {
+  function login(state?: string) {
     clearStorage()
     setLoginInProgress(true)
-    redirectToLogin(config)
+    redirectToLogin(config, state)
   }
 
   function handleTokenResponse(response: TTokenResponse) {
@@ -147,9 +149,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     return
   }
 
-  // Register the 'check for soon expiring access token' interval (Every minute)
+  // Register the 'check for soon expiring access token' interval (Every 10 seconds)
   useEffect(() => {
-    interval = setInterval(() => refreshAccessToken(), 60000) // eslint-disable-line
+    interval = setInterval(() => refreshAccessToken(), 10000) // eslint-disable-line
     return () => clearInterval(interval)
   }, [token]) // This token dependency removes the old, and registers a new Interval when a new token is fetched.
 
@@ -172,6 +174,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         logOut()
       } else if (!didFetchTokens.current) {
         didFetchTokens.current = true
+        try {
+          validateState(urlParams)
+        } catch (e: any) {
+          console.error(e)
+          setError((e as Error).message)
+        }
         // Request token from auth server with the auth code
         fetchTokens(config)
           .then((tokens: TTokenResponse) => {
@@ -184,7 +192,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             setError(error.message)
           })
           .finally(() => {
-            window.history.replaceState(null, '', window.location.pathname) // Clear ugly url params
+            if (config.clearURL) {
+              // Clear ugly url params
+              window.history.replaceState(null, '', window.location.pathname)
+            }
           })
       }
     } else if (!token) {

@@ -41,7 +41,7 @@ export interface IAuthProvider {
 export interface IAuthContext {
   token: string
   logOut: (state?: string, logoutHint?: string) => void
-  login: () => void
+  login: (state?: string) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
@@ -56,6 +56,7 @@ export type TAuthConfig = {
   tokenEndpoint: string
   redirectUri: string
   scope?: string
+  state?: string
   logoutEndpoint?: string
   logoutRedirect?: string
   preLogin?: () => void
@@ -63,6 +64,7 @@ export type TAuthConfig = {
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
+  clearURL?: boolean
   // TODO: Remove in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }
   extraAuthParameters?: { [key: string]: string | boolean | number }
@@ -83,6 +85,7 @@ export type TInternalConfig = {
   tokenEndpoint: string
   redirectUri: string
   scope: string
+  state?: string
   logoutEndpoint?: string
   logoutRedirect?: string
   preLogin?: () => void
@@ -90,6 +93,7 @@ export type TInternalConfig = {
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken: boolean
   autoLogin: boolean
+  clearURL: boolean
   // TODO: Remove in 2.0
   extraAuthParams?: { [key: string]: string | boolean | number }
   extraAuthParameters?: { [key: string]: string | boolean | number }
