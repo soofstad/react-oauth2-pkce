@@ -35,6 +35,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   )
   const [idToken, setIdToken] = useLocalStorage<string | undefined>('ROCP_idToken', undefined)
   const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
+  const [refreshInProgress, setRefreshInProgress] = useLocalStorage<boolean>('ROCP_refreshInProgress', false)
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
@@ -112,10 +113,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function refreshAccessToken(initial = false): void {
-    // We have a token, but it has expired
-    if (token && epochTimeIsPast(tokenExpire)) {
+    // Only refresh if no other instance (tab) is currently refreshing, or it's initial page load
+    if (token && epochTimeIsPast(tokenExpire) && (!refreshInProgress || initial)) {
       // We have a refreshToken, and it is not expired
       if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
+        setRefreshInProgress(true)
         fetchWithRefreshToken({ config, refreshToken })
           .then((result: TTokenResponse) => handleTokenResponse(result))
           .catch((error: unknown) => {
@@ -137,6 +139,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
               setError(error.message)
               if (initial) login()
             }
+          })
+          .finally(() => {
+            setRefreshInProgress(false)
           })
       }
       // The refreshToken has expired
