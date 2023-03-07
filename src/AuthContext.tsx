@@ -95,7 +95,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
     setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
     setIdToken(response.id_token)
-    setLoginInProgress(false)
     try {
       if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
       if (config.decodeToken && response.id_token) setIdTokenData(decodeJWT(response.id_token))
@@ -196,6 +195,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
               // Clear ugly url params
               window.history.replaceState(null, '', window.location.pathname)
             }
+            setLoginInProgress(false)
           })
       }
     } else if (!token) {
