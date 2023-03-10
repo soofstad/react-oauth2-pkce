@@ -79,6 +79,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function logOut(state?: string, logoutHint?: string) {
     clearStorage()
+    setError(null)
     if (config?.logoutEndpoint && refreshToken) redirectToLogout(config, refreshToken, idToken, state, logoutHint)
   }
 
