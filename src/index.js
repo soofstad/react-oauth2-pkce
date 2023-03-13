@@ -13,7 +13,7 @@ const authConfig = {
   clientId: 'account',
   authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
   tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
-  logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
+  // logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
   // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
@@ -92,7 +92,7 @@ function LoginInfo() {
       ) : (
         <>
           <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-          <button onClick={() => login()}>Login</button>
+          <button onClick={login}>Login</button>
           <button onClick={() => login('customLoginState')}>Login w/state</button>
         </>
       )}

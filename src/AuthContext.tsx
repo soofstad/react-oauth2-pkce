@@ -86,6 +86,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function login(state?: string) {
     clearStorage()
     setLoginInProgress(true)
+    if (typeof state !== 'string') {
+      console.warn(`Passed login state must be of type 'string'. Received '${state}'. Ignoring value...`)
+      redirectToLogin(config)
+      return
+    }
     redirectToLogin(config, state)
   }
 
