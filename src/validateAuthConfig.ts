@@ -18,6 +18,7 @@ export function validateAuthConfig(config: TInternalConfig) {
     )
   if (stringIsUnset(config?.redirectUri))
     throw Error("'redirectUri' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
+  if (!['session', 'local'].includes(config.storage)) throw Error("'storage' must be one of ('session', 'local')")
   if (config?.extraAuthParams)
     console.warn(
       "The 'extraAuthParams' configuration parameter will be deprecated. You should use " +

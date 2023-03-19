@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 
-function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
+function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'local'): [T, (v: T) => void] {
+  const storage = type === 'session' ? sessionStorage : localStorage
+
   const [storedValue, setStoredValue] = useState<T>(() => {
-    const item = localStorage.getItem(key)
+    const item = storage.getItem(key)
     try {
       return item ? JSON.parse(item) : initialValue
     } catch (error: any) {
@@ -17,13 +19,13 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
     if (!value) {
       // Delete item if set to undefined. This avoids warning on loading invalid json
       setStoredValue(value)
-      localStorage.removeItem(key)
+      storage.removeItem(key)
       return
     }
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
-      localStorage.setItem(key, JSON.stringify(valueToStore))
+      storage.setItem(key, JSON.stringify(valueToStore))
     } catch (error) {
       console.log(`Failed to store value '${value}' for key '${key}'`)
     }
@@ -31,7 +33,7 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
 
   useEffect(() => {
     const storageEventHandler = (event: StorageEvent) => {
-      if (event.storageArea === localStorage && event.key === key) {
+      if (event.storageArea === storage && event.key === key) {
         setStoredValue(JSON.parse(event.newValue ?? '') as T)
       }
     }
@@ -42,4 +44,4 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (v: T) => void] {
   return [storedValue, setValue]
 }
 
-export default useLocalStorage
+export default useBrowserStorage

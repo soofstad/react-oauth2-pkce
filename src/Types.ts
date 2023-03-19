@@ -72,6 +72,7 @@ export type TAuthConfig = {
   extraLogoutParameters?: { [key: string]: string | boolean | number }
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
+  storage?: 'session' | 'local'
 }
 
 export type TRefreshTokenExpiredEvent = {
@@ -101,4 +102,5 @@ export type TInternalConfig = {
   extraLogoutParameters?: { [key: string]: string | boolean | number }
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
+  storage: 'session' | 'local'
 }

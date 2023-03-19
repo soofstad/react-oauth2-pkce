@@ -141,6 +141,11 @@ type TAuthConfig = {
   // By default, the package will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
   autoLogin?: boolean  // default: true
+  // Store login state in 'localStorage' or 'sessionStorage'
+  // If set to 'session', no login state is persisted by 'react-oauth2-code-pkce` when the browser closes.
+  // NOTE: Many authentication servers will keep the client logged in by cookies. You should therefore use 
+  // the 'logout()'-function to properly logout the client. Or configure your server not to issue cookies.
+  storage?: 'local' | 'session'  // default: 'local'
   // Set to false if you need to access the urlParameters sent back from the login server.
   clearURL?: boolean  // default: true
   // Can be used to provide any non-standard parameters to the authentication request
