@@ -1,9 +1,10 @@
 import React, { createContext, useEffect, useRef, useState } from 'react' // eslint-disable-line
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
-import useLocalStorage from './Hooks'
+import useBrowserStorage from './Hooks'
 import {
   IAuthContext,
   IAuthProvider,
+  TAuthConfig,
   TInternalConfig,
   TRefreshTokenExpiredEvent,
   TTokenData,
@@ -23,25 +24,6 @@ export const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
-  const [refreshToken, setRefreshToken] = useLocalStorage<string | undefined>('ROCP_refreshToken', undefined)
-  const [refreshTokenExpire, setRefreshTokenExpire] = useLocalStorage<number>(
-    'ROCP_refreshTokenExpire',
-    epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME)
-  )
-  const [token, setToken] = useLocalStorage<string>('ROCP_token', '')
-  const [tokenExpire, setTokenExpire] = useLocalStorage<number>(
-    'ROCP_tokenExpire',
-    epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME)
-  )
-  const [idToken, setIdToken] = useLocalStorage<string | undefined>('ROCP_idToken', undefined)
-  const [loginInProgress, setLoginInProgress] = useLocalStorage<boolean>('ROCP_loginInProgress', false)
-  const [refreshInProgress, setRefreshInProgress] = useLocalStorage<boolean>('ROCP_refreshInProgress', false)
-  const [tokenData, setTokenData] = useState<TTokenData | undefined>()
-  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
-  const [error, setError] = useState<string | null>(null)
-
-  let interval: any
-
   // Set default values for internal config object
   const {
     autoLogin = true,
@@ -51,7 +33,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     preLogin = () => null,
     postLogin = () => null,
     onRefreshTokenExpire = undefined,
-  } = authConfig
+    storage = 'local',
+  }: TAuthConfig = authConfig
 
   const config: TInternalConfig = {
     ...authConfig,
@@ -62,9 +45,42 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     preLogin: preLogin,
     postLogin: postLogin,
     onRefreshTokenExpire: onRefreshTokenExpire,
+    storage: storage,
   }
-
   validateAuthConfig(config)
+
+  const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
+    'ROCP_refreshToken',
+    undefined,
+    config.storage
+  )
+  const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number>(
+    'ROCP_refreshTokenExpire',
+    epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME),
+    config.storage
+  )
+  const [token, setToken] = useBrowserStorage<string>('ROCP_token', '', config.storage)
+  const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
+    'ROCP_tokenExpire',
+    epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
+    config.storage
+  )
+  const [idToken, setIdToken] = useBrowserStorage<string | undefined>('ROCP_idToken', undefined, config.storage)
+  const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
+    'ROCP_loginInProgress',
+    false,
+    config.storage
+  )
+  const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
+    'ROCP_refreshInProgress',
+    false,
+    config.storage
+  )
+  const [tokenData, setTokenData] = useState<TTokenData | undefined>()
+  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
+  const [error, setError] = useState<string | null>(null)
+
+  let interval: any
 
   function clearStorage() {
     setRefreshToken(undefined)

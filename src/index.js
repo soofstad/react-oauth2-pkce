@@ -24,6 +24,7 @@ const authConfig = {
   // state: 'testState',
   clearURL: true,
   autoLogin: false,
+  storage: 'session',
 }
 
 function LoginInfo() {
