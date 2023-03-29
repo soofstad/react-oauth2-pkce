@@ -179,7 +179,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   useEffect(() => {
     interval = setInterval(() => refreshAccessToken(), 10000) // eslint-disable-line
     return () => clearInterval(interval)
-  }, [token]) // This token dependency removes the old, and registers a new Interval when a new token is fetched.
+  }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
