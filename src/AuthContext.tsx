@@ -119,10 +119,14 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
     setIdToken(response.id_token)
     try {
-      if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
-      if (config.decodeToken && response.id_token) setIdTokenData(decodeJWT(response.id_token))
+      if (response.id_token) setIdTokenData(decodeJWT(response.id_token))
     } catch (e) {
-      setError((e as Error).message)
+      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+    }
+    try {
+      if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
+    } catch (e) {
+      console.warn(`Failed to decode access token: ${(e as Error).message}`)
     }
   }
 
