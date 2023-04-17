@@ -16,7 +16,7 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
   })
 
   const setValue = (value: T | ((val: T) => T)): void => {
-    if (!value) {
+    if (value === undefined) {
       // Delete item if set to undefined. This avoids warning on loading invalid json
       setStoredValue(value)
       storage.removeItem(key)
