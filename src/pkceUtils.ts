@@ -22,6 +22,11 @@ export function generateRandomString(length: number): string {
  *  PKCE Code Challenge = base64url(hash(codeVerifier))
  */
 export async function generateCodeChallenge(codeVerifier: string): Promise<string> {
+  if (!window.crypto.subtle?.digest) {
+    throw new Error(
+      "The context/environment is not secure, and does not support the 'crypto.subtle' module. See: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/subtle for details"
+    )
+  }
   const encoder = new TextEncoder()
   const bytes: Uint8Array = encoder.encode(codeVerifier) // Encode the verifier to a byteArray
   const hash: ArrayBuffer = await window.crypto.subtle.digest('SHA-256', bytes) // sha256 hash it

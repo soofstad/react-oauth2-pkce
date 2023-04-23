@@ -102,12 +102,17 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function login(state?: string) {
     clearStorage()
     setLoginInProgress(true)
+    // TODO: Raise error on wrong state type in v2
+    let typeSafePassedState = state
     if (typeof state !== 'string') {
       console.warn(`Passed login state must be of type 'string'. Received '${state}'. Ignoring value...`)
-      redirectToLogin(config)
-      return
+      typeSafePassedState = undefined
     }
-    redirectToLogin(config, state)
+    redirectToLogin(config, typeSafePassedState).catch((error) => {
+      console.error(error)
+      setError(error.message)
+      setLoginInProgress(false)
+    })
   }
 
   function handleTokenResponse(response: TTokenResponse) {

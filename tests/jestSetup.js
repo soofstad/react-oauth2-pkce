@@ -15,8 +15,5 @@ beforeAll(() => {
   // @ts-ignore
   window.location = location
 
-  window.crypto = {
-    subtle: nodeCrypto.webcrypto.subtle,
-    getRandomValues: nodeCrypto.webcrypto.getRandomValues.bind(nodeCrypto.webcrypto),
-  }
+  global.crypto.subtle = nodeCrypto.subtle
 })
