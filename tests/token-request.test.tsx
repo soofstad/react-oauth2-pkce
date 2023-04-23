@@ -42,8 +42,6 @@ const AuthConsumer = () => {
 }
 
 describe('make token request with extra parameters', () => {
-  const wrapper = ({ children }: any) => <AuthProvider authConfig={authConfig}>{children}</AuthProvider>
-
   // Setting up a state similar to what it would be just after redirect back from auth provider
   localStorage.setItem('ROCP_loginInProgress', 'true')
   sessionStorage.setItem('PKCE_code_verifier', 'arandomstring')
@@ -52,9 +50,11 @@ describe('make token request with extra parameters', () => {
     // Have been redirected back with a code in query params
     window.location.search = '?code=1234'
 
-    await act(async () => {
-      render(<AuthConsumer />, { wrapper })
-    })
+    render(
+      <AuthProvider authConfig={authConfig}>
+        <AuthConsumer />
+      </AuthProvider>
+    )
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {

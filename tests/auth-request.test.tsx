@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { AuthProvider } from '../src/AuthContext'
 import { TAuthConfig } from '../src/Types'
-import { act, render, waitFor } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import { AuthContext } from '../src'
 
 const authConfig: TAuthConfig = {
@@ -28,12 +28,12 @@ const AuthConsumer = () => {
 }
 
 describe('first page visit should redirect to auth provider for login', () => {
-  const wrapper = ({ children }: any) => <AuthProvider authConfig={authConfig}>{children}</AuthProvider>
-
   it('redirects with correct query params', async () => {
-    await act(async () => {
-      render(<AuthConsumer />, { wrapper })
-    })
+    render(
+      <AuthProvider authConfig={authConfig}>
+        <AuthConsumer />
+      </AuthProvider>
+    )
 
     await waitFor(() =>
       expect(window.location.replace).toHaveBeenCalledWith(

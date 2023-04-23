@@ -11,13 +11,13 @@ import { postWithXForm } from './httpUtils'
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
 
-export async function redirectToLogin(config: TInternalConfig, customState?: string) {
+export async function redirectToLogin(config: TInternalConfig, customState?: string): Promise<void> {
   // Create and store a random string in sessionStorage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
   sessionStorage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
-  generateCodeChallenge(codeVerifier).then((codeChallenge) => {
+  return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
     const params = new URLSearchParams({
       response_type: 'code',
