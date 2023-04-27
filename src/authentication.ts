@@ -12,9 +12,10 @@ const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
 
 export async function redirectToLogin(config: TInternalConfig, customState?: string): Promise<void> {
-  // Create and store a random string in sessionStorage, used as the 'code_verifier'
+  // Create and store a random string in sessionStorage or localStorage, used as the 'code_verifier'
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
   const codeVerifier = generateRandomString(96)
-  sessionStorage.setItem(codeVerifierStorageKey, codeVerifier)
+  storage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
@@ -29,15 +30,46 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
       ...config.extraAuthParameters,
     })
 
-    sessionStorage.removeItem(stateStorageKey)
+    storage.removeItem(stateStorageKey)
     const state = customState ?? config.state
     if (state) {
-      sessionStorage.setItem(stateStorageKey, state)
+      storage.setItem(stateStorageKey, state)
       params.append('state', state)
     }
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
     window.location.replace(`${config.authorizationEndpoint}?${params.toString()}`)
+  })
+}
+
+export async function redirectToRegister(config: TInternalConfig, customState?: string): Promise<void> {
+  // Create and store a random string in sessionStorage or localStorage, used as the 'code_verifier'
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
+  const codeVerifier = generateRandomString(96)
+  storage.setItem(codeVerifierStorageKey, codeVerifier)
+
+  // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
+  return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
+    // Set query parameters and redirect user to OAuth2 authentication endpoint
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: config.clientId,
+      scope: config.scope,
+      redirect_uri: config.redirectUri,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
+      ...config.extraAuthParameters,
+    })
+
+    storage.removeItem(stateStorageKey)
+    const state = customState ?? config.state
+    if (state) {
+      storage.setItem(stateStorageKey, state)
+      params.append('state', state)
+    }
+    // Call any preLogin function in authConfig
+    if (config?.preLogin) config.preLogin()
+    window.location.replace(`${config.registrationEndpoint}?${params.toString()}`)
   })
 }
 
@@ -64,9 +96,10 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     a 'code' url parameter.
     This code will now be exchanged for Access- and Refresh Tokens.
   */
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
-  const codeVerifier = window.sessionStorage.getItem(codeVerifierStorageKey)
+  const codeVerifier = storage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
     throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
@@ -127,9 +160,10 @@ export function redirectToLogout(
   window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
-export function validateState(urlParams: URLSearchParams) {
+export function validateState(urlParams: URLSearchParams, storageType: 'local' | 'session') {
   const receivedState = urlParams.get('state')
-  const loadedState = sessionStorage.getItem(stateStorageKey)
+  const storage = storageType === 'session' ? sessionStorage : localStorage
+  const loadedState = storage.getItem(stateStorageKey)
   if (receivedState !== loadedState) {
     throw new Error(
       '"state" value received from authentication server does no match client request. Possible cross-site request forgery'

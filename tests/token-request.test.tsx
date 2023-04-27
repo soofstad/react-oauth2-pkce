@@ -25,6 +25,7 @@ const authConfig: TAuthConfig = {
   tokenEndpoint: 'myTokenEndpoint',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
+  storage: 'local',
   extraAuthParams: {
     prompt: true,
     client_id: 'anotherClientId',
@@ -44,7 +45,8 @@ const AuthConsumer = () => {
 describe('make token request with extra parameters', () => {
   // Setting up a state similar to what it would be just after redirect back from auth provider
   localStorage.setItem('ROCP_loginInProgress', 'true')
-  sessionStorage.setItem('PKCE_code_verifier', 'arandomstring')
+  const storage = authConfig.storage === 'local' ? localStorage : sessionStorage
+  storage.setItem('PKCE_code_verifier', 'arandomstring')
 
   it('calls the token endpoint with these parameters', async () => {
     // Have been redirected back with a code in query params
