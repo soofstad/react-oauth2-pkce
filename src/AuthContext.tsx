@@ -1,11 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from 'react' // eslint-disable-line
-import {
-  fetchTokens,
-  fetchWithRefreshToken,
-  redirectToLogin,
-  redirectToLogout,
-  validateState,
-} from './authentication'
+import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import useBrowserStorage from './Hooks'
 import {
   IAuthContext,
