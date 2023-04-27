@@ -251,9 +251,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, []) // eslint-disable-line
 
   return (
-    <AuthContext.Provider
-      value={{ token, tokenData, idToken, idTokenData, login, logOut, error, loginInProgress }}
-    >
+    <AuthContext.Provider value={{ token, tokenData, idToken, idTokenData, login, logOut, error, loginInProgress }}>
       {children}
     </AuthContext.Provider>
   )
