@@ -65,7 +65,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     a 'code' url parameter.
     This code will now be exchanged for Access- and Refresh Tokens.
   */
-  const storage = config.storage === 'session' ? sessionStorage : localStorage
+  const storage = config.storage === 'local' ? localStorage : sessionStorage
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
   const codeVerifier = storage.getItem(codeVerifierStorageKey)
