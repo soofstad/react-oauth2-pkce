@@ -80,6 +80,9 @@ interface IAuthContext {
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
   login: (state?: string) => void  
+  // Function to trigger register.
+  // It's similar to login, but will direct the user to register page
+  register?: (state? string) => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string) => void
@@ -114,6 +117,8 @@ type TAuthConfig = {
   clientId: string  // Required
   // URL for the authentication endpoint at the authentication provider
   authorizationEndpoint: string  // Required
+  // URL for the registration endpoint at the authentication provider
+  registrationEndpoint?: string  // Optional
   // URL for the token endpoint at the authentication provider
   tokenEndpoint: string  // Required
   // Which URL the auth provider should redirect the user after successfull authentication/login
