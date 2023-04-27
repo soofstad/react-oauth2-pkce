@@ -5,7 +5,6 @@ import {
   redirectToLogin,
   redirectToLogout,
   validateState,
-  redirectToRegister,
 } from './authentication'
 import useBrowserStorage from './Hooks'
 import {
@@ -25,7 +24,6 @@ import { FetchError } from './errors'
 export const AuthContext = createContext<IAuthContext>({
   token: '',
   login: () => null,
-  register: () => null,
   logOut: () => null,
   error: null,
   loginInProgress: false,
@@ -117,21 +115,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       typeSafePassedState = undefined
     }
     redirectToLogin(config, typeSafePassedState).catch((error) => {
-      console.error(error)
-      setError(error.message)
-      setLoginInProgress(false)
-    })
-  }
-
-  function register(state?: string) {
-    clearStorage()
-    setLoginInProgress(true)
-    let typeSafePassedState = state
-    if (typeof state !== 'string') {
-      console.warn(`Passed login state must be of type 'string'. Received '${state}'. Ignoring value...`)
-      typeSafePassedState = undefined
-    }
-    redirectToRegister(config, typeSafePassedState).catch((error) => {
       console.error(error)
       setError(error.message)
       setLoginInProgress(false)
@@ -275,7 +258,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, tokenData, idToken, idTokenData, login, logOut, register, error, loginInProgress }}
+      value={{ token, tokenData, idToken, idTokenData, login, logOut, error, loginInProgress }}
     >
       {children}
     </AuthContext.Provider>

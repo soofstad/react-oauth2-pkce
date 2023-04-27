@@ -42,7 +42,6 @@ export interface IAuthContext {
   token: string
   logOut: (state?: string, logoutHint?: string) => void
   login: (state?: string) => void
-  register: (state?: string) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
@@ -54,7 +53,6 @@ export interface IAuthContext {
 export type TAuthConfig = {
   clientId: string
   authorizationEndpoint: string
-  registrationEndpoint?: string
   tokenEndpoint: string
   redirectUri: string
   scope?: string
@@ -85,7 +83,6 @@ export type TRefreshTokenExpiredEvent = {
 export type TInternalConfig = {
   clientId: string
   authorizationEndpoint: string
-  registrationEndpoint?: string
   tokenEndpoint: string
   redirectUri: string
   scope: string

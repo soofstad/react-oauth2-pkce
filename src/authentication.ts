@@ -42,37 +42,6 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
   })
 }
 
-export async function redirectToRegister(config: TInternalConfig, customState?: string): Promise<void> {
-  // Create and store a random string in sessionStorage or localStorage, used as the 'code_verifier'
-  const storage = config.storage === 'session' ? sessionStorage : localStorage
-  const codeVerifier = generateRandomString(96)
-  storage.setItem(codeVerifierStorageKey, codeVerifier)
-
-  // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
-  return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
-    // Set query parameters and redirect user to OAuth2 authentication endpoint
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: config.clientId,
-      scope: config.scope,
-      redirect_uri: config.redirectUri,
-      code_challenge: codeChallenge,
-      code_challenge_method: 'S256',
-      ...config.extraAuthParameters,
-    })
-
-    storage.removeItem(stateStorageKey)
-    const state = customState ?? config.state
-    if (state) {
-      storage.setItem(stateStorageKey, state)
-      params.append('state', state)
-    }
-    // Call any preLogin function in authConfig
-    if (config?.preLogin) config.preLogin()
-    window.location.replace(`${config.registrationEndpoint}?${params.toString()}`)
-  })
-}
-
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
 function isTokenResponse(body: any | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
