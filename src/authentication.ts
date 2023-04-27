@@ -13,7 +13,7 @@ const stateStorageKey = 'ROCP_auth_state'
 
 export async function redirectToLogin(config: TInternalConfig, customState?: string): Promise<void> {
   // Create and store a random string in sessionStorage or localStorage, used as the 'code_verifier'
-  const storage = config.storage === 'session' ? sessionStorage : localStorage
+  const storage = config.storage === 'local' ? localStorage : sessionStorage
   const codeVerifier = generateRandomString(96)
   storage.setItem(codeVerifierStorageKey, codeVerifier)
 
