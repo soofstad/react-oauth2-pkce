@@ -107,14 +107,14 @@ export const fetchWithRefreshToken = (props: {
 export function redirectToLogout(
   config: TInternalConfig,
   token: string,
+  refresh_token?: string,
   idToken?: string,
   state?: string,
   logoutHint?: string
 ) {
   const params = new URLSearchParams({
-    token: token,
-    // TODO: Add config param for token type
-    token_type_hint: 'refresh_token',
+    token: refresh_token || token,
+    token_type_hint: refresh_token ? 'refresh_token' : 'access_token',
     client_id: config.clientId,
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
     ui_locales: window.navigator.languages.reduce((a: string, b: string) => a + ' ' + b),

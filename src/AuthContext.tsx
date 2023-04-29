@@ -96,7 +96,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function logOut(state?: string, logoutHint?: string) {
     clearStorage()
     setError(null)
-    if (config?.logoutEndpoint && refreshToken) redirectToLogout(config, refreshToken, idToken, state, logoutHint)
+    if (config?.logoutEndpoint) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
   }
 
   function login(state?: string) {
