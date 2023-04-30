@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef, useState } from 'react' // eslint-disable-line
+import React, { createContext, useEffect, useMemo, useRef, useState } from 'react' // eslint-disable-line
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import useBrowserStorage from './Hooks'
 import {
@@ -10,7 +10,7 @@ import {
   TTokenData,
   TTokenResponse,
 } from './Types'
-import { validateAuthConfig } from './validateAuthConfig'
+import { createInternalConfig } from './authConfig'
 import { epochAtSecondsFromNow, epochTimeIsPast, FALLBACK_EXPIRE_TIME, getRefreshExpiresIn } from './timeUtils'
 import { decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
@@ -24,30 +24,7 @@ export const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
-  // Set default values for internal config object
-  const {
-    autoLogin = true,
-    clearURL = true,
-    decodeToken = true,
-    scope = '',
-    preLogin = () => null,
-    postLogin = () => null,
-    onRefreshTokenExpire = undefined,
-    storage = 'local',
-  }: TAuthConfig = authConfig
-
-  const config: TInternalConfig = {
-    ...authConfig,
-    autoLogin: autoLogin,
-    clearURL: clearURL,
-    decodeToken: decodeToken,
-    scope: scope,
-    preLogin: preLogin,
-    postLogin: postLogin,
-    onRefreshTokenExpire: onRefreshTokenExpire,
-    storage: storage,
-  }
-  validateAuthConfig(config)
+  const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
 
   const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
     'ROCP_refreshToken',
@@ -104,7 +81,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setLoginInProgress(true)
     // TODO: Raise error on wrong state type in v2
     let typeSafePassedState = state
-    if (typeof state !== 'string') {
+    if (state && typeof state !== 'string') {
       console.warn(`Passed login state must be of type 'string'. Received '${state}'. Ignoring value...`)
       typeSafePassedState = undefined
     }
@@ -139,8 +116,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
     if (initial) return login()
     // TODO: Breaking change - remove automatic login during ongoing session
-    else if (!onRefreshTokenExpire) return login()
-    else return onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
+    else if (!config.onRefreshTokenExpire) return login()
+    else return config.onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
   }
 
   function refreshAccessToken(initial = false): void {
@@ -238,7 +215,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       // First page visit
       if (config.autoLogin) login()
     } else {
-      if (decodeToken) {
+      if (config.decodeToken) {
         try {
           setTokenData(decodeJWT(token))
           if (idToken) setIdTokenData(decodeJWT(idToken))

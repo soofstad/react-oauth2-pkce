@@ -1,19 +1,18 @@
 const { TextDecoder, TextEncoder } = require('util')
 const nodeCrypto = require('crypto')
 
-// Add some mocks
-beforeAll(() => {
-  global.TextEncoder = TextEncoder
-  // @ts-ignore
-  global.TextDecoder = TextDecoder
+beforeEach(() => {
+  localStorage.removeItem('ROCP_loginInProgress')
+  localStorage.removeItem('ROCP_token')
+  localStorage.removeItem('ROCP_refreshToken')
+  localStorage.removeItem('PKCE_code_verifier')
 
-  // @ts-ignore
+  global.TextEncoder = TextEncoder
+  global.TextDecoder = TextDecoder
+  global.crypto.subtle = nodeCrypto.subtle
+
   delete window.location
   const location = new URL('https://www.example.com')
-  // @ts-ignore
   location.replace = jest.fn()
-  // @ts-ignore
   window.location = location
-
-  global.crypto.subtle = nodeCrypto.subtle
 })
