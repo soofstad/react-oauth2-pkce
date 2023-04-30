@@ -1,11 +1,39 @@
-import { TInternalConfig } from './Types'
+import { TAuthConfig, TInternalConfig } from './Types'
 
 function stringIsUnset(value: any) {
   const unset = ['', undefined, null]
   return unset.includes(value)
 }
 
-export function validateAuthConfig(config: TInternalConfig) {
+export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig {
+  // Set default values for internal config object
+  const {
+    autoLogin = true,
+    clearURL = true,
+    decodeToken = true,
+    scope = '',
+    preLogin = () => null,
+    postLogin = () => null,
+    onRefreshTokenExpire = undefined,
+    storage = 'local',
+  }: TAuthConfig = passedConfig
+
+  const config: TInternalConfig = {
+    ...passedConfig,
+    autoLogin: autoLogin,
+    clearURL: clearURL,
+    decodeToken: decodeToken,
+    scope: scope,
+    preLogin: preLogin,
+    postLogin: postLogin,
+    onRefreshTokenExpire: onRefreshTokenExpire,
+    storage: storage,
+  }
+  validateConfig(config)
+  return config
+}
+
+export function validateConfig(config: TInternalConfig) {
   if (stringIsUnset(config?.clientId))
     throw Error("'clientId' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
   if (stringIsUnset(config?.authorizationEndpoint))
