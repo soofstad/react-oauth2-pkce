@@ -23,5 +23,8 @@ export function getRefreshExpiresIn(tokenExpiresIn: number, response: TTokenResp
   for (const key of refreshExpireKeys) {
     if (key in response) return response[key] as number
   }
-  return tokenExpiresIn + FALLBACK_EXPIRE_TIME
+  // If the response has a refresh_token, but no expire_time. Assume it's at least 10m longer than access_token's expire
+  if (response.refresh_token) return tokenExpiresIn + FALLBACK_EXPIRE_TIME
+  // The token response had no refresh_token. Set refresh_expire equals to access_token expire
+  return tokenExpiresIn
 }
