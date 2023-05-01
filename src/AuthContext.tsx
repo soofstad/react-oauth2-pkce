@@ -1,10 +1,9 @@
-import React, { createContext, useEffect, useMemo, useRef, useState } from 'react' // eslint-disable-line
+import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import useBrowserStorage from './Hooks'
 import {
   IAuthContext,
   IAuthProvider,
-  TAuthConfig,
   TInternalConfig,
   TRefreshTokenExpiredEvent,
   TTokenData,
@@ -121,44 +120,49 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function refreshAccessToken(initial = false): void {
-    // Only refresh if no other instance (tab) is currently refreshing, or it's initial page load
-    if (token && epochTimeIsPast(tokenExpire) && (!refreshInProgress || initial)) {
-      // We have a refreshToken, and it is not expired
-      if (refreshToken && !epochTimeIsPast(refreshTokenExpire)) {
-        setRefreshInProgress(true)
-        fetchWithRefreshToken({ config, refreshToken })
-          .then((result: TTokenResponse) => handleTokenResponse(result))
-          .catch((error: unknown) => {
-            if (error instanceof FetchError) {
-              // If the fetch failed with status 400, assume expired refresh token
-              if (error.status === 400) {
-                return handleExpiredRefreshToken(initial)
-              }
-              // Unknown error. Set error, and login if first page load
-              else {
-                console.error(error)
-                setError(error.message)
-                if (initial) login()
-              }
+    if (!token) return
+    // The token has not expired. Do nothing
+    if (!epochTimeIsPast(tokenExpire)) return
+
+    // Other instance (tab) is currently refreshing. This instance skip the refresh if not initial
+    if (refreshInProgress && !initial) return
+
+    // The refreshToken has expired
+    if (epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken(initial)
+
+    // The access_token has expired, and we have a non-expired refresh_token. Use it to refresh access_token.
+    if (refreshToken) {
+      setRefreshInProgress(true)
+      fetchWithRefreshToken({ config, refreshToken })
+        .then((result: TTokenResponse) => handleTokenResponse(result))
+        .catch((error: unknown) => {
+          if (error instanceof FetchError) {
+            // If the fetch failed with status 400, assume expired refresh token
+            if (error.status === 400) {
+              return handleExpiredRefreshToken(initial)
             }
             // Unknown error. Set error, and login if first page load
-            else if (error instanceof Error) {
+            else {
               console.error(error)
               setError(error.message)
               if (initial) login()
             }
-          })
-          .finally(() => {
-            setRefreshInProgress(false)
-          })
-      }
-      // The refreshToken has expired
-      else {
-        return handleExpiredRefreshToken(initial)
-      }
+          }
+          // Unknown error. Set error, and login if first page load
+          else if (error instanceof Error) {
+            console.error(error)
+            setError(error.message)
+            if (initial) login()
+          }
+        })
+        .finally(() => {
+          setRefreshInProgress(false)
+        })
+      return
     }
-    // The token has not expired. Do nothing
-    return
+    console.warn(
+      'Failed to refresh access_token. Most likely there is no refresh_token, or the authentication server did not reply with an explicit expire time, and the default expire times are longer than the actual tokens expire time'
+    )
   }
 
   // Register the 'check for soon expiring access token' interval (Every 10 seconds)
@@ -174,8 +178,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   // Runs once on page load
   useEffect(() => {
+    // The client has been redirected back from the auth endpoint with an auth code
     if (loginInProgress) {
-      // The client has been redirected back from the Auth endpoint with an auth code
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now..."
@@ -184,7 +188,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         console.error(error_description)
         setError(error_description)
         logOut()
-      } else if (!didFetchTokens.current) {
+        return
+      }
+      // Make sure we only try to use the auth code once
+      if (!didFetchTokens.current) {
         didFetchTokens.current = true
         try {
           validateState(urlParams)
@@ -192,7 +199,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           console.error(e)
           setError((e as Error).message)
         }
-        // Request token from auth server with the auth code
+        // Request tokens from auth server with the auth code
         fetchTokens(config)
           .then((tokens: TTokenResponse) => {
             handleTokenResponse(tokens)
@@ -210,21 +217,25 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             }
             setLoginInProgress(false)
           })
+        return
       }
-    } else if (!token) {
-      // First page visit
-      if (config.autoLogin) login()
-    } else {
-      if (config.decodeToken) {
-        try {
-          setTokenData(decodeJWT(token))
-          if (idToken) setIdTokenData(decodeJWT(idToken))
-        } catch (e) {
-          setError((e as Error).message)
-        }
-      }
-      refreshAccessToken(true) // Check if token should be updated
     }
+
+    // First page visit
+    if (!token && config.autoLogin) return login()
+
+    // Page refresh after login has succeeded
+    try {
+      if (idToken) setIdTokenData(decodeJWT(idToken))
+    } catch (e) {
+      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+    }
+    try {
+      if (config.decodeToken) setTokenData(decodeJWT(token))
+    } catch (e) {
+      console.warn(`Failed to decode access token: ${(e as Error).message}`)
+    }
+    refreshAccessToken(true) // Check if token should be updated
   }, []) // eslint-disable-line
 
   return (
