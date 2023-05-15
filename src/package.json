@@ -1,6 +1,6 @@
 {
   "name": "react-oauth2-code-pkce",
-  "version": "1.13.3",
+  "version": "1.13.4",
   "description": "Provider agnostic react package for OAuth2 Authorization Code flow with PKCE",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
