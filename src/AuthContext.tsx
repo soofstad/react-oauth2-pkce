@@ -217,8 +217,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             }
             setLoginInProgress(false)
           })
-        return
       }
+      return
     }
 
     // First page visit
