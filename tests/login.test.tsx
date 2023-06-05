@@ -12,7 +12,7 @@ test('First page visit should redirect to auth provider for login', async () => 
   )
 
   await waitFor(() => {
-    expect(window.location.replace).toHaveBeenCalledWith(
+    expect(window.location.assign).toHaveBeenCalledWith(
       expect.stringMatching(
         /^myAuthEndpoint\?response_type=code&client_id=myClientID&redirect_uri=http%3A%2F%2Flocalhost%2F&code_challenge=.{43}&code_challenge_method=S256&scope=someScope\+openid&state=testState/gm
       )

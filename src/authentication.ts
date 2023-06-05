@@ -40,7 +40,7 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
     }
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
-    window.location.replace(`${config.authorizationEndpoint}?${params.toString()}`)
+    window.location.assign(`${config.authorizationEndpoint}?${params.toString()}`)
   })
 }
 
@@ -125,8 +125,7 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
-
-  window.location.replace(`${config.logoutEndpoint}?${params.toString()}`)
+  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
 export function validateState(urlParams: URLSearchParams) {
