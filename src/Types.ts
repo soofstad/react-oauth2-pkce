@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 interface TTokenRqBase {
   grant_type: string
-  scope: string
+  scope?: string
   client_id: string
   redirect_uri: string
 }
@@ -85,7 +85,7 @@ export type TInternalConfig = {
   authorizationEndpoint: string
   tokenEndpoint: string
   redirectUri: string
-  scope: string
+  scope?: string
   state?: string
   logoutEndpoint?: string
   logoutRedirect?: string

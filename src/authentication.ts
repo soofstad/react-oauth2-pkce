@@ -22,12 +22,15 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: config.clientId,
-      scope: config.scope,
       redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
       ...config.extraAuthParameters,
     })
+
+    if (config.scope !== undefined) {
+      params.append('scope', config.scope)
+    }
 
     sessionStorage.removeItem(stateStorageKey)
     const state = customState ?? config.state
