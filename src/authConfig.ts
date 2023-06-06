@@ -11,7 +11,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     autoLogin = true,
     clearURL = true,
     decodeToken = true,
-    scope = '',
+    scope = undefined,
     preLogin = () => null,
     postLogin = () => null,
     onRefreshTokenExpire = undefined,
