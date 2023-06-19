@@ -85,9 +85,9 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,
+    ...config.extraTokenParameters,
     // TODO: Remove in 2.0
     ...config.extraAuthParams,
-    ...config.extraTokenParameters,
   }
   return postTokenRequest(config.tokenEndpoint, tokenRequest)
 }
@@ -103,6 +103,7 @@ export const fetchWithRefreshToken = (props: {
     scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
+    ...config.extraTokenParameters,
   }
   return postTokenRequest(config.tokenEndpoint, refreshRequest)
 }
