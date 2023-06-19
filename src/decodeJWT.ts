@@ -19,7 +19,7 @@ export const decodeJWT = (token: string): TTokenData => {
   } catch (e) {
     console.error(e)
     throw Error(
-      'Failed to decode the access token.\n\tIs it a proper Java Web Token?\n\t' +
+      'Failed to decode the access token.\n\tIs it a proper JSON Web Token?\n\t' +
         "You can disable JWT decoding by setting the 'decodeToken' value to 'false' the configuration."
     )
   }
