@@ -241,7 +241,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       console.warn(`Failed to decode idToken: ${(e as Error).message}`)
     }
     try {
-      if (config.decodeToken) setTokenData(decodeJWT(token))
+      if (token && config.decodeToken) setTokenData(decodeJWT(token))
     } catch (e) {
       console.warn(`Failed to decode access token: ${(e as Error).message}`)
     }
