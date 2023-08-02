@@ -26,31 +26,41 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
 
   const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
-    'ROCP_refreshToken',
+    'refreshToken',
     undefined,
-    config.storage
+    config.storage,
+    config.storageKeyPrefix
   )
   const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number>(
-    'ROCP_refreshTokenExpire',
+    'refreshTokenExpire',
     epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME),
-    config.storage
+    config.storage,
+    config.storageKeyPrefix
   )
-  const [token, setToken] = useBrowserStorage<string>('ROCP_token', '', config.storage)
+  const [token, setToken] = useBrowserStorage<string>('ROCP_token', '', config.storage, config.storageKeyPrefix)
   const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
-    'ROCP_tokenExpire',
+    'tokenExpire',
     epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
-    config.storage
+    config.storage,
+    config.storageKeyPrefix
   )
-  const [idToken, setIdToken] = useBrowserStorage<string | undefined>('ROCP_idToken', undefined, config.storage)
+  const [idToken, setIdToken] = useBrowserStorage<string | undefined>(
+    'idToken',
+    undefined,
+    config.storage,
+    config.storageKeyPrefix
+  )
   const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
-    'ROCP_loginInProgress',
+    'loginInProgress',
     false,
-    config.storage
+    config.storage,
+    config.storageKeyPrefix
   )
   const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
-    'ROCP_refreshInProgress',
+    'refreshInProgress',
     false,
-    config.storage
+    config.storage,
+    config.storageKeyPrefix
   )
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()

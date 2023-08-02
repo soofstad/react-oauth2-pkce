@@ -22,7 +22,7 @@ test('First page visit should redirect to auth provider for login', async () => 
 
 test('Attempting to login with and unsecure context should raise error', async () => {
   // @ts-ignore
-  global.crypto.subtle.digest = undefined
+  window.crypto.subtle.digest = undefined
   render(
     <AuthProvider authConfig={authConfig}>
       <AuthConsumer />
