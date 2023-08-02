@@ -2,6 +2,7 @@ import { AuthContext, TAuthConfig } from '../src'
 import React, { useContext } from 'react'
 
 export const authConfig: TAuthConfig = {
+  autoLogin: true,
   clientId: 'myClientID',
   authorizationEndpoint: 'myAuthEndpoint',
   tokenEndpoint: 'myTokenEndpoint',
