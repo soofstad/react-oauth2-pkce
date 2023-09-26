@@ -37,7 +37,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     config.storage,
     config.storageKeyPrefix
   )
-  const [token, setToken] = useBrowserStorage<string>('ROCP_token', '', config.storage, config.storageKeyPrefix)
+  const [token, setToken] = useBrowserStorage<string>('token', '', config.storage, config.storageKeyPrefix)
   const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
     'tokenExpire',
     epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),

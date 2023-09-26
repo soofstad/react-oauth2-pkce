@@ -22,6 +22,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "root": true,
   "plugins": ["react", "@typescript-eslint", "react-hooks", "jsx-a11y", "eslint-plugin-prettier"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",

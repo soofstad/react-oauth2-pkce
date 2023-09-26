@@ -10,7 +10,7 @@ beforeEach(() => {
   global.TextEncoder = TextEncoder
   global.TextDecoder = TextDecoder
 
-  global.crypto.subtle = nodeCrypto.webcrypto.subtle;
+  global.crypto.subtle = nodeCrypto.webcrypto.subtle
 
   delete window.location
   const location = new URL('https://www.example.com')
