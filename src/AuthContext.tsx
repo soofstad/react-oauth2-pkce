@@ -82,7 +82,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function logOut(state?: string, logoutHint?: string) {
     clearStorage()
     setError(null)
-    if (config?.logoutEndpoint) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
+    if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
   }
 
   function login(state?: string) {
@@ -201,7 +201,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             "\nExpected  to find a '?code=' parameter in the URL by now. Did the authentication get aborted or interrupted?"
         )
         setError(error_description)
-        logOut()
+        clearStorage()
         return
       }
       // Make sure we only try to use the auth code once
