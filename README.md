@@ -10,8 +10,9 @@ Short version;
 The modern and secure way to do authentication for mobile and web applications!
 
 Long version;  
-<https://oauth.net/2/pkce/>  
-<https://datatracker.ietf.org/doc/html/rfc7636>
+<https://www.rfc-editor.org/rfc/rfc6749.html>  
+<https://datatracker.ietf.org/doc/html/rfc7636>  
+<https://oauth.net/2/pkce/>
 
 ## Features
 

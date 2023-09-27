@@ -194,8 +194,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now..."
         const error_description =
-          urlParams.get('error_description') || 'Bad authorization state. Refreshing the page might solve the issue.'
-        console.error(error_description)
+          urlParams.get('error_description') ||
+          'Bad authorization state. Refreshing the page and log in again might solve the issue.'
+        console.error(
+          error_description +
+            "\nExpected  to find a '?code=' parameter in the URL by now. Did the authentication get aborted or interrupted?"
+        )
         setError(error_description)
         logOut()
         return
