@@ -2,7 +2,9 @@ import { TTokenResponse } from './Types'
 export const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 // Returns epoch time (in seconds) for when the token will expire
-export const epochAtSecondsFromNow = (secondsFromNow: number) => Math.round(Date.now() / 1000 + secondsFromNow)
+// 'secondsFromNow' should always be an integer, but some auth providers has decided that whole numbers should be strings...
+export const epochAtSecondsFromNow = (secondsFromNow: number | string) =>
+  Math.round(Date.now() / 1000 + Number(secondsFromNow))
 
 /**
  * Check if the Access Token has expired.
