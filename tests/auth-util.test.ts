@@ -51,6 +51,18 @@ test('check if still valid token inside buffer has expired', () => {
   expect(hasExpired).toBe(true)
 })
 
+test('expire time as string gets correctly converted', () => {
+  const expectedEpoch = Math.round(Date.now() / 1000 + 55555)
+  const epochSumCalculated = epochAtSecondsFromNow('55555')
+  expect(expectedEpoch).toBe(epochSumCalculated)
+})
+
+test('expire time as int gets correctly converted', () => {
+  const expectedEpoch = Math.round(Date.now() / 1000 + 55555)
+  const epochSumCalculated = epochAtSecondsFromNow(55555)
+  expect(expectedEpoch).toBe(epochSumCalculated)
+})
+
 test('check if still valid token outside buffer has expired', () => {
   const willExpireAt = epochAtSecondsFromNow(301) // Will expire in 5min
   const hasExpired = epochTimeIsPast(willExpireAt)
