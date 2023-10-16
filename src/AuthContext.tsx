@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
-import useBrowserStorage from './Hooks'
+import { useStorage } from './useStorage'
 import {
   IAuthContext,
   IAuthProvider,
@@ -24,44 +24,23 @@ export const AuthContext = createContext<IAuthContext>({
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
+  const {
+    refreshToken,
+    setRefreshToken,
+    refreshTokenExpire,
+    setRefreshTokenExpire,
+    token,
+    setToken,
+    tokenExpire,
+    setTokenExpire,
+    idToken,
+    setIdToken,
+    loginInProgress,
+    setLoginInProgress,
+    refreshInProgress,
+    setRefreshInProgress,
+  } = useStorage(config)
 
-  const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
-    'refreshToken',
-    undefined,
-    config.storage,
-    config.storageKeyPrefix
-  )
-  const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number>(
-    'refreshTokenExpire',
-    epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME),
-    config.storage,
-    config.storageKeyPrefix
-  )
-  const [token, setToken] = useBrowserStorage<string>('token', '', config.storage, config.storageKeyPrefix)
-  const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
-    'tokenExpire',
-    epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
-    config.storage,
-    config.storageKeyPrefix
-  )
-  const [idToken, setIdToken] = useBrowserStorage<string | undefined>(
-    'idToken',
-    undefined,
-    config.storage,
-    config.storageKeyPrefix
-  )
-  const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
-    'loginInProgress',
-    false,
-    config.storage,
-    config.storageKeyPrefix
-  )
-  const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
-    'refreshInProgress',
-    false,
-    config.storage,
-    config.storageKeyPrefix
-  )
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)

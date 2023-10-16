@@ -17,6 +17,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     onRefreshTokenExpire = undefined,
     storage = 'local',
     storageKeyPrefix = 'ROCP_',
+    baseDomain = undefined,
   }: TAuthConfig = passedConfig
 
   const config: TInternalConfig = {
@@ -30,6 +31,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     onRefreshTokenExpire: onRefreshTokenExpire,
     storage: storage,
     storageKeyPrefix: storageKeyPrefix,
+    baseDomain: baseDomain,
   }
   validateConfig(config)
   return config
@@ -48,7 +50,8 @@ export function validateConfig(config: TInternalConfig) {
     )
   if (stringIsUnset(config?.redirectUri))
     throw Error("'redirectUri' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
-  if (!['session', 'local'].includes(config.storage)) throw Error("'storage' must be one of ('session', 'local')")
+  if (!['session', 'local', 'cookie'].includes(config.storage))
+    throw Error("'storage' must be one of ('session', 'local', 'cookie')")
   if (config?.extraAuthParams)
     console.warn(
       "The 'extraAuthParams' configuration parameter will be deprecated. You should use " +
