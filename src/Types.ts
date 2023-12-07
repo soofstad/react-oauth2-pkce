@@ -2,7 +2,6 @@ import { ReactNode } from 'react'
 
 interface TTokenRqBase {
   grant_type: string
-  scope?: string
   client_id: string
   redirect_uri: string
 }
