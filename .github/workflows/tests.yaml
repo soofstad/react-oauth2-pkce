@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  pre-commit:
+  linting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
       - name: Run pre-commit
         run: pre-commit run --all-files
         
-  test:
+  unittests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
