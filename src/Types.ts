@@ -12,6 +12,7 @@ export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
 }
 
 export interface TTokenRequestForRefresh extends TTokenRqBase {
+  scope?: string
   refresh_token: string
 }
 
