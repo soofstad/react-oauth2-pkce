@@ -33,7 +33,7 @@ test('make token request with extra parameters', async () => {
 
   await waitFor(() =>
     expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
-      body: 'grant_type=authorization_code&code=1234&scope=someScope%20openid&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
+      body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
