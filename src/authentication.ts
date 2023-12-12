@@ -81,7 +81,6 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
   const tokenRequest: TTokenRequestWithCodeAndVerifier = {
     grant_type: 'authorization_code',
     code: authCode,
-    scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     code_verifier: codeVerifier,

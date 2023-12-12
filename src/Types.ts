@@ -2,7 +2,6 @@ import { ReactNode } from 'react'
 
 interface TTokenRqBase {
   grant_type: string
-  scope?: string
   client_id: string
   redirect_uri: string
 }
@@ -13,6 +12,7 @@ export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
 }
 
 export interface TTokenRequestForRefresh extends TTokenRqBase {
+  scope?: string
   refresh_token: string
 }
 
