@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 
-function useBrowserStorage<T>(
-  key: string,
-  initialValue: T,
-  type: 'session' | 'local',
-  prefix?: string
-): [T, (v: T) => void] {
+function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'local'): [T, (v: T) => void] {
   const storage = type === 'session' ? sessionStorage : localStorage
-  key = `${prefix ?? ''}${key}`
 
   const [storedValue, setStoredValue] = useState<T>(() => {
     const item = storage.getItem(key)

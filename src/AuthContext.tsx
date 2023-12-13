@@ -26,41 +26,35 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
 
   const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
-    'refreshToken',
+    `${config.storageKeyPrefix}refreshToken`,
     undefined,
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
   const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number>(
-    'refreshTokenExpire',
+    `${config.storageKeyPrefix}refreshTokenExpire`,
     epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME),
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
-  const [token, setToken] = useBrowserStorage<string>('token', '', config.storage, config.storageKeyPrefix)
+  const [token, setToken] = useBrowserStorage<string>(`${config.storageKeyPrefix}token`, '', config.storage)
   const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
-    'tokenExpire',
+    `${config.storageKeyPrefix}tokenExpire`,
     epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
   const [idToken, setIdToken] = useBrowserStorage<string | undefined>(
-    'idToken',
+    `${config.storageKeyPrefix}idToken`,
     undefined,
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
   const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
-    'loginInProgress',
+    `${config.storageKeyPrefix}loginInProgress`,
     false,
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
   const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
-    'refreshInProgress',
+    `${config.storageKeyPrefix}refreshInProgress`,
     false,
-    config.storage,
-    config.storageKeyPrefix
+    config.storage
   )
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()

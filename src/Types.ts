@@ -104,5 +104,5 @@ export type TInternalConfig = {
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
   storage: 'session' | 'local'
-  storageKeyPrefix?: string
+  storageKeyPrefix: string
 }
