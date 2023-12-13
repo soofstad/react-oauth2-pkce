@@ -99,11 +99,11 @@ export const fetchWithRefreshToken = (props: {
   const refreshRequest: TTokenRequestForRefresh = {
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
-    scope: config.scope,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     ...config.extraTokenParameters,
   }
+  if (config.refreshWithScope) refreshRequest.scope = config.scope
   return postTokenRequest(config.tokenEndpoint, refreshRequest)
 }
 
