@@ -163,6 +163,8 @@ type TAuthConfig = {
   tokenExpiresIn?: number // default: null
   // Can be used if auth provider doesn't return refresh token expiration time in token response
   refreshTokenExpiresIn?: number // default: null
+  // Whether or not to post 'scope' when refreshing the access token
+  refreshWithScope?: boolean // default: true
 }
 
 ```

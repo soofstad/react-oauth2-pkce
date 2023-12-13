@@ -17,6 +17,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     onRefreshTokenExpire = undefined,
     storage = 'local',
     storageKeyPrefix = 'ROCP_',
+    refreshWithScope = true,
   }: TAuthConfig = passedConfig
 
   const config: TInternalConfig = {
@@ -30,6 +31,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     onRefreshTokenExpire: onRefreshTokenExpire,
     storage: storage,
     storageKeyPrefix: storageKeyPrefix,
+    refreshWithScope: refreshWithScope,
   }
   validateConfig(config)
   return config

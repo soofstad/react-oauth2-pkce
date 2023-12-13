@@ -25,6 +25,7 @@ const authConfig = {
   clearURL: true,
   autoLogin: false,
   storage: 'local',
+  refreshWithScope: false,
 }
 
 function LoginInfo() {
@@ -38,6 +39,10 @@ function LoginInfo() {
       {token ? (
         <>
           <button onClick={() => logOut('rememberThis', idTokenData.tid)}>Logout</button>
+          <span style={{ margin: '0 10px' }}>
+            Access token will expire at:{' '}
+            {new Date(localStorage.getItem('ROCP_tokenExpire') * 1000).toLocaleTimeString()}
+          </span>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div>
               <h4>Access Token (JWT)</h4>
