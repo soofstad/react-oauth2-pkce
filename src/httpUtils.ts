@@ -3,9 +3,9 @@ import { FetchError } from './errors'
 
 function buildUrlEncodedRequest(request: TTokenRequest): string {
   let queryString = ''
-  Object.entries(request).forEach(([key, value]) => {
-    queryString += (queryString ? '&' : '') + key + '=' + encodeURIComponent(value)
-  })
+  for (const [key, value] of Object.entries(request)) {
+    queryString += `${queryString ? '&' : ''}${key}=${encodeURIComponent(value)}`
+  }
   return queryString
 }
 

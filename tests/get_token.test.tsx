@@ -1,7 +1,7 @@
+import { render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { AuthProvider } from '../src'
 import { TTokenResponse } from '../src/Types'
-import { render, waitFor } from '@testing-library/react'
 import { AuthConsumer, authConfig } from './test-utils'
 
 // @ts-ignore

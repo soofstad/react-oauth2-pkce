@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 // @ts-ignore
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider, TAuthConfig, IAuthContext } from 'react-oauth2-code-pkce'
+import { AuthContext, AuthProvider, IAuthContext, TAuthConfig } from 'react-oauth2-code-pkce'
 
 const authConfig: TAuthConfig = {
   clientId: '6559ce69-219d-4e82-b6ed-889a861c7c94',
@@ -26,7 +26,9 @@ function LoginInfo(): JSX.Element {
     return (
       <>
         <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
-        <button onClick={() => logOut()}>Logout</button>
+        <button type='button' onClick={() => logOut()}>
+          Logout
+        </button>
       </>
     )
   }
@@ -58,7 +60,7 @@ function LoginInfo(): JSX.Element {
           >
             <p>Welcome, John Doe!</p>
 
-            <button style={{ width: '100px' }} onClick={() => logOut()}>
+            <button type='button' style={{ width: '100px' }} onClick={() => logOut()}>
               Logout
             </button>
 
@@ -102,7 +104,7 @@ function LoginInfo(): JSX.Element {
           >
             <p>Please login to continue</p>
 
-            <button style={{ width: '100px' }} onClick={() => login()}>
+            <button type='button' style={{ width: '100px' }} onClick={() => login()}>
               Login
             </button>
           </div>

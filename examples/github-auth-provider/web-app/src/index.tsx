@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 // @ts-ignore
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider, TAuthConfig, IAuthContext } from 'react-oauth2-code-pkce'
+import { AuthContext, AuthProvider, IAuthContext, TAuthConfig } from 'react-oauth2-code-pkce'
 
 const authConfig: TAuthConfig = {
   clientId: 'c43524cc7d3c82b05a47',
@@ -80,11 +80,11 @@ ReactDOM.render(
       <h1>Demo using the 'react-oauth2-code-pkce' package</h1>
       <p>
         Github:{' '}
-        <a href="https://github.com/soofstad/react-oauth2-pkce">https://github.com/soofstad/react-oauth2-pkce</a>
+        <a href='https://github.com/soofstad/react-oauth2-pkce'>https://github.com/soofstad/react-oauth2-pkce</a>
       </p>
       <p>
         NPM:{' '}
-        <a href="https://www.npmjs.com/package/react-oauth2-code-pkce">
+        <a href='https://www.npmjs.com/package/react-oauth2-code-pkce'>
           https://www.npmjs.com/package/react-oauth2-code-pkce
         </a>
       </p>

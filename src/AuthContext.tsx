@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
-import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import useBrowserStorage from './Hooks'
 import {
   IAuthContext,
@@ -10,9 +9,10 @@ import {
   TTokenResponse,
 } from './Types'
 import { createInternalConfig } from './authConfig'
-import { epochAtSecondsFromNow, epochTimeIsPast, FALLBACK_EXPIRE_TIME, getRefreshExpiresIn } from './timeUtils'
+import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
+import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -59,8 +59,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
-
-  let interval: any
 
   function clearStorage() {
     setRefreshToken(undefined)
@@ -117,10 +115,20 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleExpiredRefreshToken(initial = false): void {
     // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
-    if (initial) return login()
+    if (initial) {
+      login()
+      return
+    }
+
     // TODO: Breaking change - remove automatic login during ongoing session
-    else if (!config.onRefreshTokenExpire) return login()
-    else return config.onRefreshTokenExpire({ login } as TRefreshTokenExpiredEvent)
+    if (!config.onRefreshTokenExpire) {
+      login()
+      return
+    }
+
+    config.onRefreshTokenExpire({
+      login,
+    } as TRefreshTokenExpiredEvent)
   }
 
   function refreshAccessToken(initial = false): void {
@@ -132,7 +140,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (refreshInProgress && !initial) return
 
     // The refreshToken has expired
-    if (epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken(initial)
+    if (epochTimeIsPast(refreshTokenExpire)) {
+      handleExpiredRefreshToken(initial)
+      return
+    }
 
     // The access_token has expired, and we have a non-expired refresh_token. Use it to refresh access_token.
     if (refreshToken) {
@@ -143,14 +154,13 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           if (error instanceof FetchError) {
             // If the fetch failed with status 400, assume expired refresh token
             if (error.status === 400) {
-              return handleExpiredRefreshToken(initial)
+              handleExpiredRefreshToken(initial)
+              return
             }
             // Unknown error. Set error, and login if first page load
-            else {
-              console.error(error)
-              setError(error.message)
-              if (initial) login()
-            }
+            console.error(error)
+            setError(error.message)
+            if (initial) login()
           }
           // Unknown error. Set error, and login if first page load
           else if (error instanceof Error) {
@@ -171,7 +181,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   // Register the 'check for soon expiring access token' interval (Every 10 seconds)
   useEffect(() => {
-    interval = setInterval(() => refreshAccessToken(), 10000) // eslint-disable-line
+    const interval = setInterval(() => refreshAccessToken(), 10000) // eslint-disable-line
     return () => clearInterval(interval)
   }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
@@ -191,8 +201,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           urlParams.get('error_description') ||
           'Bad authorization state. Refreshing the page and log in again might solve the issue.'
         console.error(
-          error_description +
-            "\nExpected  to find a '?code=' parameter in the URL by now. Did the authentication get aborted or interrupted?"
+          `${error_description}\nExpected  to find a '?code=' parameter in the URL by now. Did the authentication get aborted or interrupted?`
         )
         setError(error_description)
         clearStorage()
@@ -203,7 +212,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         didFetchTokens.current = true
         try {
           validateState(urlParams)
-        } catch (e: any) {
+        } catch (e: unknown) {
           console.error(e)
           setError((e as Error).message)
         }
@@ -247,7 +256,18 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }, []) // eslint-disable-line
 
   return (
-    <AuthContext.Provider value={{ token, tokenData, idToken, idTokenData, login, logOut, error, loginInProgress }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        tokenData,
+        idToken,
+        idTokenData,
+        login,
+        logOut,
+        error,
+        loginInProgress,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

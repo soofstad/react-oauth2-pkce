@@ -1,5 +1,5 @@
-import { AuthContext, TAuthConfig } from '../src'
 import React, { useContext } from 'react'
+import { AuthContext, TAuthConfig } from '../src'
 
 export const authConfig: TAuthConfig = {
   autoLogin: true,
@@ -28,8 +28,12 @@ export const AuthConsumer = () => {
   return (
     <>
       <div>{tokenData?.name}</div>
-      <button onClick={() => logOut('logoutState')}>Logout</button>
-      <button onClick={() => login('loginState')}>Login</button>
+      <button type='button' onClick={() => logOut('logoutState')}>
+        Logout
+      </button>
+      <button type='button' onClick={() => login('loginState')}>
+        Login
+      </button>
       <label aria-label={'loginInProgress'}>{JSON.stringify(loginInProgress)}</label>
       <label aria-label={'error'}>{error}</label>
       <label aria-label={'token'}>{token}</label>

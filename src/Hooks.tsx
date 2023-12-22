@@ -7,10 +7,8 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
     const item = storage.getItem(key)
     try {
       return item ? JSON.parse(item) : initialValue
-    } catch (error: any) {
-      console.warn(
-        `Failed to parse stored value for '${key}'.\nContinuing with default value.\nError: ${error.message}`
-      )
+    } catch (error: unknown) {
+      console.warn(`Failed to parse stored value for '${key}'.\nContinuing with default value.`)
       return initialValue
     }
   })

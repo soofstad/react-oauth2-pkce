@@ -19,6 +19,7 @@ export interface TTokenRequestForRefresh extends TTokenRqBase {
 export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh
 
 export type TTokenData = {
+  // biome-ignore lint: It really can be any, almost
   [x: string]: any
 }
 

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
-import { createRoot } from 'react-dom/client'
 // @ts-ignore
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider, TAuthConfig, IAuthContext } from 'react-oauth2-code-pkce'
+import { createRoot } from 'react-dom/client'
+import { AuthContext, AuthProvider, IAuthContext, TAuthConfig } from 'react-oauth2-code-pkce'
 
 // Get info from http://localhost:8080/realms/test/.well-known/openid-configuration
 
@@ -87,11 +87,11 @@ root.render(
       <h1>Demo using the 'react-oauth2-code-pkce' package</h1>
       <p>
         Github:{' '}
-        <a href="https://github.com/soofstad/react-oauth2-pkce">https://github.com/soofstad/react-oauth2-pkce</a>
+        <a href='https://github.com/soofstad/react-oauth2-pkce'>https://github.com/soofstad/react-oauth2-pkce</a>
       </p>
       <p>
         NPM:{' '}
-        <a href="https://www.npmjs.com/package/react-oauth2-code-pkce">
+        <a href='https://www.npmjs.com/package/react-oauth2-code-pkce'>
           https://www.npmjs.com/package/react-oauth2-code-pkce
         </a>
       </p>

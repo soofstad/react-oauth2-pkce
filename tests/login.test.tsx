@@ -1,8 +1,8 @@
-import React from 'react'
 import '@testing-library/jest-dom'
-import { AuthProvider } from '../src'
 import { render, screen, waitFor } from '@testing-library/react'
-import { authConfig, AuthConsumer } from './test-utils'
+import React from 'react'
+import { AuthProvider } from '../src'
+import { AuthConsumer, authConfig } from './test-utils'
 
 test('First page visit should redirect to auth provider for login', async () => {
   render(

@@ -12,6 +12,7 @@ beforeEach(() => {
 
   global.crypto.subtle = nodeCrypto.webcrypto.subtle
 
+  // biome-ignore lint: set undefine does not work...
   delete window.location
   const location = new URL('https://www.example.com')
   location.replace = jest.fn()

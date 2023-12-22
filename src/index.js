@@ -15,8 +15,6 @@ const authConfig = {
   tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
   logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
-  // preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
-  // postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
   onRefreshTokenExpire: (event) =>
     window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
   decodeToken: true,
@@ -29,16 +27,15 @@ const authConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idTokenData, login, logOut, error, loginInProgress } = useContext(AuthContext)
+  const { tokenData, token, idTokenData, login, logOut, error, loginInProgress, idToken } = useContext(AuthContext)
 
   if (loginInProgress) return null
-
   return (
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
       {token ? (
         <>
-          <button onClick={() => logOut('rememberThis', idTokenData.tid)}>Logout</button>
+          <button onClick={() => logOut('rememberThis', idTokenData.session_state)}>Logout</button>
           <span style={{ margin: '0 10px' }}>
             Access token will expire at:{' '}
             {new Date(localStorage.getItem('ROCP_tokenExpire') * 1000).toLocaleTimeString()}
@@ -115,11 +112,11 @@ root.render(
       <h1>Demo using the &apos;react-oauth2-code-pkce&apos; package</h1>
       <p>
         Github:{' '}
-        <a href="https://github.com/soofstad/react-oauth2-pkce">https://github.com/soofstad/react-oauth2-pkce</a>
+        <a href='https://github.com/soofstad/react-oauth2-pkce'>https://github.com/soofstad/react-oauth2-pkce</a>
       </p>
       <p>
         NPM:{' '}
-        <a href="https://www.npmjs.com/package/react-oauth2-code-pkce">
+        <a href='https://www.npmjs.com/package/react-oauth2-code-pkce'>
           https://www.npmjs.com/package/react-oauth2-code-pkce
         </a>
       </p>
