@@ -1,8 +1,8 @@
-import { decodeJWT } from '../src/decodeJWT'
-import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
 import { TInternalConfig } from '../src/Types'
 import { fetchWithRefreshToken } from '../src/authentication'
+import { decodeJWT } from '../src/decodeJWT'
 import { FetchError } from '../src/errors'
+import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
 
 const authConfig: TInternalConfig = {
   autoLogin: false,
@@ -74,7 +74,7 @@ test('check if still valid token outside buffer has expired', () => {
 test('failed refresh fetch raises FetchError', () => {
   // @ts-ignore
   global.fetch = jest.fn(() =>
-    Promise.resolve<any>({
+    Promise.resolve({
       ok: false,
       status: 400,
       statusText: 'Bad request',

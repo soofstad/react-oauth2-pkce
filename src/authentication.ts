@@ -1,12 +1,12 @@
-import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import {
   TInternalConfig,
-  TTokenResponse,
   TTokenRequest,
-  TTokenRequestWithCodeAndVerifier,
   TTokenRequestForRefresh,
+  TTokenRequestWithCodeAndVerifier,
+  TTokenResponse,
 } from './Types'
 import { postWithXForm } from './httpUtils'
+import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
@@ -45,18 +45,17 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
 }
 
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
-function isTokenResponse(body: any | TTokenResponse): body is TTokenResponse {
+function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
 }
 
 function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
   return postWithXForm(tokenEndpoint, tokenRequest).then((response) => {
-    return response.json().then((body: TTokenResponse | any): TTokenResponse => {
+    return response.json().then((body: TTokenResponse | unknown): TTokenResponse => {
       if (isTokenResponse(body)) {
         return body
-      } else {
-        throw Error(body)
       }
+      throw Error(JSON.stringify(body))
     })
   })
 }
@@ -120,7 +119,7 @@ export function redirectToLogout(
     token_type_hint: refresh_token ? 'refresh_token' : 'access_token',
     client_id: config.clientId,
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
-    ui_locales: window.navigator.languages.reduce((a: string, b: string) => a + ' ' + b),
+    ui_locales: window.navigator.languages.join(' '),
     ...config.extraLogoutParameters,
   })
   if (idToken) params.append('id_token_hint', idToken)

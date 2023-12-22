@@ -1,6 +1,6 @@
 import { TAuthConfig, TInternalConfig } from './Types'
 
-function stringIsUnset(value: any) {
+function stringIsUnset(value: string | null | undefined) {
   const unset = ['', undefined, null]
   return unset.includes(value)
 }

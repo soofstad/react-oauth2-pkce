@@ -13,26 +13,8 @@ repos:
       - id: mixed-line-ending
         exclude: ^.*\.(lock)$||^docs\/
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.1.0
     hooks:
-      - id: prettier
-        files: \.(ts|tsx|js|css|html|json)$
-
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.33.0'
-    hooks:
-      - id: eslint
-        args: [--fix]
-        additional_dependencies:
-          - eslint
-          - typescript
-          - "@typescript-eslint/parser"
-          - "@typescript-eslint/eslint-plugin"
-          - eslint-config-prettier # turns off all rules that might conflict with prettier
-          - eslint-plugin-jsx-a11y # checks accessibility rules on jsx elements
-          - eslint-plugin-prettier # runs prettier as an eslint rule
-          - eslint-plugin-react # react specific linting rules
-          - eslint-plugin-react-hooks # enforces the rules of hooks
-        files: ^src/.*\.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
-        types: [file]
+      - id: biome-check
+        additional_dependencies: [ "@biomejs/biome@1.4.1" ]

@@ -1,8 +1,8 @@
-import React from 'react'
-import { AuthProvider } from '../src'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { authConfig, AuthConsumer } from './test-utils'
+import React from 'react'
+import { AuthProvider } from '../src'
+import { AuthConsumer, authConfig } from './test-utils'
 
 test('Full featured logout requests', async () => {
   localStorage.setItem('ROCP_loginInProgress', 'false')
