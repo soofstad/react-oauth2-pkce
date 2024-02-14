@@ -12,7 +12,7 @@ import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
-import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
+import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getExpFromJWTToken, getRefreshExpiresIn } from './timeUtils'
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -96,7 +96,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
     setRefreshToken(response.refresh_token)
-    const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? FALLBACK_EXPIRE_TIME
+    const tokenExpiresIn = config.tokenExpiresIn
+      ?? response.expires_in
+      ?? getExpFromJWTToken(response.id_token)
+      ?? FALLBACK_EXPIRE_TIME
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
     setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
