@@ -32,11 +32,11 @@ export function getRefreshExpiresIn(tokenExpiresIn: number, response: TTokenResp
   return tokenExpiresIn
 }
 
-export function getExpFromJWTToken(idToken: string | undefined): number | undefined {
+export function getExpiresInFromJWTToken(idToken: string | undefined): number | undefined {
   if (idToken) {
     try {
       const decodedToken = decodeJWT(idToken)
-      return decodedToken.exp
+      return Math.round(Number(decodedToken.exp) - Date.now() / 1000)
     } catch (error) {
       // idToken was not a JWT
       return
