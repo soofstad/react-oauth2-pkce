@@ -1,5 +1,4 @@
 import { TTokenResponse } from './Types'
-import { decodeJWT } from './decodeJWT'
 export const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 // Returns epoch time (in seconds) for when the token will expire
@@ -30,16 +29,4 @@ export function getRefreshExpiresIn(tokenExpiresIn: number, response: TTokenResp
   if (response.refresh_token) return tokenExpiresIn + FALLBACK_EXPIRE_TIME
   // The token response had no refresh_token. Set refresh_expire equals to access_token expire
   return tokenExpiresIn
-}
-
-export function getExpiresInFromJWTToken(idToken: string | undefined): number | undefined {
-  if (idToken) {
-    try {
-      const decodedToken = decodeJWT(idToken)
-      return Math.round(Number(decodedToken.exp) - Date.now() / 1000)
-    } catch (error) {
-      // idToken was not a JWT
-      return
-    }
-  }
 }
