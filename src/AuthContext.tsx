@@ -96,16 +96,21 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
     setRefreshToken(response.refresh_token)
-    const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? FALLBACK_EXPIRE_TIME
+    let tokenExp = FALLBACK_EXPIRE_TIME
+    try {
+      if (response.id_token) {
+        const decodedToken = decodeJWT(response.id_token)
+        setIdTokenData(decodedToken)
+        tokenExp = Math.round(Number(decodedToken.exp) - Date.now() / 1000) // number of seconds from now
+      }
+    } catch (e) {
+      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+    }
+    const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? tokenExp
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
     setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
     setIdToken(response.id_token)
-    try {
-      if (response.id_token) setIdTokenData(decodeJWT(response.id_token))
-    } catch (e) {
-      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
-    }
     try {
       if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
     } catch (e) {
