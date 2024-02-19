@@ -95,8 +95,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
-    setRefreshToken(response.refresh_token)
     let tokenExp = FALLBACK_EXPIRE_TIME
+    // Decode IdToken, so we can use "exp" from that as fallback if expire not returned in the response
     try {
       if (response.id_token) {
         const decodedToken = decodeJWT(response.id_token)
@@ -109,7 +109,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? tokenExp
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
-    setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+    if (response.refresh_token) {
+      setRefreshToken(response.refresh_token)
+      setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+    }
     setIdToken(response.id_token)
     try {
       if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
