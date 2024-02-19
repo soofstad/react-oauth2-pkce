@@ -171,6 +171,19 @@ type TAuthConfig = {
 
 ## Common issues
 
+### Sessions expire too quickly
+
+A session expire happens when the `refresh_token` is no longer valid and can't be used to fetch a new valid `access_token`.
+This is governed by the `expires_in`, and `refresh_expires_in | refresh_token_expires_in`, in the token response.
+If the response does not contain these values, the library assumes a quite conservative value. 
+You should configure your IDP (Identity Provider) to send these, but if that is not possible, you can set them explicitly
+with the config parameters `tokenExpiresIn` and `refreshTokenExpiresIn`.
+
+### Fails to compile with Next.js
+
+This library expects to have a `localStorage` available. That is not the case when compiling Next.js projects serverside.  
+See: https://github.com/soofstad/react-oauth2-pkce/discussions/90 for a solution.
+
 ### After redirect back from auth provider with `?code`, no token request is made
 
 If you are using libraries that intercept any `fetch()`-requests made. For example `@tanstack/react-query`. That can cause
