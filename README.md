@@ -184,12 +184,26 @@ with the config parameters `tokenExpiresIn` and `refreshTokenExpiresIn`.
 This library expects to have a `localStorage` available. That is not the case when compiling Next.js projects serverside.  
 See: https://github.com/soofstad/react-oauth2-pkce/discussions/90 for a solution.
 
+### Error `Bad authorization state...`
+
+This is most likely to happen if the authentication at the identity
+provider got aborted in some way.
+You might also see the error `Expected  to find a '?code=' parameter in the URL by now. Did the authentication get aborted or interrupted?` in the console.
+
+First of all, you should handle any errors the library throws. Usually, hinting at the user reload the page is enough.
+
+Some known causes for this is that instead of logging in at the 
+auth provider, the user "Registers" or "Reset password" or 
+something similar instead. Any such functions should be handled 
+outside of this library, with separate buttons/links than the 
+Login-button.
+
 ### After redirect back from auth provider with `?code`, no token request is made
 
 If you are using libraries that intercept any `fetch()`-requests made. For example `@tanstack/react-query`. That can cause
 issues for the _AuthProviders_ token fetching. This can be solved by _not_ wrapping the `<AuthProvider>` in any such library.
 
-This could also happend if some routes in your app are not wrapped by the `<AuthProvider>`.
+This could also happen if some routes in your app are not wrapped by the `<AuthProvider>`.
 
 ### The page randomly refreshes in the middle of a session
 

@@ -204,7 +204,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (loginInProgress) {
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
-        // This should not happen. There should be a 'code' parameter in the url by now..."
+        // This should not happen. There should be a 'code' parameter in the url by now...
         const error_description =
           urlParams.get('error_description') ||
           'Bad authorization state. Refreshing the page and log in again might solve the issue.'
