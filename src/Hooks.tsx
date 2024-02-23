@@ -25,14 +25,22 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
       setStoredValue(valueToStore)
       storage.setItem(key, JSON.stringify(valueToStore))
     } catch (error) {
-      console.log(`Failed to store value '${value}' for key '${key}'`)
+      console.error(`Failed to store value '${value}' for key '${key}'`)
     }
   }
 
   useEffect(() => {
     const storageEventHandler = (event: StorageEvent) => {
       if (event.storageArea === storage && event.key === key) {
-        setStoredValue(JSON.parse(event.newValue ?? '') as T)
+        if (event.newValue === null) {
+          setStoredValue(undefined as T)
+        } else {
+          try {
+            setStoredValue(JSON.parse(event.newValue ?? '') as T)
+          } catch (error: unknown) {
+            console.warn(`Failed to handle storageEvent's newValue='${event.newValue}' for key '${key}'`)
+          }
+        }
       }
     }
     window.addEventListener('storage', storageEventHandler, false)
