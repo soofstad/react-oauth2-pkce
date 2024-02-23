@@ -187,9 +187,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     )
   }
 
-  // Register the 'check for soon expiring access token' interval (Every 10 seconds)
+  // Register the 'check for soon expiring access token' interval (every ~10 seconds).
   useEffect(() => {
-    const interval = setInterval(() => refreshAccessToken(), 10000) // eslint-disable-line
+    // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
+    const randomStagger = 10000 * Math.random()
+    const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger) // eslint-disable-line
     return () => clearInterval(interval)
   }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
