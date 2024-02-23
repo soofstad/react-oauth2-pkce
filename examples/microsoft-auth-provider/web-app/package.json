@@ -1,19 +1,19 @@
 {
   "name": "ms-example-app",
   "version": "0.1.0",
-  "dependencies": {
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-oauth2-code-pkce": ">=1.8.4",
-    "react-scripts": "^5.0.1"
-  },
   "scripts": {
     "start": "ESLINT_NO_DEV_ERRORS='true' react-scripts start",
     "build": "react-scripts build"
   },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-oauth2-code-pkce": "1.17.1",
+    "react-scripts": "^5.0.1"
+  },
   "devDependencies": {
-    "@types/react": "^18.0.9",
-    "typescript": "^4.4.3"
+    "@types/react": "^18.2.58",
+    "typescript": "^5.3.3"
   },
   "browserslist": {
     "production": [

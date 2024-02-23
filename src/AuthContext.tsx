@@ -191,7 +191,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   useEffect(() => {
     // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
     const randomStagger = 10000 * Math.random()
-    const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger) // eslint-disable-line
+    const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
     return () => clearInterval(interval)
   }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
@@ -263,7 +263,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       console.warn(`Failed to decode access token: ${(e as Error).message}`)
     }
     refreshAccessToken(true) // Check if token should be updated
-  }, []) // eslint-disable-line
+  }, [])
 
   return (
     <AuthContext.Provider
