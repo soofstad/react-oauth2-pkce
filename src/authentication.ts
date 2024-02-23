@@ -12,9 +12,11 @@ const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
 
 export async function redirectToLogin(config: TInternalConfig, customState?: string): Promise<void> {
-  // Create and store a random string in sessionStorage, used as the 'code_verifier'
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
+
+  // Create and store a random string in storage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
-  sessionStorage.setItem(codeVerifierStorageKey, codeVerifier)
+  storage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
@@ -32,10 +34,10 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
       params.append('scope', config.scope)
     }
 
-    sessionStorage.removeItem(stateStorageKey)
+    storage.removeItem(stateStorageKey)
     const state = customState ?? config.state
     if (state) {
-      sessionStorage.setItem(stateStorageKey, state)
+      storage.setItem(stateStorageKey, state)
       params.append('state', state)
     }
     // Call any preLogin function in authConfig
@@ -61,6 +63,7 @@ function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest): P
 }
 
 export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> => {
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
@@ -68,7 +71,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
   */
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
-  const codeVerifier = window.sessionStorage.getItem(codeVerifierStorageKey)
+  const codeVerifier = storage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
     throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
@@ -128,9 +131,10 @@ export function redirectToLogout(
   window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
-export function validateState(urlParams: URLSearchParams) {
+export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {
+  const storage = storageType === 'session' ? sessionStorage : localStorage
   const receivedState = urlParams.get('state')
-  const loadedState = sessionStorage.getItem(stateStorageKey)
+  const loadedState = storage.getItem(stateStorageKey)
   if (receivedState !== loadedState) {
     throw new Error(
       '"state" value received from authentication server does no match client request. Possible cross-site request forgery'

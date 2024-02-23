@@ -22,7 +22,7 @@ global.fetch = jest.fn(() =>
 test('make token request with extra parameters', async () => {
   // Setting up a state similar to what it would be just after redirect back from auth provider
   localStorage.setItem('ROCP_loginInProgress', 'true')
-  sessionStorage.setItem('PKCE_code_verifier', 'arandomstring')
+  localStorage.setItem('PKCE_code_verifier', 'arandomstring')
   window.location.search = '?code=1234'
 
   render(
