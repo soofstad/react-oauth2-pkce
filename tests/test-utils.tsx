@@ -24,15 +24,15 @@ export const authConfig: TAuthConfig = {
 }
 
 export const AuthConsumer = () => {
-  const { tokenData, logOut, loginInProgress, idToken, idTokenData, login, token, error } = useContext(AuthContext)
+  const { tokenData, logOut, loginInProgress, idToken, idTokenData, logIn, token, error } = useContext(AuthContext)
   return (
     <>
       <div>{tokenData?.name}</div>
       <button type='button' onClick={() => logOut('logoutState')}>
-        Logout
+        Log out
       </button>
-      <button type='button' onClick={() => login('loginState')}>
-        Login
+      <button type='button' onClick={() => logIn('loginState')}>
+        Log in
       </button>
       <label aria-label={'loginInProgress'}>{JSON.stringify(loginInProgress)}</label>
       <label aria-label={'error'}>{error}</label>

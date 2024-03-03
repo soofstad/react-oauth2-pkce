@@ -16,7 +16,7 @@ test('Full featured logout requests', async () => {
     </AuthProvider>
   )
 
-  await user.click(screen.getByText('Logout'))
+  await user.click(screen.getByText('Log out'))
 
   await waitFor(() =>
     expect(window.location.assign).toHaveBeenCalledWith(
@@ -38,7 +38,7 @@ test('No refresh token, no logoutRedirect, logout request', async () => {
     </AuthProvider>
   )
 
-  await user.click(screen.getByText('Logout'))
+  await user.click(screen.getByText('Log out'))
 
   await waitFor(() =>
     expect(window.location.assign).toHaveBeenCalledWith(

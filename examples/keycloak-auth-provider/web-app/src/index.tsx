@@ -21,13 +21,13 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo(): JSX.Element {
-  const { tokenData, token, login, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
+  const { tokenData, token, logIn, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
 
   if (error) {
     return (
       <>
         <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
-        <button onClick={() => logOut()}>Logout</button>
+        <button onClick={() => logOut()}>Log out</button>
       </>
     )
   }
@@ -66,12 +66,12 @@ function LoginInfo(): JSX.Element {
               {JSON.stringify(tokenData, null, 2)}
             </pre>
           </div>
-          <button onClick={() => logOut()}>Logout</button>
+          <button onClick={() => logOut()}>Log out</button>
         </>
       ) : (
         <>
           <div>You are not logged in.</div>
-          <button onClick={() => login()}>Login</button>
+          <button onClick={() => logIn()}>Log in</button>
         </>
       )}
     </>
