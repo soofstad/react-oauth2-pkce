@@ -41,6 +41,7 @@ export interface IAuthProvider {
 
 export interface IAuthContext {
   token: string
+  logIn: (state?: string) => void
   logOut: (state?: string, logoutHint?: string) => void
   login: (state?: string) => void
   error: string | null
@@ -79,7 +80,7 @@ export type TAuthConfig = {
 }
 
 export type TRefreshTokenExpiredEvent = {
-  login: () => void
+  logIn: () => void
 }
 
 // The AuthProviders internal config type. All values will be set by user provided, or default values
