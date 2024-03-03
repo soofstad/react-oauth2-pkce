@@ -10,7 +10,7 @@ const authConfig: TAuthConfig = {
   tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
   redirectUri: 'http://localhost:3000/',
   onRefreshTokenExpire: (event) =>
-    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
+    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.logIn(),
   // Example to redirect back to original path after login has completed
   preLogin: () => localStorage.setItem('preLoginPath', window.location.pathname),
   postLogin: () => window.location.replace(localStorage.getItem('preLoginPath') || ''),
@@ -20,14 +20,14 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo(): JSX.Element {
-  const { tokenData, token, logOut, idToken, error, login }: IAuthContext = useContext(AuthContext)
+  const { tokenData, token, logOut, idToken, error, logIn }: IAuthContext = useContext(AuthContext)
 
   if (error) {
     return (
       <>
         <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>
         <button type='button' onClick={() => logOut()}>
-          Logout
+          Log out
         </button>
       </>
     )
@@ -61,7 +61,7 @@ function LoginInfo(): JSX.Element {
             <p>Welcome, John Doe!</p>
 
             <button type='button' style={{ width: '100px' }} onClick={() => logOut()}>
-              Logout
+              Log out
             </button>
 
             <p>Use this token to authenticate yourself</p>
@@ -104,8 +104,8 @@ function LoginInfo(): JSX.Element {
           >
             <p>Please login to continue</p>
 
-            <button type='button' style={{ width: '100px' }} onClick={() => login()}>
-              Login
+            <button type='button' style={{ width: '100px' }} onClick={() => logIn()}>
+              Log in
             </button>
           </div>
         </div>

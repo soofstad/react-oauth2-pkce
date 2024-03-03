@@ -36,7 +36,7 @@ const authConfig: TAuthConfig = {
   tokenEndpoint: 'https://myAuthProvider.com/token',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
-  onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => window.confirm('Session expired. Refresh page to continue using the site?') && event.login(),
+  onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => window.confirm('Session expired. Refresh page to continue using the site?') && event.logIn(),
 }
 
 const UserInfo = (): JSX.Element => {
@@ -81,7 +81,7 @@ interface IAuthContext {
   tokenData?: TTokenData
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
-  login: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void  
+  logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string) => void
@@ -112,17 +112,17 @@ The `<AuthProvider>` takes a `config` object that supports these parameters;
 
 ```typescript
 type TAuthConfig = {
-  // Id of your app at the authentication provider
+  // ID of your app at the authentication provider
   clientId: string  // Required
   // URL for the authentication endpoint at the authentication provider
   authorizationEndpoint: string  // Required
   // URL for the token endpoint at the authentication provider
   tokenEndpoint: string  // Required
-  // Which URL the auth provider should redirect the user after successfull authentication/login
+  // Which URL the auth provider should redirect the user to after successful authentication/login
   redirectUri: string  // Required
   // Which scopes to request for the auth token
   scope?: string  // default: ''
-  // Optional state value. Will often make more sense to provide the state in a call to the 'login()' function
+  // Optional state value. Will often make more sense to provide the state in a call to the 'logIn()' function
   state?: string // default: null
   // Which URL to call for logging out of the auth provider
   logoutEndpoint?: string  // default: null
@@ -135,18 +135,18 @@ type TAuthConfig = {
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
   // Optional callback function for the 'refreshTokenExpired' event.
-  // You likely want to display a message saying the user need to login again. A page refresh is enough.
+  // You likely want to display a message saying the user need to log in again. A page refresh is enough.
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined
   // Whether or not to decode the access token (should be set to 'false' if the access token is not a JWT (e.g. from Github))
   // If `false`, 'tokenData' will be 'undefined' from the <AuthContext>
   decodeToken?: boolean  // default: true
   // By default, the package will automatically redirect the user to the login server if not already logged in.
-  // If set to false, you need to call the "login()" function to login (e.g. with a "Login" button)
+  // If set to false, you need to call the "logIn()" function to log in (e.g. with a "Log in" button)
   autoLogin?: boolean  // default: true
   // Store login state in 'localStorage' or 'sessionStorage'
   // If set to 'session', no login state is persisted by 'react-oauth2-code-pkce` when the browser closes.
   // NOTE: Many authentication servers will keep the client logged in by cookies. You should therefore use 
-  // the 'logout()'-function to properly logout the client. Or configure your server not to issue cookies.
+  // the logOut() function to properly log out the client. Or configure your server not to issue cookies.
   storage?: 'local' | 'session'  // default: 'local'
   // Sets the prefix used when storing login state
   storageKeyPrefix?: string // default: 'ROCP_'
@@ -193,7 +193,7 @@ You might also see the error `Expected  to find a '?code=' parameter in the URL 
 First of all, you should handle any errors the library throws. Usually, hinting at the user reload the page is enough.
 
 Some known causes for this is that instead of logging in at the auth provider, the user "Registers" or "Reset password" or 
-something similar instead. Any such functions should be handled outside of this library, with separate buttons/links than the Login-button.
+something similar instead. Any such functions should be handled outside of this library, with separate buttons/links than the "Log in" button.
 
 ### After redirect back from auth provider with `?code`, no token request is made
 
@@ -205,8 +205,8 @@ This could also happen if some routes in your app are not wrapped by the `<AuthP
 ### The page randomly refreshes in the middle of a session
 
 This will happen if you haven't provided a callback-function for the `onRefreshTokenExpire` config parameter, and the refresh token expires.
-You probably want to implement some kind of "alert/message/banner", saying that the session has expired and that the user needs to login again.
-Either by refreshing the page, or clicking a "Login-button".
+You probably want to implement some kind of "alert/message/banner", saying that the session has expired and that the user needs to log in again.
+Either by refreshing the page, or clicking a "Log in" button.
 
 ## Develop
 

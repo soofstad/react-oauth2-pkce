@@ -18,6 +18,7 @@ import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefres
 export const AuthContext = createContext<IAuthContext>({
   token: '',
   login: () => null,
+  logIn: () => null,
   logOut: () => null,
   error: null,
   loginInProgress: false,
@@ -78,7 +79,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
   }
 
-  function login(state?: string, additionalParameters?: TPrimitiveRecord) {
+  function logIn(state?: string, additionalParameters?: TPrimitiveRecord) {
     clearStorage()
     setLoginInProgress(true)
     // TODO: Raise error on wrong state type in v2
@@ -125,18 +126,19 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function handleExpiredRefreshToken(initial = false): void {
     // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
     if (initial) {
-      login()
+      logIn()
       return
     }
 
     // TODO: Breaking change - remove automatic login during ongoing session
     if (!config.onRefreshTokenExpire) {
-      login()
+      logIn()
       return
     }
 
     config.onRefreshTokenExpire({
-      login,
+      login: logIn,
+      logIn,
     } as TRefreshTokenExpiredEvent)
   }
 
@@ -166,16 +168,16 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
               handleExpiredRefreshToken(initial)
               return
             }
-            // Unknown error. Set error, and login if first page load
+            // Unknown error. Set error, and log in if first page load
             console.error(error)
             setError(error.message)
-            if (initial) login()
+            if (initial) logIn()
           }
-          // Unknown error. Set error, and login if first page load
+          // Unknown error. Set error, and log in if first page load
           else if (error instanceof Error) {
             console.error(error)
             setError(error.message)
-            if (initial) login()
+            if (initial) logIn()
           }
         })
         .finally(() => {
@@ -250,7 +252,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
 
     // First page visit
-    if (!token && config.autoLogin) return login()
+    if (!token && config.autoLogin) return logIn()
 
     // Page refresh after login has succeeded
     try {
@@ -273,7 +275,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         tokenData,
         idToken,
         idTokenData,
-        login,
+        login: logIn,
+        logIn,
         logOut,
         error,
         loginInProgress,

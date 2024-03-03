@@ -16,7 +16,7 @@ const authConfig = {
   logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
   onRefreshTokenExpire: (event) =>
-    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.login(),
+    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.logIn(),
   decodeToken: true,
   scope: 'profile openid',
   // state: 'testState',
@@ -27,22 +27,22 @@ const authConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idTokenData, login, logOut, error, loginInProgress, idToken } = useContext(AuthContext)
+  const { tokenData, token, idTokenData, logIn, logOut, error, loginInProgress, idToken } = useContext(AuthContext)
 
   if (loginInProgress) return null
   return (
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
       <>
-        <button onClick={login}>Login</button>
-        <button onClick={() => login('customLoginState')}>Login w/state</button>
-        <button onClick={() => login('customLoginState', { scope: 'profile', something: 123 })}>
-          Login w/extra params
+        <button onClick={logIn}>Log in</button>
+        <button onClick={() => logIn('customLoginState')}>Log in w/state</button>
+        <button onClick={() => logIn('customLoginState', { scope: 'profile', something: 123 })}>
+          Log in w/extra params
         </button>
       </>
       {token ? (
         <>
-          <button onClick={() => logOut('rememberThis', idTokenData.session_state)}>Logout</button>
+          <button onClick={() => logOut('rememberThis', idTokenData.session_state)}>Log out</button>
           <span style={{ margin: '0 10px' }}>
             Access token will expire at:{' '}
             {new Date(localStorage.getItem('ROCP_tokenExpire') * 1000).toLocaleTimeString()}
