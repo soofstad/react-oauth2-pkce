@@ -1,4 +1,5 @@
-# react-oauth2-code-pkce &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/soofstad/react-oauth2-pkce/blob/main/LICENSE) ![NPM Version](https://img.shields.io/npm/v/react-oauth2-code-pkce?logo=npm&label=version) ![NPM Downloads](https://img.shields.io/npm/d18m/react-oauth2-code-pkce?logo=npm) ![CI](https://github.com/soofstad/react-oauth2-pkce/actions/workflows/tests.yaml/badge.svg)
+# react-oauth2-code-pkce
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/soofstad/react-oauth2-pkce/blob/main/LICENSE) ![NPM Version](https://img.shields.io/npm/v/react-oauth2-code-pkce?logo=npm&label=version) ![NPM Downloads](https://img.shields.io/npm/d18m/react-oauth2-code-pkce?logo=npm) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/react-oauth2-code-pkce?label=size) ![CI](https://github.com/soofstad/react-oauth2-pkce/actions/workflows/tests.yaml/badge.svg)
 
 React package for OAuth2 Authorization Code flow with PKCE
 
