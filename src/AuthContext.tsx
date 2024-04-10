@@ -241,7 +241,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
           .finally(() => {
             if (config.clearURL) {
               // Clear ugly url params
-              window.history.replaceState(null, '', window.location.pathname)
+              window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
             }
             setLoginInProgress(false)
           })
