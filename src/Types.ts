@@ -42,13 +42,15 @@ export interface IAuthProvider {
 export interface IAuthContext {
   token: string
   logOut: (state?: string, logoutHint?: string) => void
-  login: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
+  login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
   idTokenData?: TTokenData
   loginInProgress: boolean
 }
+
+export type TPrimitiveRecord = { [key: string]: string | boolean | number }
 
 // Input from users of the package, some optional values
 export type TAuthConfig = {
@@ -67,10 +69,10 @@ export type TAuthConfig = {
   autoLogin?: boolean
   clearURL?: boolean
   // TODO: Remove in 2.0
-  extraAuthParams?: { [key: string]: string | boolean | number }
-  extraAuthParameters?: { [key: string]: string | boolean | number }
-  extraTokenParameters?: { [key: string]: string | boolean | number }
-  extraLogoutParameters?: { [key: string]: string | boolean | number }
+  extraAuthParams?: TPrimitiveRecord
+  extraAuthParameters?: TPrimitiveRecord
+  extraTokenParameters?: TPrimitiveRecord
+  extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
   storage?: 'session' | 'local'
@@ -99,10 +101,10 @@ export type TInternalConfig = {
   autoLogin: boolean
   clearURL: boolean
   // TODO: Remove in 2.0
-  extraAuthParams?: { [key: string]: string | boolean | number }
-  extraAuthParameters?: { [key: string]: string | boolean | number }
-  extraTokenParameters?: { [key: string]: string | boolean | number }
-  extraLogoutParameters?: { [key: string]: string | boolean | number }
+  extraAuthParams?: TPrimitiveRecord
+  extraAuthParameters?: TPrimitiveRecord
+  extraTokenParameters?: TPrimitiveRecord
+  extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
   storage: 'session' | 'local'
