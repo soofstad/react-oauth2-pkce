@@ -42,7 +42,7 @@ export interface IAuthProvider {
 export interface IAuthContext {
   token: string
   logOut: (state?: string, logoutHint?: string) => void
-  login: (state?: string) => void
+  login: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string

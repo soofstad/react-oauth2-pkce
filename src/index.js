@@ -33,6 +33,13 @@ function LoginInfo() {
   return (
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
+      <>
+        <button onClick={login}>Login</button>
+        <button onClick={() => login('customLoginState')}>Login w/state</button>
+        <button onClick={() => login('customLoginState', { scope: 'profile', something: 123 })}>
+          Login w/extra params
+        </button>
+      </>
       {token ? (
         <>
           <button onClick={() => logOut('rememberThis', idTokenData.session_state)}>Logout</button>
@@ -93,11 +100,7 @@ function LoginInfo() {
           </div>
         </>
       ) : (
-        <>
-          <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
-          <button onClick={login}>Login</button>
-          <button onClick={() => login('customLoginState')}>Login w/state</button>
-        </>
+        <div style={{ backgroundColor: 'red' }}>You are not logged in</div>
       )}
     </>
   )
