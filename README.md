@@ -81,7 +81,7 @@ interface IAuthContext {
   tokenData?: TTokenData
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
-  login: (state?: string) => void  
+  login: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void  
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string) => void

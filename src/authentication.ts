@@ -11,7 +11,11 @@ import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
 
-export async function redirectToLogin(config: TInternalConfig, customState?: string): Promise<void> {
+export async function redirectToLogin(
+  config: TInternalConfig,
+  customState?: string,
+  additionalParameters?: { [key: string]: string | boolean | number }
+): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
 
   // Create and store a random string in storage, used as the 'code_verifier'
@@ -28,9 +32,10 @@ export async function redirectToLogin(config: TInternalConfig, customState?: str
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
       ...config.extraAuthParameters,
+      ...additionalParameters,
     })
 
-    if (config.scope !== undefined) {
+    if (config.scope !== undefined && !params.has('scope')) {
       params.append('scope', config.scope)
     }
 
