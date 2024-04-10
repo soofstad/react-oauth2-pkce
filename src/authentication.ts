@@ -1,5 +1,6 @@
 import {
   TInternalConfig,
+  TPrimitiveRecord,
   TTokenRequest,
   TTokenRequestForRefresh,
   TTokenRequestWithCodeAndVerifier,
@@ -14,7 +15,7 @@ const stateStorageKey = 'ROCP_auth_state'
 export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
-  additionalParameters?: { [key: string]: string | boolean | number }
+  additionalParameters?: TPrimitiveRecord
 ): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
 

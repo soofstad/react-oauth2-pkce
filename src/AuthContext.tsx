@@ -4,6 +4,7 @@ import {
   IAuthContext,
   IAuthProvider,
   TInternalConfig,
+  TPrimitiveRecord,
   TRefreshTokenExpiredEvent,
   TTokenData,
   TTokenResponse,
@@ -77,7 +78,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
   }
 
-  function login(state?: string, additionalParameters?: { [key: string]: string | boolean | number }) {
+  function login(state?: string, additionalParameters?: TPrimitiveRecord) {
     clearStorage()
     setLoginInProgress(true)
     // TODO: Raise error on wrong state type in v2
