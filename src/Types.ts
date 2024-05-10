@@ -19,7 +19,7 @@ export interface TTokenRequestForRefresh extends TTokenRqBase {
 export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh
 
 export type TTokenData = {
-  // biome-ignore lint: It really can be any, almost
+  // biome-ignore lint: It really can be `any` (almost)
   [x: string]: any
 }
 
@@ -70,7 +70,7 @@ export type TAuthConfig = {
   decodeToken?: boolean
   autoLogin?: boolean
   clearURL?: boolean
-  // TODO: Remove in 2.0
+  /** @deprecated Use `extraAuthParameters` instead. Will be removed in a future version. */
   extraAuthParams?: TPrimitiveRecord
   extraAuthParameters?: TPrimitiveRecord
   extraTokenParameters?: TPrimitiveRecord
@@ -84,7 +84,7 @@ export type TAuthConfig = {
 
 export type TRefreshTokenExpiredEvent = {
   logIn: () => void
-  /** @deprecated Use `logIn` instead */
+  /** @deprecated Use `logIn` instead. Will be removed in a future version. */
   login: () => void
 }
 
@@ -104,7 +104,7 @@ export type TInternalConfig = {
   decodeToken: boolean
   autoLogin: boolean
   clearURL: boolean
-  // TODO: Remove in 2.0
+  /** @deprecated Use `extraAuthParameters` instead. Will be removed in a future version. */
   extraAuthParams?: TPrimitiveRecord
   extraAuthParameters?: TPrimitiveRecord
   extraTokenParameters?: TPrimitiveRecord

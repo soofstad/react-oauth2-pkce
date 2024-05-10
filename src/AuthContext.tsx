@@ -85,7 +85,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     // TODO: Raise error on wrong state type in v2
     let typeSafePassedState = state
     if (state && typeof state !== 'string') {
-      console.warn(`Passed login state must be of type 'string'. Received '${state}'. Ignoring value...`)
+      const jsonState = JSON.stringify(state)
+      console.warn(
+        `Passed login state must be of type 'string'. Received '${jsonState}'. Ignoring value. In a future version, an error will be thrown here.`
+      )
       typeSafePassedState = undefined
     }
     redirectToLogin(config, typeSafePassedState, additionalParameters).catch((error) => {
