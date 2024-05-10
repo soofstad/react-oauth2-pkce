@@ -9,3 +9,11 @@ __pycache__
 yarn.lock
 package-lock.json
 yarn-error.log
+.yarnrc.yml
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
