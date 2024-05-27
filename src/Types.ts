@@ -42,7 +42,7 @@ export interface IAuthProvider {
 export interface IAuthContext {
   token: string
   logIn: (state?: string, additionalParameters?: TPrimitiveRecord) => void
-  logOut: (state?: string, logoutHint?: string) => void
+  logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
   /** @deprecated Use `logIn` instead */
   login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null

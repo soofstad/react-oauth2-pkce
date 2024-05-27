@@ -121,7 +121,8 @@ export function redirectToLogout(
   refresh_token?: string,
   idToken?: string,
   state?: string,
-  logoutHint?: string
+  logoutHint?: string,
+  additionalParameters?: TPrimitiveRecord
 ) {
   const params = new URLSearchParams({
     token: refresh_token || token,
@@ -130,6 +131,7 @@ export function redirectToLogout(
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
     ui_locales: window.navigator.languages.join(' '),
     ...config.extraLogoutParameters,
+    ...additionalParameters,
   })
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
