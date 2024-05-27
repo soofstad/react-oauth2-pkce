@@ -15,7 +15,8 @@ const stateStorageKey = 'ROCP_auth_state'
 export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
-  additionalParameters?: TPrimitiveRecord
+  additionalParameters?: TPrimitiveRecord,
+  method: 'popup' | 'redirect' = 'redirect'
 ): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
 
@@ -46,9 +47,18 @@ export async function redirectToLogin(
       storage.setItem(stateStorageKey, state)
       params.append('state', state)
     }
+
+    const loginUrl = `${config.authorizationEndpoint}?${params.toString()}`
+
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
-    window.location.assign(`${config.authorizationEndpoint}?${params.toString()}`)
+
+    if (method === 'popup') {
+      const handle: null | WindowProxy = window.open(loginUrl, 'loginPopup', 'popup width=600 height=600')
+      if (handle) return
+      console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
+    }
+    window.location.assign(loginUrl)
   })
 }
 

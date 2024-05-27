@@ -15,8 +15,7 @@ const authConfig = {
   tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
   logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
-  onRefreshTokenExpire: (event) =>
-    window.confirm('Tokens have expired. Refresh page to continue using the site?') && event.logIn(),
+  onRefreshTokenExpire: (event) => event.logIn('', {}, 'popup'),
   decodeToken: true,
   scope: 'profile openid',
   // state: 'testState',
@@ -34,7 +33,8 @@ function LoginInfo() {
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
       <>
-        <button onClick={logIn}>Log in</button>
+        <button onClick={() => logIn('', {}, 'popup')}>Log in w/popup</button>
+        <button onClick={() => logIn()}>Log in w/redirect</button>
         <button onClick={() => logIn('customLoginState')}>Log in w/state</button>
         <button onClick={() => logIn('customLoginState', { scope: 'profile', something: 123 })}>
           Log in w/extra params
