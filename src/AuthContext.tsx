@@ -32,9 +32,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     undefined,
     config.storage
   )
-  const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number>(
+  const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>(
     `${config.storageKeyPrefix}refreshTokenExpire`,
-    epochAtSecondsFromNow(2 * FALLBACK_EXPIRE_TIME),
+    undefined,
     config.storage
   )
   const [token, setToken] = useBrowserStorage<string>(`${config.storageKeyPrefix}token`, '', config.storage)
@@ -66,7 +66,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setRefreshToken(undefined)
     setToken('')
     setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
-    setRefreshTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
+    setRefreshTokenExpire(undefined)
     setIdToken(undefined)
     setTokenData(undefined)
     setIdTokenData(undefined)
@@ -128,16 +128,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleExpiredRefreshToken(initial = false): void {
     // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
-    if (initial) {
-      logIn()
-      return
-    }
+    if (initial) return logIn()
 
     // TODO: Breaking change - remove automatic login during ongoing session
-    if (!config.onRefreshTokenExpire) {
-      logIn()
-      return
-    }
+    if (!config.onRefreshTokenExpire) return logIn()
 
     config.onRefreshTokenExpire({
       login: logIn,
@@ -153,11 +147,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     // Other instance (tab) is currently refreshing. This instance skip the refresh if not initial
     if (refreshInProgress && !initial) return
 
+    // If no refreshToken, act as if the refreshToken expired (session expired)
+    if (!refreshToken) return handleExpiredRefreshToken(initial)
+
     // The refreshToken has expired
-    if (epochTimeIsPast(refreshTokenExpire)) {
-      handleExpiredRefreshToken(initial)
-      return
-    }
+    if (refreshTokenExpire && epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken(initial)
 
     // The access_token has expired, and we have a non-expired refresh_token. Use it to refresh access_token.
     if (refreshToken) {

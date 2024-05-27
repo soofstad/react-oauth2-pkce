@@ -23,7 +23,8 @@
         "useButtonType": "off"
       },
       "correctness": {
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "off",
+        "noVoidTypeReturn": "off"
       }
     }
   }
