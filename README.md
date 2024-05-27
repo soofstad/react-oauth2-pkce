@@ -36,7 +36,7 @@ const authConfig: TAuthConfig = {
   tokenEndpoint: 'https://myAuthProvider.com/token',
   redirectUri: 'http://localhost:3000/',
   scope: 'someScope openid',
-  onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => window.confirm('Session expired. Refresh page to continue using the site?') && event.logIn(),
+  onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => event.logIn(undefined, undefined, "popup"),
 }
 
 const UserInfo = (): JSX.Element => {
@@ -81,7 +81,7 @@ interface IAuthContext {
   tokenData?: TTokenData
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
-  logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
+  logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }, method: 'redirect' | 'popup' = 'redirect') => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void

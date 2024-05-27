@@ -58,6 +58,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     false,
     config.storage
   )
+  const [loginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>(
+    `${config.storageKeyPrefix}loginMethod`,
+    'redirect',
+    config.storage
+  )
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
@@ -80,9 +85,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
-  function logIn(state?: string, additionalParameters?: TPrimitiveRecord) {
+  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: 'redirect' | 'popup' = 'redirect') {
     clearStorage()
     setLoginInProgress(true)
+    setLoginMethod(method)
     // TODO: Raise error on wrong state type in v2
     let typeSafePassedState = state
     if (state && typeof state !== 'string') {
@@ -92,7 +98,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       )
       typeSafePassedState = undefined
     }
-    redirectToLogin(config, typeSafePassedState, additionalParameters).catch((error) => {
+    redirectToLogin(config, typeSafePassedState, additionalParameters, method).catch((error) => {
       console.error(error)
       setError(error.message)
       setLoginInProgress(false)
@@ -101,12 +107,12 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
+    setIdToken(response.id_token)
     let tokenExp = FALLBACK_EXPIRE_TIME
     // Decode IdToken, so we can use "exp" from that as fallback if expire not returned in the response
     try {
       if (response.id_token) {
         const decodedToken = decodeJWT(response.id_token)
-        setIdTokenData(decodedToken)
         tokenExp = Math.round(Number(decodedToken.exp) - Date.now() / 1000) // number of seconds from now
       }
     } catch (e) {
@@ -118,12 +124,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     if (response.refresh_token) {
       setRefreshToken(response.refresh_token)
       setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
-    }
-    setIdToken(response.id_token)
-    try {
-      if (config.decodeToken) setTokenData(decodeJWT(response.access_token))
-    } catch (e) {
-      console.warn(`Failed to decode access token: ${(e as Error).message}`)
     }
   }
 
@@ -201,6 +201,20 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
   const didFetchTokens = useRef(false)
 
+  // Load token-/idToken-data when tokens change
+  useEffect(() => {
+    try {
+      if (idToken) setIdTokenData(decodeJWT(idToken))
+    } catch (e) {
+      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+    }
+    try {
+      if (token && config.decodeToken) setTokenData(decodeJWT(token))
+    } catch (e) {
+      console.warn(`Failed to decode access token: ${(e as Error).message}`)
+    }
+  }, [token, idToken])
+
   // Runs once on page load
   useEffect(() => {
     // The client has been redirected back from the auth endpoint with an auth code
@@ -233,6 +247,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             handleTokenResponse(tokens)
             // Call any postLogin function in authConfig
             if (config?.postLogin) config.postLogin()
+            if (loginMethod === 'popup') window.close()
           })
           .catch((error: Error) => {
             console.error(error)
@@ -251,18 +266,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
     // First page visit
     if (!token && config.autoLogin) return logIn()
-
-    // Page refresh after login has succeeded
-    try {
-      if (idToken) setIdTokenData(decodeJWT(idToken))
-    } catch (e) {
-      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
-    }
-    try {
-      if (token && config.decodeToken) setTokenData(decodeJWT(token))
-    } catch (e) {
-      console.warn(`Failed to decode access token: ${(e as Error).message}`)
-    }
     refreshAccessToken(true) // Check if token should be updated
   }, [])
 
