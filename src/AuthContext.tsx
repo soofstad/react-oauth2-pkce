@@ -73,10 +73,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setLoginInProgress(false)
   }
 
-  function logOut(state?: string, logoutHint?: string) {
+  function logOut(state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) {
     clearStorage()
     setError(null)
-    if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint)
+    if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
   function logIn(state?: string, additionalParameters?: TPrimitiveRecord) {

@@ -84,7 +84,7 @@ interface IAuthContext {
   logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
-  logOut: (state?: string, logoutHint?: string) => void
+  logOut: (state?: string, logoutHint?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
   // Keeps any errors that occured during login, token fetching/refreshing, decoding, etc.. 
   error: string | null
   // The idToken, if it was returned along with the access token
