@@ -1,4 +1,4 @@
-import { TAuthConfig, TInternalConfig } from './Types'
+import { TAuthConfig, TInternalConfig } from './types'
 
 function stringIsUnset(value: string | null | undefined) {
   const unset = ['', undefined, null]

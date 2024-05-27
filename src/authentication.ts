@@ -1,3 +1,5 @@
+import { postWithXForm } from './httpUtils'
+import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import {
   TInternalConfig,
   TPrimitiveRecord,
@@ -5,9 +7,7 @@ import {
   TTokenRequestForRefresh,
   TTokenRequestWithCodeAndVerifier,
   TTokenResponse,
-} from './Types'
-import { postWithXForm } from './httpUtils'
-import { generateCodeChallenge, generateRandomString } from './pkceUtils'
+} from './types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
