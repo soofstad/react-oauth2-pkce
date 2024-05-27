@@ -1,5 +1,10 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import useBrowserStorage from './Hooks'
+import { createInternalConfig } from './authConfig'
+import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
+import { decodeJWT } from './decodeJWT'
+import { FetchError } from './errors'
+import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
 import {
   IAuthContext,
   IAuthProvider,
@@ -8,12 +13,7 @@ import {
   TRefreshTokenExpiredEvent,
   TTokenData,
   TTokenResponse,
-} from './Types'
-import { createInternalConfig } from './authConfig'
-import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
-import { decodeJWT } from './decodeJWT'
-import { FetchError } from './errors'
-import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
+} from './types'
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -76,7 +76,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   function logOut(state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) {
     clearStorage()
     setError(null)
-    if (config?.logoutEndpoint && token) redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
+    if (config?.logoutEndpoint && token)
+      redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
   function logIn(state?: string, additionalParameters?: TPrimitiveRecord) {
