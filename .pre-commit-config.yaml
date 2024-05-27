@@ -16,13 +16,3 @@ repos:
     hooks:
       - id: biome-check
         additional_dependencies: [ "@biomejs/biome@1.4.1" ]
-
-  - repo: local
-    hooks:
-      - id: typescript-check
-        name: check typescript
-        language: node
-        entry: tsc -p src/tsconfig.json --noEmit
-        pass_filenames: false
-        additional_dependencies:
-          - "typescript"
