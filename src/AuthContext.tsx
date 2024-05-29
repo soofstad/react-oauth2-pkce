@@ -192,7 +192,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   // Register the 'check for soon expiring access token' interval (every ~10 seconds).
   useEffect(() => {
-    console.log('Registering interval for token refresh')
     // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
     const randomStagger = 10000 * Math.random()
     const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
