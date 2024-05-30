@@ -123,7 +123,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
     if (response.refresh_token) {
       setRefreshToken(response.refresh_token)
-      setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+      if(!refreshTokenExpire || config.refreshTokenExpiryStrategy !== 'absolute'){
+        setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+      }
     }
   }
 
