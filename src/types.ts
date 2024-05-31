@@ -41,7 +41,7 @@ export interface IAuthProvider {
 
 export interface IAuthContext {
   token: string
-  logIn: (state?: string, additionalParameters?: TPrimitiveRecord) => void
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
   /** @deprecated Use `logIn` instead */
   login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
@@ -83,9 +83,9 @@ export type TAuthConfig = {
 }
 
 export type TRefreshTokenExpiredEvent = {
-  logIn: () => void
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
   /** @deprecated Use `logIn` instead. Will be removed in a future version. */
-  login: () => void
+  login: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
 }
 
 // The AuthProviders internal config type. All values will be set by user provided, or default values
