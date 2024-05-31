@@ -14,6 +14,7 @@ const authConfig: TInternalConfig = {
   scope: 'someScope openid',
   clearURL: false,
   storage: 'local',
+  refreshTokenExpiryStrategy: 'renewable',
   storageKeyPrefix: 'ROCP_',
   refreshWithScope: true,
   extraAuthParams: {
