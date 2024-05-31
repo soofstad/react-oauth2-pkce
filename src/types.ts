@@ -77,6 +77,7 @@ export type TAuthConfig = {
   extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
+  refreshTokenExpiryStrategy?: 'renewable' | 'absolute'
   storage?: 'session' | 'local'
   storageKeyPrefix?: string
   refreshWithScope?: boolean
@@ -111,6 +112,7 @@ export type TInternalConfig = {
   extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
+  refreshTokenExpiryStrategy: 'renewable' | 'absolute'
   storage: 'session' | 'local'
   storageKeyPrefix: string
   refreshWithScope: boolean

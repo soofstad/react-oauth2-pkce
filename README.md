@@ -164,6 +164,10 @@ type TAuthConfig = {
   tokenExpiresIn?: number // default: null
   // Can be used if auth provider doesn't return refresh token expiration time in token response
   refreshTokenExpiresIn?: number // default: null
+  // Defines the expiration strategy for the refresh token.
+  // - 'renewable': The refresh token's expiration time is renewed each time it is used, getting a new validity period.
+  // - 'absolute': The refresh token's expiration time is fixed from its initial issuance and does not change, regardless of how many times it is used.
+  refreshTokenExpiryStrategy?: 'renewable' | 'absolute' // default: renewable
   // Whether or not to post 'scope' when refreshing the access token
   refreshWithScope?: boolean // default: true
 }
