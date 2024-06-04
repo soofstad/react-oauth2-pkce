@@ -22,6 +22,7 @@ export const AuthContext = createContext<IAuthContext>({
   logOut: () => null,
   error: null,
   loginInProgress: false,
+  getAccessTokenSilently: () => Promise.resolve(''),
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
@@ -68,6 +69,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [error, setError] = useState<string | null>(null)
 
   function clearStorage() {
+    console.log('clearStorage')
     setRefreshToken(undefined)
     setToken('')
     setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
@@ -106,6 +108,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function handleTokenResponse(response: TTokenResponse) {
+    console.log('handleTokenResponse')
     setToken(response.access_token)
     setIdToken(response.id_token)
     let tokenExp = FALLBACK_EXPIRE_TIME
@@ -142,61 +145,59 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     } as TRefreshTokenExpiredEvent)
   }
 
-  function refreshAccessToken(initial = false): void {
-    if (!token) return
-    // The token has not expired. Do nothing
-    if (!epochTimeIsPast(tokenExpire)) return
-
-    // Other instance (tab) is currently refreshing. This instance skip the refresh if not initial
-    if (refreshInProgress && !initial) return
-
+  async function refreshAccessToken(): Promise<string| void> {
     // If no refreshToken, act as if the refreshToken expired (session expired)
-    if (!refreshToken) return handleExpiredRefreshToken(initial)
+    if (!refreshToken) return handleExpiredRefreshToken()
 
     // The refreshToken has expired
-    if (refreshTokenExpire && epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken(initial)
+    if (refreshTokenExpire && epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken()
 
     // The access_token has expired, and we have a non-expired refresh_token. Use it to refresh access_token.
     if (refreshToken) {
-      setRefreshInProgress(true)
-      fetchWithRefreshToken({ config, refreshToken })
-        .then((result: TTokenResponse) => handleTokenResponse(result))
-        .catch((error: unknown) => {
-          if (error instanceof FetchError) {
-            // If the fetch failed with status 400, assume expired refresh token
-            if (error.status === 400) {
-              handleExpiredRefreshToken(initial)
-              return
-            }
-            // Unknown error. Set error, and log in if first page load
-            console.error(error)
-            setError(error.message)
-            if (initial) logIn()
-          }
-          // Unknown error. Set error, and log in if first page load
-          else if (error instanceof Error) {
-            console.error(error)
-            setError(error.message)
-            if (initial) logIn()
-          }
-        })
-        .finally(() => {
-          setRefreshInProgress(false)
-        })
-      return
+      // setRefreshInProgress(true)
+
+      try {
+        console.log('refreshAccessToken', {refreshToken})
+        console.log('firetail_refreshToken', localStorage.getItem('firetail_refreshToken'))
+        const result: TTokenResponse = await fetchWithRefreshToken({ config, refreshToken })
+        
+        handleTokenResponse(result)
+        
+        // setRefreshInProgress(false)
+        
+        return result.access_token
+      } catch(error) {
+        setRefreshInProgress(false)
+        throw error
+      }
+
     }
     console.warn(
       'Failed to refresh access_token. Most likely there is no refresh_token, or the authentication server did not reply with an explicit expire time, and the default expire times are longer than the actual tokens expire time'
     )
   }
 
+  async function getAccessTokenSilently(): Promise<string | void>{
+    console.log("getAccessTokenSilently", {token})
+
+    if (!token) logIn()
+    
+    console.log('tokenExpire', tokenExpire, epochTimeIsPast(tokenExpire))
+    if (epochTimeIsPast(tokenExpire)) {
+      console.log('token expired')
+      return refreshAccessToken()
+    }
+    
+    return token
+  }
+
   // Register the 'check for soon expiring access token' interval (every ~10 seconds).
-  useEffect(() => {
-    // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
-    const randomStagger = 10000 * Math.random()
-    const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
-    return () => clearInterval(interval)
-  }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
+  // useEffect(() => {
+  //   // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
+  //   const randomStagger = 10000 * Math.random()
+  //   const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
+  //   return () => clearInterval(interval)
+  // }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
@@ -268,13 +269,14 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
     // First page visit
     if (!token && config.autoLogin) return logIn()
-    refreshAccessToken(true) // Check if token should be updated
+    // refreshAccessToken(true) // Check if token should be updated
   }, [])
 
   return (
     <AuthContext.Provider
       value={{
         token,
+        getAccessTokenSilently,
         tokenData,
         idToken,
         idTokenData,
