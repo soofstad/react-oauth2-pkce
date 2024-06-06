@@ -21,8 +21,14 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
 
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(
+    () =>
+      localStorage.getItem(config.storageKeyPrefix + 'loginInProgress') === 'true' ||
+      localStorage.getItem(config.storageKeyPrefix + 'logoutInProgress') === 'true'
+  )
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => localStorage.getItem(config.storageKeyPrefix + 'token') !== null
+  )
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
 
