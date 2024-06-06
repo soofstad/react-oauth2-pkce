@@ -3,5 +3,4 @@ export type {
   TAuthConfig,
   IAuthProvider,
   IAuthContext,
-  TRefreshTokenExpiredEvent,
 } from './types'

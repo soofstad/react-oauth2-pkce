@@ -1,78 +1,98 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import useBrowserStorage from './Hooks'
+import { Mutex } from 'async-mutex'
 import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeJWT } from './decodeJWT'
-import { FetchError } from './errors'
 import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
-import {
-  IAuthContext,
-  IAuthProvider,
-  TInternalConfig,
-  TPrimitiveRecord,
-  TRefreshTokenExpiredEvent,
-  TTokenData,
-  TTokenResponse,
-} from './types'
+import { IAuthContext, IAuthProvider, TInternalConfig, TPrimitiveRecord, TTokenData, TTokenResponse } from './types'
 
 export const AuthContext = createContext<IAuthContext>({
-  token: '',
-  login: () => null,
+  token: undefined,
   logIn: () => null,
   logOut: () => null,
   error: null,
-  loginInProgress: false,
-  getAccessTokenSilently: () => Promise.resolve(''),
+  isLoading: false,
+  getTokenSilently: () => Promise.resolve(''),
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
+  const mutex = new Mutex()
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
 
-  const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
-    `${config.storageKeyPrefix}refreshToken`,
-    undefined,
-    config.storage
-  )
-  const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>(
-    `${config.storageKeyPrefix}refreshTokenExpire`,
-    undefined,
-    config.storage
-  )
-  const [token, setToken] = useBrowserStorage<string>(`${config.storageKeyPrefix}token`, '', config.storage)
-  const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
-    `${config.storageKeyPrefix}tokenExpire`,
-    epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
-    config.storage
-  )
-  const [idToken, setIdToken] = useBrowserStorage<string | undefined>(
-    `${config.storageKeyPrefix}idToken`,
-    undefined,
-    config.storage
-  )
-  const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
-    `${config.storageKeyPrefix}loginInProgress`,
-    false,
-    config.storage
-  )
-  const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
-    `${config.storageKeyPrefix}refreshInProgress`,
-    false,
-    config.storage
-  )
-  const [loginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>(
-    `${config.storageKeyPrefix}loginMethod`,
-    'redirect',
-    config.storage
-  )
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
 
+  const [getRefreshToken, setRefreshToken] = useBrowserStorage<string | undefined>({
+    key: `${config.storageKeyPrefix}refreshToken`,
+    initialValue: undefined,
+    type: config.storage,
+  })
+  const [getRefreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>({
+    key: `${config.storageKeyPrefix}refreshTokenExpire`,
+    initialValue: undefined,
+    type: config.storage,
+  })
+  const [getTokenExpire, setTokenExpire] = useBrowserStorage<number | undefined>({
+    key: `${config.storageKeyPrefix}tokenExpire`,
+    initialValue: undefined,
+    type: config.storage,
+  })
+  const [getToken, setToken] = useBrowserStorage<string | undefined>({
+    key: `${config.storageKeyPrefix}token`,
+    initialValue: undefined,
+    type: config.storage,
+    onChange: (token) => {
+      setIsAuthenticated(!!token)
+
+      try {
+        if (token && config.decodeToken) {
+          setTokenData(decodeJWT(token))
+        }
+      } catch (e) {
+        console.warn(`Failed to decode access token: ${(e as Error).message}`)
+      }
+    },
+  })
+  const [getIdToken, setIdToken] = useBrowserStorage<string | undefined>({
+    key: `${config.storageKeyPrefix}idToken`,
+    initialValue: undefined,
+    type: config.storage,
+    onChange: (idToken) => {
+      try {
+        if (idToken) {
+          setIdTokenData(decodeJWT(idToken))
+        }
+      } catch (e) {
+        console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+      }
+    },
+  })
+  const [getLoginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>({
+    key: `${config.storageKeyPrefix}loginMethod`,
+    initialValue: 'redirect',
+    type: config.storage,
+  })
+  const [getLoginInProgress, setLoginInProgress] = useBrowserStorage<boolean>({
+    key: `${config.storageKeyPrefix}loginInProgress`,
+    initialValue: false,
+    type: config.storage,
+    onChange: (loginInProgress) => setIsLoading(loginInProgress === true),
+  })
+  const [getLogoutInProgress, setLogoutInProgress] = useBrowserStorage<boolean>({
+    key: `${config.storageKeyPrefix}logoutInProgress`,
+    initialValue: false,
+    type: config.storage,
+    onChange: (logoutInProgress) => setIsLoading(logoutInProgress === true),
+  })
+
   function clearStorage() {
-    console.log('clearStorage')
     setRefreshToken(undefined)
-    setToken('')
-    setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
+    setToken(undefined)
+    setTokenExpire(undefined)
     setRefreshTokenExpire(undefined)
     setIdToken(undefined)
     setTokenData(undefined)
@@ -81,7 +101,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function logOut(state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) {
+    const refreshToken = getRefreshToken()
+    const token = getToken()
+    const idToken = getIdToken()
     clearStorage()
+    setLogoutInProgress(true)
     setError(null)
     if (config?.logoutEndpoint && token)
       redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
@@ -108,9 +132,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function handleTokenResponse(response: TTokenResponse) {
-    console.log('handleTokenResponse')
     setToken(response.access_token)
     setIdToken(response.id_token)
+    setRefreshToken(response.refresh_token)
     let tokenExp = FALLBACK_EXPIRE_TIME
     // Decode IdToken, so we can use "exp" from that as fallback if expire not returned in the response
     try {
@@ -123,104 +147,65 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
     const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? tokenExp
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
-    const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
-    if (response.refresh_token) {
-      setRefreshToken(response.refresh_token)
-      if (!refreshTokenExpire || config.refreshTokenExpiryStrategy !== 'absolute') {
-        setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
-      }
+    const refreshTokenExpire = getRefreshTokenExpire()
+    if (!refreshTokenExpire || config.refreshTokenExpiryStrategy !== 'absolute') {
+      const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
+      setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
     }
   }
 
-  function handleExpiredRefreshToken(initial = false): void {
-    // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
-    if (initial) return logIn()
+  async function refreshAccessToken(): Promise<string> {
+    const refreshToken = getRefreshToken()
+    if (!refreshToken) throw new Error('No refresh token available')
 
-    // TODO: Breaking change - remove automatic login during ongoing session
-    if (!config.onRefreshTokenExpire) return logIn()
-
-    config.onRefreshTokenExpire({
-      login: logIn,
-      logIn,
-    } as TRefreshTokenExpiredEvent)
-  }
-
-  async function refreshAccessToken(): Promise<string| void> {
-    // If no refreshToken, act as if the refreshToken expired (session expired)
-    if (!refreshToken) return handleExpiredRefreshToken()
+    const refreshTokenExpire = getRefreshTokenExpire()
+    if (!refreshTokenExpire) throw new Error('No refresh token expire available')
 
     // The refreshToken has expired
-    if (refreshTokenExpire && epochTimeIsPast(refreshTokenExpire)) return handleExpiredRefreshToken()
+    if (epochTimeIsPast(refreshTokenExpire)) throw new Error('Refresh token expired')
 
     // The access_token has expired, and we have a non-expired refresh_token. Use it to refresh access_token.
-    if (refreshToken) {
-      // setRefreshInProgress(true)
+    try {
+      const result: TTokenResponse = await fetchWithRefreshToken({
+        config,
+        refreshToken,
+      })
 
-      try {
-        console.log('refreshAccessToken', {refreshToken})
-        console.log('firetail_refreshToken', localStorage.getItem('firetail_refreshToken'))
-        const result: TTokenResponse = await fetchWithRefreshToken({ config, refreshToken })
-        
-        handleTokenResponse(result)
-        
-        // setRefreshInProgress(false)
-        
-        return result.access_token
-      } catch(error) {
-        setRefreshInProgress(false)
-        throw error
+      handleTokenResponse(result)
+
+      return result.access_token
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function getTokenSilently(): Promise<string> {
+    return await mutex.runExclusive(async () => {
+      const token = getToken()
+      if (!token) throw new Error('No token available')
+
+      const tokenExpire = getTokenExpire()
+      if (!tokenExpire) throw new Error('No token expire available')
+
+      // The access_token has expired
+      if (epochTimeIsPast(tokenExpire)) {
+        const newToken = await refreshAccessToken()
+        return newToken
       }
 
-    }
-    console.warn(
-      'Failed to refresh access_token. Most likely there is no refresh_token, or the authentication server did not reply with an explicit expire time, and the default expire times are longer than the actual tokens expire time'
-    )
+      return token
+    })
   }
-
-  async function getAccessTokenSilently(): Promise<string | void>{
-    console.log("getAccessTokenSilently", {token})
-
-    if (!token) logIn()
-    
-    console.log('tokenExpire', tokenExpire, epochTimeIsPast(tokenExpire))
-    if (epochTimeIsPast(tokenExpire)) {
-      console.log('token expired')
-      return refreshAccessToken()
-    }
-    
-    return token
-  }
-
-  // Register the 'check for soon expiring access token' interval (every ~10 seconds).
-  // useEffect(() => {
-  //   // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
-  //   const randomStagger = 10000 * Math.random()
-  //   const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
-  //   return () => clearInterval(interval)
-  // }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
   // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
   const didFetchTokens = useRef(false)
 
-  // Load token-/idToken-data when tokens change
-  useEffect(() => {
-    try {
-      if (idToken) setIdTokenData(decodeJWT(idToken))
-    } catch (e) {
-      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
-    }
-    try {
-      if (token && config.decodeToken) setTokenData(decodeJWT(token))
-    } catch (e) {
-      console.warn(`Failed to decode access token: ${(e as Error).message}`)
-    }
-  }, [token, idToken])
-
   // Runs once on page load
   useEffect(() => {
     // The client has been redirected back from the auth endpoint with an auth code
+    const loginInProgress = getLoginInProgress()
     if (loginInProgress) {
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
@@ -250,6 +235,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             handleTokenResponse(tokens)
             // Call any postLogin function in authConfig
             if (config?.postLogin) config.postLogin()
+            const loginMethod = getLoginMethod()
             if (loginMethod === 'popup') window.close()
           })
           .catch((error: Error) => {
@@ -267,24 +253,32 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       return
     }
 
+    // The client has been redirected back from the auth endpoint after a logout
+    const logoutInProgress = getLogoutInProgress()
+    if (logoutInProgress) {
+      setLogoutInProgress(false)
+
+      // Call any postLogout function in authConfig
+      if (config?.postLogout) config.postLogout()
+      return
+    }
+
     // First page visit
+    const token = getToken()
     if (!token && config.autoLogin) return logIn()
-    // refreshAccessToken(true) // Check if token should be updated
   }, [])
 
   return (
     <AuthContext.Provider
       value={{
-        token,
-        getAccessTokenSilently,
+        isAuthenticated,
+        getTokenSilently,
         tokenData,
-        idToken,
         idTokenData,
-        login: logIn,
         logIn,
         logOut,
         error,
-        loginInProgress,
+        isLoading,
       }}
     >
       {children}
