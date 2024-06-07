@@ -2,14 +2,12 @@ import { useCallback, useEffect } from 'react'
 
 interface Props<T> {
   key: string
-  type: 'session' | 'local'
+  storage: Storage
   initialValue: T
   onChange?: (newValue: T) => void
 }
 
-function useBrowserStorage<T>({ key, type, initialValue, onChange }: Props<T>): [() => T, (v: T) => void] {
-  const storage = type === 'session' ? sessionStorage : localStorage
-
+function useBrowserStorage<T>({ key, storage, initialValue, onChange }: Props<T>): [() => T, (v: T) => void] {
   const getValue = useCallback(() => {
     const storedValue = storage.getItem(key)
     try {

@@ -17,40 +17,42 @@ export const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
-  const mutex = new Mutex()
   const config: TInternalConfig = useMemo(() => createInternalConfig(authConfig), [authConfig])
+  const storage: Storage = config.storage === 'session' ? sessionStorage : localStorage
+  const mutex = new Mutex()
+
+  const loginInProgressStorageKey = `${config.storageKeyPrefix}loginInProgress`
+  const logoutInProgressStorageKey = `${config.storageKeyPrefix}logoutInProgress`
+  const tokenStorageKey = `${config.storageKeyPrefix}token`
 
   const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(
     () =>
-      localStorage.getItem(config.storageKeyPrefix + 'loginInProgress') === 'true' ||
-      localStorage.getItem(config.storageKeyPrefix + 'logoutInProgress') === 'true'
+      storage.getItem(loginInProgressStorageKey) === 'true' || storage.getItem(logoutInProgressStorageKey) === 'true'
   )
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => localStorage.getItem(config.storageKeyPrefix + 'token') !== null
-  )
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => storage.getItem(tokenStorageKey) !== null)
   const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
   const [error, setError] = useState<string | null>(null)
 
   const [getRefreshToken, setRefreshToken] = useBrowserStorage<string | undefined>({
     key: `${config.storageKeyPrefix}refreshToken`,
     initialValue: undefined,
-    type: config.storage,
+    storage,
   })
   const [getRefreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>({
     key: `${config.storageKeyPrefix}refreshTokenExpire`,
     initialValue: undefined,
-    type: config.storage,
+    storage,
   })
   const [getTokenExpire, setTokenExpire] = useBrowserStorage<number | undefined>({
     key: `${config.storageKeyPrefix}tokenExpire`,
     initialValue: undefined,
-    type: config.storage,
+    storage,
   })
   const [getToken, setToken] = useBrowserStorage<string | undefined>({
-    key: `${config.storageKeyPrefix}token`,
+    key: tokenStorageKey,
     initialValue: undefined,
-    type: config.storage,
+    storage,
     onChange: (token) => {
       setIsAuthenticated(!!token)
 
@@ -66,7 +68,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [getIdToken, setIdToken] = useBrowserStorage<string | undefined>({
     key: `${config.storageKeyPrefix}idToken`,
     initialValue: undefined,
-    type: config.storage,
+    storage,
     onChange: (idToken) => {
       try {
         if (idToken) {
@@ -80,18 +82,18 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [getLoginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>({
     key: `${config.storageKeyPrefix}loginMethod`,
     initialValue: 'redirect',
-    type: config.storage,
+    storage,
   })
   const [getLoginInProgress, setLoginInProgress] = useBrowserStorage<boolean>({
-    key: `${config.storageKeyPrefix}loginInProgress`,
+    key: loginInProgressStorageKey,
     initialValue: false,
-    type: config.storage,
+    storage,
     onChange: (loginInProgress) => setIsLoading(loginInProgress === true),
   })
   const [getLogoutInProgress, setLogoutInProgress] = useBrowserStorage<boolean>({
-    key: `${config.storageKeyPrefix}logoutInProgress`,
+    key: logoutInProgressStorageKey,
     initialValue: false,
-    type: config.storage,
+    storage,
     onChange: (logoutInProgress) => setIsLoading(logoutInProgress === true),
   })
 
