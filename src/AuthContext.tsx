@@ -1,11 +1,18 @@
+import { Mutex } from 'async-mutex'
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import useBrowserStorage from './Hooks'
-import { Mutex } from 'async-mutex'
 import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeJWT } from './decodeJWT'
 import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
-import { IAuthContext, IAuthProvider, TInternalConfig, TPrimitiveRecord, TTokenData, TTokenResponse } from './types'
+import {
+  IAuthContext,
+  IAuthProvider,
+  TInternalConfig,
+  TPrimitiveRecord,
+  TTokenData,
+  TTokenResponse,
+} from './types'
 
 export const AuthContext = createContext<IAuthContext>({
   token: undefined,
@@ -23,15 +30,34 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   const loginInProgressStorageKey = `${config.storageKeyPrefix}loginInProgress`
   const logoutInProgressStorageKey = `${config.storageKeyPrefix}logoutInProgress`
+  const idTokenStorageKey = `${config.storageKeyPrefix}idToken`
   const tokenStorageKey = `${config.storageKeyPrefix}token`
 
-  const [tokenData, setTokenData] = useState<TTokenData | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(
     () =>
       storage.getItem(loginInProgressStorageKey) === 'true' || storage.getItem(logoutInProgressStorageKey) === 'true'
   )
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => storage.getItem(tokenStorageKey) !== null)
-  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
+  const [tokenData, setTokenData] = useState<TTokenData | undefined>(() => {
+    try {
+      const token = storage.getItem(tokenStorageKey)
+      if (token && config.decodeToken) {
+        return decodeJWT(token)
+      }
+    } catch (e) {
+      console.warn(`Failed to decode access token: ${(e as Error).message}`)
+    }
+  })
+  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>(() => {
+    try {
+      const idToken = storage.getItem(idTokenStorageKey)
+      if (idToken) {
+        return decodeJWT(idToken)
+      }
+    } catch (e) {
+      console.warn(`Failed to decode id token: ${(e as Error).message}`)
+    }
+  })
   const [error, setError] = useState<string | null>(null)
 
   const [getRefreshToken, setRefreshToken] = useBrowserStorage<string | undefined>({
@@ -66,7 +92,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     },
   })
   const [getIdToken, setIdToken] = useBrowserStorage<string | undefined>({
-    key: `${config.storageKeyPrefix}idToken`,
+    key: idTokenStorageKey,
     initialValue: undefined,
     storage,
     onChange: (idToken) => {
@@ -189,9 +215,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   async function getTokenSilently(): Promise<string> {
     return await mutex.runExclusive(async () => {
-      const token = getToken()
-      if (!token) throw new Error('No token available')
-
       const tokenExpire = getTokenExpire()
       if (!tokenExpire) throw new Error('No token expire available')
 
@@ -200,6 +223,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         const newToken = await refreshAccessToken()
         return newToken
       }
+
+      const token = getToken()
+      if (!token) throw new Error('No token available')
 
       return token
     })

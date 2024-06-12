@@ -85,13 +85,6 @@ function useBrowserStorage<T>({ key, storage, initialValue, onChange }: Props<T>
     return () => window.removeEventListener('storage', storageEventHandler, false)
   }, [key, storage, onChange])
 
-  useEffect(() => {
-    if (onChange === undefined) return
-
-    const storedValue = storage.getItem(key)
-    onChange(storedValue ? JSON.parse(storedValue) : undefined)
-  }, [])
-
   return [getValue, setValue]
 }
 
