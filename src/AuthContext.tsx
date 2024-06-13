@@ -62,22 +62,22 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   const [getRefreshToken, setRefreshToken] = useBrowserStorage<string | undefined>({
     key: `${config.storageKeyPrefix}refreshToken`,
-    initialValue: undefined,
+    defaultValue: undefined,
     storage,
   })
   const [getRefreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>({
     key: `${config.storageKeyPrefix}refreshTokenExpire`,
-    initialValue: undefined,
+    defaultValue: undefined,
     storage,
   })
   const [getTokenExpire, setTokenExpire] = useBrowserStorage<number | undefined>({
     key: `${config.storageKeyPrefix}tokenExpire`,
-    initialValue: undefined,
+    defaultValue: undefined,
     storage,
   })
   const [getToken, setToken] = useBrowserStorage<string | undefined>({
     key: tokenStorageKey,
-    initialValue: undefined,
+    defaultValue: undefined,
     storage,
     onChange: (token) => {
       setIsAuthenticated(!!token)
@@ -93,7 +93,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   })
   const [getIdToken, setIdToken] = useBrowserStorage<string | undefined>({
     key: idTokenStorageKey,
-    initialValue: undefined,
+    defaultValue: undefined,
     storage,
     onChange: (idToken) => {
       try {
@@ -107,18 +107,18 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   })
   const [getLoginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>({
     key: `${config.storageKeyPrefix}loginMethod`,
-    initialValue: 'redirect',
+    defaultValue: 'redirect',
     storage,
   })
-  const [getLoginInProgress, setLoginInProgress] = useBrowserStorage<boolean>({
+  const [getLoginInProgress, setLoginInProgress] = useBrowserStorage<boolean | undefined>({
     key: loginInProgressStorageKey,
-    initialValue: false,
+    defaultValue: false,
     storage,
     onChange: (loginInProgress) => setIsLoading(loginInProgress === true),
   })
-  const [getLogoutInProgress, setLogoutInProgress] = useBrowserStorage<boolean>({
+  const [getLogoutInProgress, setLogoutInProgress] = useBrowserStorage<boolean | undefined>({
     key: logoutInProgressStorageKey,
-    initialValue: false,
+    defaultValue: false,
     storage,
     onChange: (logoutInProgress) => setIsLoading(logoutInProgress === true),
   })
@@ -131,7 +131,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setIdToken(undefined)
     setTokenData(undefined)
     setIdTokenData(undefined)
-    setLoginInProgress(false)
+    setLoginInProgress(undefined)
+    setLogoutInProgress(undefined)
   }
 
   function logOut(state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) {
@@ -271,6 +272,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             if (config?.postLogin) config.postLogin()
             const loginMethod = getLoginMethod()
             if (loginMethod === 'popup') window.close()
+            setError(null)
           })
           .catch((error: Error) => {
             console.error(error)
