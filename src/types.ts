@@ -40,16 +40,16 @@ export interface IAuthProvider {
 }
 
 export interface IAuthContext {
-  token: string
+  token?: string
   logIn: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
-  /** @deprecated Use `logIn` instead */
-  login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
   idTokenData?: TTokenData
-  loginInProgress: boolean
+  isLoading: boolean
+  getTokenSilently: () => Promise<string | void>
+  isAuthenticated: boolean
 }
 
 export type TPrimitiveRecord = { [key: string]: string | boolean | number }
@@ -66,7 +66,7 @@ export type TAuthConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
+  postLogout?: () => void
   decodeToken?: boolean
   autoLogin?: boolean
   clearURL?: boolean
@@ -83,12 +83,6 @@ export type TAuthConfig = {
   refreshWithScope?: boolean
 }
 
-export type TRefreshTokenExpiredEvent = {
-  logIn: () => void
-  /** @deprecated Use `logIn` instead. Will be removed in a future version. */
-  login: () => void
-}
-
 // The AuthProviders internal config type. All values will be set by user provided, or default values
 export type TInternalConfig = {
   clientId: string
@@ -101,7 +95,7 @@ export type TInternalConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
+  postLogout?: () => void
   decodeToken: boolean
   autoLogin: boolean
   clearURL: boolean
