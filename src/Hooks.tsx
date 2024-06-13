@@ -3,15 +3,18 @@ import { useCallback, useEffect } from 'react'
 interface Props<T> {
   key: string
   storage: Storage
-  initialValue: T
+  defaultValue: T
   onChange?: (newValue: T) => void
 }
 
-function useBrowserStorage<T>({ key, storage, initialValue, onChange }: Props<T>): [() => T, (v: T) => void] {
+function useBrowserStorage<T>({ key, storage, defaultValue, onChange }: Props<T>): [() => T, (v: T) => void] {
   const getValue = useCallback(() => {
     const storedValue = storage.getItem(key)
+
+    if (storedValue === null) return defaultValue
+
     try {
-      return storedValue ? JSON.parse(storedValue) : null
+      return JSON.parse(storedValue)
     } catch (error) {
       console.error(`Error parsing storage value for key "${key}":`, error)
       return null
@@ -57,13 +60,6 @@ function useBrowserStorage<T>({ key, storage, initialValue, onChange }: Props<T>
     },
     [key]
   )
-
-  useEffect(() => {
-    const storedValue = getValue()
-    if (storedValue === null && initialValue !== null && initialValue !== undefined) {
-      setValue(initialValue)
-    }
-  }, [getValue, setValue, initialValue])
 
   useEffect(() => {
     const storageEventHandler = (event: StorageEvent) => {
