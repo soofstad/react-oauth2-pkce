@@ -196,7 +196,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     const randomStagger = 10000 * Math.random()
     const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
     return () => clearInterval(interval)
-  }, [token, refreshToken, refreshTokenExpire, tokenExpire]) // Replace the interval with a new when values used inside refreshAccessToken changes
+  }, [token, refreshToken, refreshTokenExpire, tokenExpire, refreshInProgress]) // Replace the interval with a new when values used inside refreshAccessToken changes
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
