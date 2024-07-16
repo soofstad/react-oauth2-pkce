@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { AuthContext, TAuthConfig } from '../src'
+import { AuthContext, type TAuthConfig } from '../src'
 
 export const authConfig: TAuthConfig = {
   autoLogin: true,

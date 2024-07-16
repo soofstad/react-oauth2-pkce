@@ -5,7 +5,7 @@ import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, 
 import { decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
 import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
-import {
+import type {
   IAuthContext,
   IAuthProvider,
   TInternalConfig,

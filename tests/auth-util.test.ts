@@ -2,7 +2,7 @@ import { fetchWithRefreshToken } from '../src/authentication'
 import { decodeJWT } from '../src/decodeJWT'
 import { FetchError } from '../src/errors'
 import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
-import { TInternalConfig } from '../src/types'
+import type { TInternalConfig } from '../src/types'
 
 const authConfig: TInternalConfig = {
   autoLogin: false,

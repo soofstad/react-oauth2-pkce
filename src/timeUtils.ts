@@ -1,4 +1,4 @@
-import { TTokenResponse } from './types'
+import type { TTokenResponse } from './types'
 export const FALLBACK_EXPIRE_TIME = 600 // 10minutes
 
 // Returns epoch time (in seconds) for when the token will expire
