@@ -39,7 +39,5 @@
     "url": "https://github.com/soofstad/react-oauth2-pkce/issues"
   },
   "homepage": "https://github.com/soofstad/react-oauth2-pkce#readme",
-  "files": [
-    "dist/"
-  ]
+  "files": ["dist/"]
 }

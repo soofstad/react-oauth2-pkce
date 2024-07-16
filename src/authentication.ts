@@ -1,6 +1,6 @@
 import { postWithXForm } from './httpUtils'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
-import {
+import type {
   TInternalConfig,
   TPrimitiveRecord,
   TTokenRequest,

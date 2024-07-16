@@ -1,12 +1,11 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
   "javascript": {
     "formatter": {
       "indentStyle": "space",
       "indentWidth": 2,
       "jsxQuoteStyle": "single",
       "quoteStyle": "single",
-      "trailingComma": "es5",
+      "trailingCommas": "es5",
       "lineWidth": 119,
       "semicolons": "asNeeded"
     }

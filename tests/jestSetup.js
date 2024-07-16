@@ -1,5 +1,5 @@
-const { TextDecoder, TextEncoder } = require('util')
-const nodeCrypto = require('crypto')
+const { TextDecoder, TextEncoder } = require('node:util')
+const nodeCrypto = require('node:crypto')
 
 beforeEach(() => {
   localStorage.removeItem('ROCP_loginInProgress')
