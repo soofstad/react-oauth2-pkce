@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 interface TTokenRqBase {
   grant_type: string
   client_id: string
+  client_secret?: string
   redirect_uri: string
 }
 
@@ -57,6 +58,7 @@ export type TPrimitiveRecord = { [key: string]: string | boolean | number }
 // Input from users of the package, some optional values
 export type TAuthConfig = {
   clientId: string
+  clientSecret?: string
   authorizationEndpoint: string
   tokenEndpoint: string
   redirectUri: string
@@ -92,6 +94,7 @@ export type TRefreshTokenExpiredEvent = {
 // The AuthProviders internal config type. All values will be set by user provided, or default values
 export type TInternalConfig = {
   clientId: string
+  clientSecret?: string
   authorizationEndpoint: string
   tokenEndpoint: string
   redirectUri: string

@@ -9,11 +9,16 @@ function buildUrlEncodedRequest(request: TTokenRequest): string {
   return queryString
 }
 
-export async function postWithXForm(url: string, request: TTokenRequest): Promise<Response> {
+export async function postWithXForm(url: string, request: TTokenRequest, clientSecret?: string): Promise<Response> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    ...(clientSecret ? { 'Authorization': `Basic ${btoa(`${request.client_id}:${clientSecret}`)}` } : {})
+  };
+
   return fetch(url, {
     method: 'POST',
     body: buildUrlEncodedRequest(request),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: headers,
   }).then(async (response: Response) => {
     if (!response.ok) {
       const responseBody = await response.text()
