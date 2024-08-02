@@ -67,8 +67,8 @@ function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse
   return (body as TTokenResponse).access_token !== undefined
 }
 
-function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest): Promise<TTokenResponse> {
-  return postWithXForm(tokenEndpoint, tokenRequest).then((response) => {
+function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest, clientSecret?: string): Promise<TTokenResponse> {
+  return postWithXForm(tokenEndpoint, tokenRequest, clientSecret).then((response) => {
     return response.json().then((body: TTokenResponse | unknown): TTokenResponse => {
       if (isTokenResponse(body)) {
         return body
