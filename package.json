@@ -1,5 +1,5 @@
 {
-  "name": "package-development",
+  "name": "react-oauth2-pkce-gm",
   "version": "0.1.0",
   "scripts": {
     "start": "ESLINT_NO_DEV_ERRORS='true' react-scripts start",
