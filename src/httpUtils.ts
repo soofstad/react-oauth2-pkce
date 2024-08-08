@@ -13,7 +13,7 @@ export async function postWithXForm(url: string, request: TTokenRequest): Promis
   return fetch(url, {
     method: 'POST',
     body: buildUrlEncodedRequest(request),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'mode': 'no-cors' },
   }).then(async (response: Response) => {
     if (!response.ok) {
       const responseBody = await response.text()
