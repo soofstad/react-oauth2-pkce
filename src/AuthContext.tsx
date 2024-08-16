@@ -107,7 +107,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
-    setIdToken(response.id_token)
+    if (response.id_token) {
+      setIdToken(response.id_token)
+    }
     let tokenExp = FALLBACK_EXPIRE_TIME
     // Decode IdToken, so we can use "exp" from that as fallback if expire not returned in the response
     try {
