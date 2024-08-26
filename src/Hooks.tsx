@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
 
+function isString(value: any): boolean {
+  return typeof value === 'string' || value instanceof String;
+}
+
 function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'local'): [T, (v: T) => void] {
   const storage = type === 'session' ? sessionStorage : localStorage
 
@@ -23,7 +27,9 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
-      storage.setItem(key, JSON.stringify(valueToStore))
+
+      const storageString = isString(valueToStore) ? (valueToStore as string) : JSON.stringify(valueToStore);
+      storage.setItem(key, storageString)
     } catch (error) {
       console.error(`Failed to store value '${value}' for key '${key}'`)
     }
