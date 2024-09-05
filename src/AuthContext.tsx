@@ -271,8 +271,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         doFetchTokens(urlParams)
       }
       return
-    } else if (urlParams.get('code') && !didFetchTokens.current) {
+    }
+    if (urlParams.get('code') && !didFetchTokens.current) {
       doFetchTokens(urlParams)
+      return
     }
 
     // First page visit
