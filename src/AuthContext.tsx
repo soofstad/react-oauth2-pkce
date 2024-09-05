@@ -192,6 +192,40 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     )
   }
 
+  // This ref is used to make sure the 'fetchTokens' call is only made once.
+  // Multiple calls with the same code will, and should, return an error from the API
+  // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
+  const didFetchTokens = useRef(false)
+
+  function doFetchTokens(urlParams: URLSearchParams): void {
+    didFetchTokens.current = true
+    try {
+      validateState(urlParams, config.storage)
+    } catch (e: unknown) {
+      console.error(e)
+      setError((e as Error).message)
+    }
+    // Request tokens from auth server with the auth code
+    fetchTokens(config)
+      .then((tokens: TTokenResponse) => {
+        handleTokenResponse(tokens)
+        // Call any postLogin function in authConfig
+        if (config?.postLogin) config.postLogin()
+        if (loginMethod === 'popup') window.close()
+      })
+      .catch((error: Error) => {
+        console.error(error)
+        setError(error.message)
+      })
+      .finally(() => {
+        if (config.clearURL) {
+          // Clear ugly url params
+          window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
+        }
+        setLoginInProgress(false)
+      })
+  }
+
   // Register the 'check for soon expiring access token' interval (every ~10 seconds).
   useEffect(() => {
     // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
@@ -199,11 +233,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
     return () => clearInterval(interval)
   }, [token, refreshToken, refreshTokenExpire, tokenExpire, refreshInProgress]) // Replace the interval with a new when values used inside refreshAccessToken changes
-
-  // This ref is used to make sure the 'fetchTokens' call is only made once.
-  // Multiple calls with the same code will, and should, return an error from the API
-  // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
-  const didFetchTokens = useRef(false)
 
   // Load token-/idToken-data when tokens change
   useEffect(() => {
@@ -221,9 +250,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   // Runs once on page load
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+
     // The client has been redirected back from the auth endpoint with an auth code
     if (loginInProgress) {
-      const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now...
         const error_description =
@@ -238,34 +268,11 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       }
       // Make sure we only try to use the auth code once
       if (!didFetchTokens.current) {
-        didFetchTokens.current = true
-        try {
-          validateState(urlParams, config.storage)
-        } catch (e: unknown) {
-          console.error(e)
-          setError((e as Error).message)
-        }
-        // Request tokens from auth server with the auth code
-        fetchTokens(config)
-          .then((tokens: TTokenResponse) => {
-            handleTokenResponse(tokens)
-            // Call any postLogin function in authConfig
-            if (config?.postLogin) config.postLogin()
-            if (loginMethod === 'popup') window.close()
-          })
-          .catch((error: Error) => {
-            console.error(error)
-            setError(error.message)
-          })
-          .finally(() => {
-            if (config.clearURL) {
-              // Clear ugly url params
-              window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
-            }
-            setLoginInProgress(false)
-          })
+        doFetchTokens(urlParams)
       }
       return
+    } else if (urlParams.get('code') && !didFetchTokens.current) {
+      doFetchTokens(urlParams)
     }
 
     // First page visit
