@@ -19,25 +19,49 @@ global.fetch = jest.fn(() =>
   })
 )
 
-test('make token request with extra parameters', async () => {
-  // Setting up a state similar to what it would be just after redirect back from auth provider
-  localStorage.setItem('ROCP_loginInProgress', 'true')
-  localStorage.setItem('PKCE_code_verifier', 'arandomstring')
-  window.location.search = '?code=1234'
+describe('make token request', () => {
+  beforeEach(() => {
+    // Setting up a state similar to what it would be just after redirect back from auth provider
+    localStorage.setItem('ROCP_loginInProgress', 'true')
+    localStorage.setItem('PKCE_code_verifier', 'arandomstring')
+    window.location.search = '?code=1234'
+  })
 
-  render(
-    <AuthProvider authConfig={authConfig}>
-      <AuthConsumer />
-    </AuthProvider>
-  )
+  test('with extra parameters', async () => {
+    render(
+      <AuthProvider authConfig={authConfig}>
+        <AuthConsumer />
+      </AuthProvider>
+    )
 
-  await waitFor(() =>
-    expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
-      body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method: 'POST',
-    })
-  )
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
+        body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        credentials: 'same-origin',
+      })
+    )
+  })
+
+  test('with custom credentials', async () => {
+    render(
+      <AuthProvider authConfig={{ ...authConfig, tokenRequestCredentials: 'include' }}>
+        <AuthConsumer />
+      </AuthProvider>
+    )
+
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
+        body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        credentials: 'include',
+      })
+    )
+  })
 })

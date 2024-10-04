@@ -170,6 +170,12 @@ type TAuthConfig = {
   refreshTokenExpiryStrategy?: 'renewable' | 'absolute' // default: renewable
   // Whether or not to post 'scope' when refreshing the access token
   refreshWithScope?: boolean // default: true
+  tokenRequestCredentials?: RequestCredentials // default: 'same-origin'
+  // Controls whether browser credentials (cookies, TLS client certificates, or authentication headers containing a username and password) are sent when requesting tokens.
+  // Warning: The OAuth2 specification requires the client to authenticate to the token endpoint using client credentials (like client_id and client_secret) — not via cookies. Including browser credentials deviates from the standard protocol and can introduce unforeseen security issues. Only set this to 'include' if you know what you are doing and CSRF protection is present. Setting this to 'include' is required when the token endpoint requires client certificate authentication, but likely is not needed in any other case. Use with caution.
+  // - 'same-origin' (the default): only send and include credentials for same-origin requests.
+  // - 'include': always include credentials, even cross-origin.
+  // - 'omit': never send credentials in the request.
 }
 
 ```

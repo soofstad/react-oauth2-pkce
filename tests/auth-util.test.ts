@@ -26,6 +26,7 @@ const authConfig: TInternalConfig = {
     client_id: 'anotherClientId',
     testKey: 'test Value',
   },
+  tokenRequestCredentials: 'same-origin',
 }
 
 test('decode a JWT token', () => {
