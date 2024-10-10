@@ -22,3 +22,21 @@ export const decodeJWT = (token: string): TTokenData => {
     )
   }
 }
+
+export const decodeAccessToken = (token: string | null | undefined): TTokenData | undefined => {
+  if (!token || !token.length) return undefined
+  try {
+    return decodeJWT(token)
+  } catch (e) {
+    console.warn(`Failed to decode access token: ${(e as Error).message}`)
+  }
+}
+
+export const decodeIdToken = (idToken: string | null | undefined): TTokenData | undefined => {
+  if (!idToken || !idToken.length) return undefined
+  try {
+    return decodeJWT(idToken)
+  } catch (e) {
+    console.warn(`Failed to decode idToken: ${(e as Error).message}`)
+  }
+}

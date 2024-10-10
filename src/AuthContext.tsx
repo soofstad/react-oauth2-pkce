@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useMemo, useRef, useState } from 'reac
 import useBrowserStorage from './Hooks'
 import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
-import { decodeJWT } from './decodeJWT'
+import { decodeAccessToken, decodeIdToken, decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
 import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
 import type {
@@ -63,8 +63,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     'redirect',
     config.storage
   )
-  const [tokenData, setTokenData] = useState<TTokenData | undefined>()
-  const [idTokenData, setIdTokenData] = useState<TTokenData | undefined>()
+  const tokenData = useMemo(() => {
+    if (config.decodeToken) return decodeAccessToken(token)
+  }, [token])
+  const idTokenData = useMemo(() => decodeIdToken(idToken), [idToken])
   const [error, setError] = useState<string | null>(null)
 
   function clearStorage() {
@@ -73,8 +75,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
     setRefreshTokenExpire(undefined)
     setIdToken(undefined)
-    setTokenData(undefined)
-    setIdTokenData(undefined)
     setLoginInProgress(false)
   }
 
@@ -204,20 +204,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   // Multiple calls with the same code will, and should, return an error from the API
   // See: https://beta.reactjs.org/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development
   const didFetchTokens = useRef(false)
-
-  // Load token-/idToken-data when tokens change
-  useEffect(() => {
-    try {
-      if (idToken) setIdTokenData(decodeJWT(idToken))
-    } catch (e) {
-      console.warn(`Failed to decode idToken: ${(e as Error).message}`)
-    }
-    try {
-      if (token && config.decodeToken) setTokenData(decodeJWT(token))
-    } catch (e) {
-      console.warn(`Failed to decode access token: ${(e as Error).message}`)
-    }
-  }, [token, idToken])
 
   // Runs once on page load
   useEffect(() => {
