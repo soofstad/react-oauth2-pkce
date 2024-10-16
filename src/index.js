@@ -19,7 +19,6 @@ const authConfig = {
   onRefreshTokenExpire: (event) => event.logIn('', {}, 'popup'),
   preLogin: () => console.log('Logging in...'),
   postLogin: () => console.log('Logged in!'),
-  postLogout: () => console.log('Logged out!'),
   decodeToken: true,
   scope: 'profile openid',
   // state: 'testState',
