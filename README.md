@@ -134,6 +134,8 @@ type TAuthConfig = {
   // Optionally provide a callback function to run _after_ the
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
+  // Which method to use for login. Can be either 'redirect' or 'popup'
+  loginMethod: 'redirect' | 'popup'  // default: 'redirect'
   // Optional callback function for the 'refreshTokenExpired' event.
   // You likely want to display a message saying the user need to log in again. A page refresh is enough.
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined
