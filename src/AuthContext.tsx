@@ -85,7 +85,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
-  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: 'redirect' | 'popup' = 'popup') {
+  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: 'redirect' | 'popup' = 'redirect') {
     clearStorage()
     setLoginInProgress(true)
     setLoginMethod(method)
