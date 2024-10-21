@@ -12,6 +12,7 @@ export const authConfig: TAuthConfig = {
   scope: 'someScope openid',
   decodeToken: false,
   state: 'testState',
+  loginMethod: 'redirect',
   extraLogoutParameters: {
     testLogoutKey: 'logoutValue',
   },
