@@ -66,7 +66,7 @@ export type TAuthConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  loginMethod?: 'redirect' | 'popup'
+  loginMethod: 'redirect' | 'popup'
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
@@ -103,7 +103,7 @@ export type TInternalConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  loginMethod?: 'redirect' | 'popup'
+  loginMethod: 'redirect' | 'popup'
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken: boolean
   autoLogin: boolean
