@@ -133,10 +133,10 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleExpiredRefreshToken(initial = false): void {
     // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
-    if (initial) return logIn()
+    if (initial) return logIn(undefined, undefined, config.loginMethod)
 
     // TODO: Breaking change - remove automatic login during ongoing session
-    if (!config.onRefreshTokenExpire) return logIn()
+    if (!config.onRefreshTokenExpire) return logIn(undefined, undefined, config.loginMethod)
 
     config.onRefreshTokenExpire({
       login: logIn,
@@ -173,13 +173,13 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
             // Unknown error. Set error, and log in if first page load
             console.error(error)
             setError(error.message)
-            if (initial) logIn()
+            if (initial) logIn(undefined, undefined, config.loginMethod)
           }
           // Unknown error. Set error, and log in if first page load
           else if (error instanceof Error) {
             console.error(error)
             setError(error.message)
-            if (initial) logIn()
+            if (initial) logIn(undefined, undefined, config.loginMethod)
           }
         })
         .finally(() => {
@@ -255,7 +255,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
 
     // First page visit
-    if (!token && config.autoLogin) return logIn()
+    if (!token && config.autoLogin) return logIn(undefined, undefined, config.loginMethod)
     refreshAccessToken(true) // Check if token should be updated
   }, [])
 

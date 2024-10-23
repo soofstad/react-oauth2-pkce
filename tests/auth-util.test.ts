@@ -17,6 +17,7 @@ const authConfig: TInternalConfig = {
   refreshTokenExpiryStrategy: 'renewable',
   storageKeyPrefix: 'ROCP_',
   refreshWithScope: true,
+  loginMethod: 'redirect',
   extraAuthParams: {
     prompt: true,
     client_id: 'anotherClientId',

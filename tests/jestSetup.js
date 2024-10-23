@@ -17,4 +17,5 @@ beforeEach(() => {
   const location = new URL('https://www.example.com')
   location.assign = jest.fn()
   window.location = location
+  window.open = jest.fn()
 })
