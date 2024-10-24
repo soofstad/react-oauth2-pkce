@@ -212,13 +212,10 @@ const AuthProvider = dynamic(
 
 const authConfig: TAuthConfig = {...for you to fill inn}
 
-function LoginInfo() {
-  const { tokenData, token, logIn } = useContext(AuthContext)
-  return (
-    <>
-    [...for you to fill inn]
-    </>
-  )
+export default function Authenticated() {
+    (<AuthProvider authConfig={authConfig}>
+        <LoginInfo/>
+    </AuthProvider>)
 }
 ```
 
