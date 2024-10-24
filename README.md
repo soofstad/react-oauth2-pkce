@@ -194,9 +194,33 @@ You should configure your IDP (Identity Provider) to send these, but if that is 
 with the config parameters `tokenExpiresIn` and `refreshTokenExpiresIn`.
 
 ### Fails to compile with Next.js
+The library's main componet `AuthProvider` is _client side only_. Meaning it must be rendered in a web browser, and can not be pre-rendered server-side (which is default in newer versions of NextJS and similar frameworks). 
 
-This library expects to have a `localStorage` (or `sessionStorage`) available. That is not the case when compiling Next.js projects serverside.  
-See: https://github.com/soofstad/react-oauth2-pkce/discussions/90 for a solution.
+This can be solved by marking the module with `use client` and importing the component in the client only (`"ssr": false`).
+
+```tsx
+'use client'
+import {useContext} from "react";
+import dynamic from 'next/dynamic'
+import {TAuthConfig,TRefreshTokenExpiredEvent, AuthContext} from 'react-oauth2-code-pkce'
+
+const AuthProvider = dynamic(
+    ()=> import("react-oauth2-code-pkce")
+        .then((mod) => mod.AuthProvider),
+    {ssr: false}
+)
+
+const authConfig: TAuthConfig = {...for you to fill inn}
+
+function LoginInfo() {
+  const { tokenData, token, logIn } = useContext(AuthContext)
+  return (
+    <>
+    [...for you to fill inn]
+    </>
+  )
+}
+```
 
 ### Error `Bad authorization state...`
 
