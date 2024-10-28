@@ -1,5 +1,5 @@
-import { postWithXForm } from "./httpUtils";
-import { generateCodeChallenge, generateRandomString } from "./pkceUtils";
+import { postWithXForm } from './httpUtils'
+import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import type {
   TInternalConfig,
   TPopupPosition,
@@ -8,124 +8,132 @@ import type {
   TTokenRequestForRefresh,
   TTokenRequestWithCodeAndVerifier,
   TTokenResponse,
-} from "./types";
+} from './types'
 
-const codeVerifierStorageKey = "PKCE_code_verifier";
-const stateStorageKey = "ROCP_auth_state";
+const codeVerifierStorageKey = 'PKCE_code_verifier'
+const stateStorageKey = 'ROCP_auth_state'
 
 export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
   additionalParameters?: TPrimitiveRecord,
-  method: "popup" | "redirect" = "redirect"
+  method: 'popup' | 'redirect' = 'redirect'
 ): Promise<void> {
-  const storage = config.storage === "session" ? sessionStorage : localStorage;
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
 
   // Create and store a random string in storage, used as the 'code_verifier'
-  const codeVerifier = generateRandomString(96);
-  storage.setItem(codeVerifierStorageKey, codeVerifier);
+  const codeVerifier = generateRandomString(96)
+  storage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
     const params = new URLSearchParams({
-      response_type: "code",
+      response_type: 'code',
       client_id: config.clientId,
       redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
-      code_challenge_method: "S256",
+      code_challenge_method: 'S256',
       ...config.extraAuthParameters,
       ...additionalParameters,
-    });
+    })
 
-    if (config.scope !== undefined && !params.has("scope")) {
-      params.append("scope", config.scope);
+    if (config.scope !== undefined && !params.has('scope')) {
+      params.append('scope', config.scope)
     }
 
-    storage.removeItem(stateStorageKey);
-    const state = customState ?? config.state;
+    storage.removeItem(stateStorageKey)
+    const state = customState ?? config.state
     if (state) {
-      storage.setItem(stateStorageKey, state);
-      params.append("state", state);
+      storage.setItem(stateStorageKey, state)
+      params.append('state', state)
     }
 
-    const loginUrl = `${config.authorizationEndpoint}?${params.toString()}`;
+    const loginUrl = `${config.authorizationEndpoint}?${params.toString()}`
 
     // Call any preLogin function in authConfig
-    if (config?.preLogin) config.preLogin();
+    if (config?.preLogin) config.preLogin()
 
-    if (method === "popup") {
-      const { left, top, width, height } = calculatePopupPosition(600, 600);
-      const handle: null | WindowProxy = window.open(loginUrl, "loginPopup", `width=${width},height=${height},top=${top},left=${left}`);
-      if (handle) return;
-      console.warn("Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.");
+    if (method === 'popup') {
+      const { left, top, width, height } = calculatePopupPosition(600, 600)
+      const handle: null | WindowProxy = window.open(
+        loginUrl,
+        'loginPopup',
+        `width=${width},height=${height},top=${top},left=${left}`
+      )
+      if (handle) return
+      console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location.assign(loginUrl);
-  });
+    window.location.assign(loginUrl)
+  })
 }
 
-function calculatePopupPosition(popupWidth: number = 600, popupHeight: number = 600): TPopupPosition {
+function calculatePopupPosition(popupWidth = 600, popupHeight = 600): TPopupPosition {
   // Calculate the screen dimensions and position the popup at the center
-  const screenLeft = window.screenLeft || window.screenX;
-  const screenTop = window.screenTop || window.screenY;
-  const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
-  const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
+  const screenLeft = window.screenLeft || window.screenX
+  const screenTop = window.screenTop || window.screenY
+  const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width
+  const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height
 
   // Calculate the position to center the popup
-  let left = screenLeft + (screenWidth - popupWidth) / 2;
-  let top = screenTop + (screenHeight - popupHeight) / 2;
+  let left = screenLeft + (screenWidth - popupWidth) / 2
+  let top = screenTop + (screenHeight - popupHeight) / 2
 
   // Ensure the bottom-right corner does not go off the screen
   // Adjust the left and top positions if necessary
-  const maxLeft = screenLeft + (screenWidth - popupWidth);
-  const maxTop = screenTop + (screenHeight - popupHeight);
+  const maxLeft = screenLeft + (screenWidth - popupWidth)
+  const maxTop = screenTop + (screenHeight - popupHeight)
 
-  left = Math.min(left, maxLeft); // Ensure the right side is within the screen
-  top = Math.min(top, maxTop); // Ensure the bottom side is within the screen
+  left = Math.min(left, maxLeft) // Ensure the right side is within the screen
+  top = Math.min(top, maxTop) // Ensure the bottom side is within the screen
 
   // Ensure the popup is not positioned off the top/left of the screen
-  left = Math.max(0, left);
-  top = Math.max(0, top);
+  left = Math.max(0, left)
+  top = Math.max(0, top)
 
-  return { left, top, width: popupWidth, height: popupHeight };
+  return { left, top, width: popupWidth, height: popupHeight }
 }
 
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
 function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse {
-  return (body as TTokenResponse).access_token !== undefined;
+  return (body as TTokenResponse).access_token !== undefined
 }
 
-function postTokenRequest(tokenEndpoint: string, tokenRequest: TTokenRequest, credentials: RequestCredentials): Promise<TTokenResponse> {
+function postTokenRequest(
+  tokenEndpoint: string,
+  tokenRequest: TTokenRequest,
+  credentials: RequestCredentials
+): Promise<TTokenResponse> {
   return postWithXForm({ url: tokenEndpoint, request: tokenRequest, credentials: credentials }).then((response) => {
     return response.json().then((body: TTokenResponse | unknown): TTokenResponse => {
       if (isTokenResponse(body)) {
-        return body;
+        return body
       }
-      throw Error(JSON.stringify(body));
-    });
-  });
+      throw Error(JSON.stringify(body))
+    })
+  })
 }
 
 export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> => {
-  const storage = config.storage === "session" ? sessionStorage : localStorage;
+  const storage = config.storage === 'session' ? sessionStorage : localStorage
   /*
     The browser has been redirected from the authentication endpoint with
     a 'code' url parameter.
     This code will now be exchanged for Access- and Refresh Tokens.
   */
-  const urlParams = new URLSearchParams(window.location.search);
-  const authCode = urlParams.get("code");
-  const codeVerifier = storage.getItem(codeVerifierStorageKey);
+  const urlParams = new URLSearchParams(window.location.search)
+  const authCode = urlParams.get('code')
+  const codeVerifier = storage.getItem(codeVerifierStorageKey)
 
   if (!authCode) {
-    throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?");
+    throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
   }
   if (!codeVerifier) {
-    throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?");
+    throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
   }
 
   const tokenRequest: TTokenRequestWithCodeAndVerifier = {
-    grant_type: "authorization_code",
+    grant_type: 'authorization_code',
     code: authCode,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
@@ -133,22 +141,25 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     ...config.extraTokenParameters,
     // TODO: Remove in 2.0
     ...config.extraAuthParams,
-  };
-  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials);
-};
+  }
+  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials)
+}
 
-export const fetchWithRefreshToken = (props: { config: TInternalConfig; refreshToken: string }): Promise<TTokenResponse> => {
-  const { config, refreshToken } = props;
+export const fetchWithRefreshToken = (props: {
+  config: TInternalConfig
+  refreshToken: string
+}): Promise<TTokenResponse> => {
+  const { config, refreshToken } = props
   const refreshRequest: TTokenRequestForRefresh = {
-    grant_type: "refresh_token",
+    grant_type: 'refresh_token',
     refresh_token: refreshToken,
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     ...config.extraTokenParameters,
-  };
-  if (config.refreshWithScope) refreshRequest.scope = config.scope;
-  return postTokenRequest(config.tokenEndpoint, refreshRequest, config.tokenRequestCredentials);
-};
+  }
+  if (config.refreshWithScope) refreshRequest.scope = config.scope
+  return postTokenRequest(config.tokenEndpoint, refreshRequest, config.tokenRequestCredentials)
+}
 
 export function redirectToLogout(
   config: TInternalConfig,
@@ -161,24 +172,26 @@ export function redirectToLogout(
 ) {
   const params = new URLSearchParams({
     token: refresh_token || token,
-    token_type_hint: refresh_token ? "refresh_token" : "access_token",
+    token_type_hint: refresh_token ? 'refresh_token' : 'access_token',
     client_id: config.clientId,
     post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
-    ui_locales: window.navigator.languages.join(" "),
+    ui_locales: window.navigator.languages.join(' '),
     ...config.extraLogoutParameters,
     ...additionalParameters,
-  });
-  if (idToken) params.append("id_token_hint", idToken);
-  if (state) params.append("state", state);
-  if (logoutHint) params.append("logout_hint", logoutHint);
-  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`);
+  })
+  if (idToken) params.append('id_token_hint', idToken)
+  if (state) params.append('state', state)
+  if (logoutHint) params.append('logout_hint', logoutHint)
+  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
-export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig["storage"]) {
-  const storage = storageType === "session" ? sessionStorage : localStorage;
-  const receivedState = urlParams.get("state");
-  const loadedState = storage.getItem(stateStorageKey);
+export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {
+  const storage = storageType === 'session' ? sessionStorage : localStorage
+  const receivedState = urlParams.get('state')
+  const loadedState = storage.getItem(stateStorageKey)
   if (receivedState !== loadedState) {
-    throw new Error('"state" value received from authentication server does no match client request. Possible cross-site request forgery');
+    throw new Error(
+      '"state" value received from authentication server does no match client request. Possible cross-site request forgery'
+    )
   }
 }
