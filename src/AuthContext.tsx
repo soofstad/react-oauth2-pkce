@@ -221,21 +221,22 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   async function getTokenSilently(): Promise<string> {
-    return await mutex.runExclusive(async () => {
-      const tokenExpire = getTokenExpire()
-      if (!tokenExpire) throw new Error('No token expire available')
+    const tokenExpire = getTokenExpire()
+    if (!tokenExpire) throw new Error('No token expire available')
 
-      // The access_token has expired
-      if (epochTimeIsPast(tokenExpire)) {
+    if (epochTimeIsPast(tokenExpire)) {
+      // The access_token has expired, so refresh it using the refresh token
+      // This use a mutex to ensure that only one refresh operation happens at a time
+      return await mutex.runExclusive(async () => {
         const newToken = await refreshAccessToken()
         return newToken
-      }
+      })
+    }
 
-      const token = getToken()
-      if (!token) throw new Error('No token available')
+    const token = getToken()
+    if (!token) throw new Error('No token available')
 
-      return token
-    })
+    return token
   }
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
