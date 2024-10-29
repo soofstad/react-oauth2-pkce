@@ -43,6 +43,8 @@ export interface IAuthContext {
   token: string
   logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
+  /** @deprecated Use `logIn` instead */
+  login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string

@@ -17,6 +17,7 @@ import type {
 
 export const AuthContext = createContext<IAuthContext>({
   token: undefined,
+  login: () => null,
   logIn: () => null,
   logOut: () => null,
   error: null,
