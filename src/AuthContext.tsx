@@ -3,9 +3,10 @@ import React, { createContext, useEffect, useMemo, useRef, useState } from 'reac
 import useBrowserStorage from './Hooks'
 import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
-import { decodeJWT } from './decodeJWT'
+import { decodeAccessToken, decodeIdToken, decodeJWT } from './decodeJWT'
+import { FetchError } from './errors'
 import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
-import {
+import type {
   IAuthContext,
   IAuthProvider,
   TInternalConfig,
@@ -21,6 +22,7 @@ export const AuthContext = createContext<IAuthContext>({
   error: null,
   isLoading: false,
   getTokenSilently: () => Promise.resolve(''),
+  isAuthenticated: false,
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
@@ -72,7 +74,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   })
   const [getTokenExpire, setTokenExpire] = useBrowserStorage<number | undefined>({
     key: `${config.storageKeyPrefix}tokenExpire`,
-    defaultValue: undefined,
+    defaultValue: epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
     storage,
   })
   const [getToken, setToken] = useBrowserStorage<string | undefined>({
@@ -168,8 +170,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
   function handleTokenResponse(response: TTokenResponse) {
     setToken(response.access_token)
-    setIdToken(response.id_token)
-    setRefreshToken(response.refresh_token)
+    if (response.id_token) {
+      setIdToken(response.id_token)
+    }
     let tokenExp = FALLBACK_EXPIRE_TIME
     // Decode IdToken, so we can use "exp" from that as fallback if expire not returned in the response
     try {
@@ -182,10 +185,13 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     }
     const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? tokenExp
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
-    const refreshTokenExpire = getRefreshTokenExpire()
-    if (!refreshTokenExpire || config.refreshTokenExpiryStrategy !== 'absolute') {
-      const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
-      setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+    if (response.refresh_token) {
+      setRefreshToken(response.refresh_token)
+      const refreshTokenExpire = getRefreshTokenExpire()
+      if (!refreshTokenExpire || config.refreshTokenExpiryStrategy !== 'absolute') {
+        const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
+        setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
+      }
     }
   }
 
@@ -301,7 +307,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
     // First page visit
     const token = getToken()
-    if (!token && config.autoLogin) return logIn()
+    if (!token && config.autoLogin) return logIn(undefined, undefined, config.loginMethod)
   }, [])
 
   return (

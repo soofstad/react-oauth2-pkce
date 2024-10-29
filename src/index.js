@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client'
 import { AuthContext, AuthProvider } from './AuthContext'
 
 // Get auth provider info from "https://keycloak.ofstad.xyz/realms/master/.well-known/openid-configuration"
+/** @type {import('./types').TAuthConfig} */
 const authConfig = {
   clientId: 'account',
   authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
@@ -16,6 +17,8 @@ const authConfig = {
   logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:3000/',
   onRefreshTokenExpire: (event) => event.logIn('', {}, 'popup'),
+  preLogin: () => console.log('Logging in...'),
+  postLogin: () => console.log('Logged in!'),
   decodeToken: true,
   scope: 'profile openid',
   // state: 'testState',

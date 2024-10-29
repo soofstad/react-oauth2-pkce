@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { AuthContext, TAuthConfig } from '../src'
+import { AuthContext, type TAuthConfig } from '../src'
 
 export const authConfig: TAuthConfig = {
   autoLogin: true,
@@ -12,6 +12,7 @@ export const authConfig: TAuthConfig = {
   scope: 'someScope openid',
   decodeToken: false,
   state: 'testState',
+  loginMethod: 'redirect',
   extraLogoutParameters: {
     testLogoutKey: 'logoutValue',
   },

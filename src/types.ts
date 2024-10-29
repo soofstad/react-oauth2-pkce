@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface TTokenRqBase {
   grant_type: string
@@ -40,8 +40,8 @@ export interface IAuthProvider {
 }
 
 export interface IAuthContext {
-  token?: string
-  logIn: (state?: string, additionalParameters?: TPrimitiveRecord) => void
+  token: string
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null
   tokenData?: TTokenData
@@ -67,6 +67,8 @@ export type TAuthConfig = {
   preLogin?: () => void
   postLogin?: () => void
   postLogout?: () => void
+  loginMethod?: 'redirect' | 'popup'
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
   clearURL?: boolean
@@ -81,6 +83,13 @@ export type TAuthConfig = {
   storage?: 'session' | 'local'
   storageKeyPrefix?: string
   refreshWithScope?: boolean
+  tokenRequestCredentials?: RequestCredentials
+}
+
+export type TRefreshTokenExpiredEvent = {
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
+  /** @deprecated Use `logIn` instead. Will be removed in a future version. */
+  login: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
 }
 
 // The AuthProviders internal config type. All values will be set by user provided, or default values
@@ -96,6 +105,8 @@ export type TInternalConfig = {
   preLogin?: () => void
   postLogin?: () => void
   postLogout?: () => void
+  loginMethod: 'redirect' | 'popup'
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken: boolean
   autoLogin: boolean
   clearURL: boolean
@@ -110,4 +121,5 @@ export type TInternalConfig = {
   storage: 'session' | 'local'
   storageKeyPrefix: string
   refreshWithScope: boolean
+  tokenRequestCredentials: RequestCredentials
 }

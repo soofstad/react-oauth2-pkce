@@ -1,4 +1,4 @@
-import { TAuthConfig, TInternalConfig } from './types'
+import type { TAuthConfig, TInternalConfig } from './types'
 
 function stringIsUnset(value: string | null | undefined) {
   const unset = ['', undefined, null]
@@ -15,10 +15,13 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     preLogin = () => null,
     postLogin = () => null,
     postLogout = () => null,
+    loginMethod = 'redirect',
+    onRefreshTokenExpire = undefined,
     storage = 'local',
     storageKeyPrefix = 'ROCP_',
     refreshWithScope = true,
     refreshTokenExpiryStrategy = 'renewable',
+    tokenRequestCredentials = 'same-origin',
   }: TAuthConfig = passedConfig
 
   const config: TInternalConfig = {
@@ -30,10 +33,13 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     preLogin: preLogin,
     postLogout: postLogout,
     postLogin: postLogin,
+    loginMethod: loginMethod,
+    onRefreshTokenExpire: onRefreshTokenExpire,
     storage: storage,
     storageKeyPrefix: storageKeyPrefix,
     refreshWithScope: refreshWithScope,
     refreshTokenExpiryStrategy: refreshTokenExpiryStrategy,
+    tokenRequestCredentials: tokenRequestCredentials,
   }
   validateConfig(config)
   return config

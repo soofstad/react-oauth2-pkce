@@ -2,7 +2,7 @@ import { fetchWithRefreshToken } from '../src/authentication'
 import { decodeJWT } from '../src/decodeJWT'
 import { FetchError } from '../src/errors'
 import { epochAtSecondsFromNow, epochTimeIsPast } from '../src/timeUtils'
-import { TInternalConfig } from '../src/types'
+import type { TInternalConfig } from '../src/types'
 
 const authConfig: TInternalConfig = {
   autoLogin: false,
@@ -17,6 +17,7 @@ const authConfig: TInternalConfig = {
   refreshTokenExpiryStrategy: 'renewable',
   storageKeyPrefix: 'ROCP_',
   refreshWithScope: true,
+  loginMethod: 'redirect',
   extraAuthParams: {
     prompt: true,
     client_id: 'anotherClientId',
@@ -26,6 +27,7 @@ const authConfig: TInternalConfig = {
     client_id: 'anotherClientId',
     testKey: 'test Value',
   },
+  tokenRequestCredentials: 'same-origin',
 }
 
 test('decode a JWT token', () => {

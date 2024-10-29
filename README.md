@@ -81,6 +81,7 @@ interface IAuthContext {
   tokenData?: TTokenData
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
+  // Note that most browsers block popups by default. The library will print a warning and fallback to redirect if the popup is blocked
   logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }, method: 'redirect' | 'popup' = 'redirect') => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
@@ -134,6 +135,9 @@ type TAuthConfig = {
   // Optionally provide a callback function to run _after_ the
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
+  // Which method to use for login. Can be either 'redirect' or 'popup'
+  // Note that most browsers block popups by default. The library will print a warning and fallback to redirect if the popup is blocked
+  loginMethod: 'redirect' | 'popup'  // default: 'redirect'
   // Optional callback function for the 'refreshTokenExpired' event.
   // You likely want to display a message saying the user need to log in again. A page refresh is enough.
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined
@@ -170,6 +174,11 @@ type TAuthConfig = {
   refreshTokenExpiryStrategy?: 'renewable' | 'absolute' // default: renewable
   // Whether or not to post 'scope' when refreshing the access token
   refreshWithScope?: boolean // default: true
+  // Controls whether browser credentials (cookies, TLS client certificates, or authentication headers containing a username and password) are sent when requesting tokens.
+  // Warning: Including browser credentials deviates from the standard protocol and can introduce unforeseen security issues. Only set this to 'include' if you know what 
+  // you are doing and CSRF protection is present. Setting this to 'include' is required when the token endpoint requires client certificate authentication, but likely is
+  // not needed in any other case. Use with caution.
+  tokenRequestCredentials?: 'same-origin'|'include'|'omit' // default: 'same-origin'
 }
 
 ```
@@ -185,9 +194,30 @@ You should configure your IDP (Identity Provider) to send these, but if that is 
 with the config parameters `tokenExpiresIn` and `refreshTokenExpiresIn`.
 
 ### Fails to compile with Next.js
+The library's main componet `AuthProvider` is _client side only_. Meaning it must be rendered in a web browser, and can not be pre-rendered server-side (which is default in newer versions of NextJS and similar frameworks). 
 
-This library expects to have a `localStorage` (or `sessionStorage`) available. That is not the case when compiling Next.js projects serverside.  
-See: https://github.com/soofstad/react-oauth2-pkce/discussions/90 for a solution.
+This can be solved by marking the module with `use client` and importing the component in the client only (`"ssr": false`).
+
+```tsx
+'use client'
+import {useContext} from "react";
+import dynamic from 'next/dynamic'
+import {TAuthConfig,TRefreshTokenExpiredEvent, AuthContext} from 'react-oauth2-code-pkce'
+
+const AuthProvider = dynamic(
+    ()=> import("react-oauth2-code-pkce")
+        .then((mod) => mod.AuthProvider),
+    {ssr: false}
+)
+
+const authConfig: TAuthConfig = {...for you to fill inn}
+
+export default function Authenticated() {
+    (<AuthProvider authConfig={authConfig}>
+        <LoginInfo/>
+    </AuthProvider>)
+}
+```
 
 ### Error `Bad authorization state...`
 
