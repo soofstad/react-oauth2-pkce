@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 // @ts-ignore
 import ReactDOM from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { AuthContext, AuthProvider, IAuthContext, TAuthConfig } from 'react-oauth2-code-pkce'
+import { AuthContext, AuthProvider, type IAuthContext, type TAuthConfig } from 'react-oauth2-code-pkce'
 
 // Get info from http://localhost:8080/realms/test/.well-known/openid-configuration
 

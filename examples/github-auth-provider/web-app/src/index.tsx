@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 // @ts-ignore
 import ReactDOM from 'react-dom'
-import { AuthContext, AuthProvider, IAuthContext, TAuthConfig } from 'react-oauth2-code-pkce'
+import { AuthContext, AuthProvider, type IAuthContext, type TAuthConfig } from 'react-oauth2-code-pkce'
 
 const authConfig: TAuthConfig = {
   clientId: 'c43524cc7d3c82b05a47',
