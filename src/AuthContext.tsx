@@ -132,8 +132,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   function handleExpiredRefreshToken(initial = false): void {
-    // If it's the first page load, OR there is no sessionExpire callback, we trigger a new login
-    if (initial) return logIn(undefined, undefined, config.loginMethod)
+    if (config.autoLogin && initial) return logIn(undefined, undefined, config.loginMethod)
 
     // TODO: Breaking change - remove automatic login during ongoing session
     if (!config.onRefreshTokenExpire) return logIn(undefined, undefined, config.loginMethod)
