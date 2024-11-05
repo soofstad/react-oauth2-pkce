@@ -21,6 +21,9 @@ test('First page visit should redirect to auth provider for login', async () => 
 })
 
 test('First page visit should popup to auth provider for login', async () => {
+  // set window size to 1200x800 to make test predictable in different environments
+  global.innerWidth = 1200
+  global.innerHeight = 800
   render(
     <AuthProvider authConfig={{ ...authConfig, loginMethod: 'popup' }}>
       <AuthConsumer />
@@ -33,7 +36,7 @@ test('First page visit should popup to auth provider for login', async () => {
         /^myAuthEndpoint\?response_type=code&client_id=myClientID&redirect_uri=http%3A%2F%2Flocalhost%2F&code_challenge=.{43}&code_challenge_method=S256&scope=someScope\+openid&state=testState/gm
       ),
       'loginPopup',
-      'popup width=600 height=600'
+      'width=600,height=600,top=100,left=300'
     )
   })
 })

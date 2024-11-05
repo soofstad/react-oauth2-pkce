@@ -1,5 +1,6 @@
 import { postWithXForm } from './httpUtils'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
+import { calculatePopupPosition } from './popupUtils'
 import type {
   TInternalConfig,
   TPrimitiveRecord,
@@ -54,7 +55,12 @@ export async function redirectToLogin(
     if (config?.preLogin) config.preLogin()
 
     if (method === 'popup') {
-      const handle: null | WindowProxy = window.open(loginUrl, 'loginPopup', 'popup width=600 height=600')
+      const { width, height, left, top } = calculatePopupPosition(600, 600)
+      const handle: null | WindowProxy = window.open(
+        loginUrl,
+        'loginPopup',
+        `width=${width},height=${height},top=${top},left=${left}`
+      )
       if (handle) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }

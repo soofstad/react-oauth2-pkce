@@ -34,6 +34,13 @@ export type TTokenResponse = {
   id_token?: string
 }
 
+export type TPopupPosition = {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
 export interface IAuthProvider {
   authConfig: TAuthConfig
   children: ReactNode
