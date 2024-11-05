@@ -1,8 +1,8 @@
 import { postWithXForm } from './httpUtils'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
+import { calculatePopupPosition } from './popupUtils'
 import type {
   TInternalConfig,
-  TPopupPosition,
   TPrimitiveRecord,
   TTokenRequest,
   TTokenRequestForRefresh,
@@ -55,7 +55,7 @@ export async function redirectToLogin(
     if (config?.preLogin) config.preLogin()
 
     if (method === 'popup') {
-      const { left, top, width, height } = calculatePopupPosition(600, 600)
+      const { width, height, left, top } = calculatePopupPosition(600, 600)
       const handle: null | WindowProxy = window.open(
         loginUrl,
         'loginPopup',
@@ -66,32 +66,6 @@ export async function redirectToLogin(
     }
     window.location.assign(loginUrl)
   })
-}
-
-function calculatePopupPosition(popupWidth = 600, popupHeight = 600): TPopupPosition {
-  // Calculate the screen dimensions and position the popup at the center
-  const screenLeft = window.screenLeft || window.screenX
-  const screenTop = window.screenTop || window.screenY
-  const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width
-  const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height
-
-  // Calculate the position to center the popup
-  let left = screenLeft + (screenWidth - popupWidth) / 2
-  let top = screenTop + (screenHeight - popupHeight) / 2
-
-  // Ensure the bottom-right corner does not go off the screen
-  // Adjust the left and top positions if necessary
-  const maxLeft = screenLeft + (screenWidth - popupWidth)
-  const maxTop = screenTop + (screenHeight - popupHeight)
-
-  left = Math.min(left, maxLeft) // Ensure the right side is within the screen
-  top = Math.min(top, maxTop) // Ensure the bottom side is within the screen
-
-  // Ensure the popup is not positioned off the top/left of the screen
-  left = Math.max(0, left)
-  top = Math.max(0, top)
-
-  return { left, top, width: popupWidth, height: popupHeight }
 }
 
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
