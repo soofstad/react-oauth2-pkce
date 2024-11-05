@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 // ##########################################
 // NOTE: This file is not part of the package.
 // It's only function is to help development in testing and debugging.
@@ -15,7 +17,7 @@ const authConfig = {
   authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
   tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
   logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
-  redirectUri: 'http://localhost:3000/',
+  redirectUri: 'http://localhost:5173/',
   onRefreshTokenExpire: (event) => event.logIn('', {}, 'popup'),
   preLogin: () => console.log('Logging in...'),
   postLogin: () => console.log('Logged in!'),
@@ -45,10 +47,10 @@ function LoginInfo() {
       </>
       {token ? (
         <>
-          <button onClick={() => logOut('rememberThis', idTokenData.session_state)}>Log out</button>
+          <button onClick={() => logOut('rememberThis', idTokenData?.session_state)}>Log out</button>
           <span style={{ margin: '0 10px' }}>
             Access token will expire at:{' '}
-            {new Date(localStorage.getItem('ROCP_tokenExpire') * 1000).toLocaleTimeString()}
+            {new Date(Number(localStorage.getItem('ROCP_tokenExpire')) * 1000).toLocaleTimeString()}
           </span>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div>
@@ -110,6 +112,7 @@ function LoginInfo() {
 }
 
 const container = document.getElementById('root')
+if (!container) throw new Error('No container found')
 const root = createRoot(container)
 
 root.render(
