@@ -14,9 +14,10 @@ import { AuthContext, AuthProvider } from './AuthContext'
 /** @type {import('./types').TAuthConfig} */
 const authConfig = {
   clientId: 'account',
-  authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
-  tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
-  logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
+  discoveryEndpoint: 'https://keycloak.ofstad.xyz/realms/master/.well-known/openid-configuration',
+  // authorizationEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/auth',
+  // tokenEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/token',
+  // logoutEndpoint: 'https://keycloak.ofstad.xyz/realms/master/protocol/openid-connect/logout',
   redirectUri: 'http://localhost:5173/',
   onRefreshTokenExpire: (event) => event.logIn('', {}, 'popup'),
   preLogin: () => console.log('Logging in...'),

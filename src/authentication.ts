@@ -8,10 +8,27 @@ import type {
   TTokenRequestForRefresh,
   TTokenRequestWithCodeAndVerifier,
   TTokenResponse,
+  TWellKnown,
 } from './types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
+
+async function getPublicWellKnownConfig(config: TInternalConfig): Promise<TWellKnown> {
+  if (!config.discoveryEndpoint) throw Error('No "discoveryEndpoint" config parameter provided')
+  const storedConfig = localStorage.getItem(`${config.storageKeyPrefix}well_known`)
+  if (storedConfig) {
+    return new Promise((resolve) => resolve(JSON.parse(storedConfig)))
+  }
+  return fetch(config.discoveryEndpoint).then(async (response) => {
+    if (!response.ok) {
+      throw Error('Failed to fetch public well-known config')
+    }
+    const fetchedConfig = (await response.json()) as TWellKnown
+    localStorage.setItem(`${config.storageKeyPrefix}well_known`, JSON.stringify(fetchedConfig))
+    return fetchedConfig
+  })
+}
 
 export async function redirectToLogin(
   config: TInternalConfig,
@@ -26,7 +43,7 @@ export async function redirectToLogin(
   storage.setItem(codeVerifierStorageKey, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
-  return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
+  return generateCodeChallenge(codeVerifier).then(async (codeChallenge) => {
     // Set query parameters and redirect user to OAuth2 authentication endpoint
     const params = new URLSearchParams({
       response_type: 'code',
@@ -49,7 +66,7 @@ export async function redirectToLogin(
       params.append('state', state)
     }
 
-    const loginUrl = `${config.authorizationEndpoint}?${params.toString()}`
+    const loginUrl = config.authorizationEndpoint ?? (await getPublicWellKnownConfig(config)).authorization_endpoint
 
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
@@ -57,14 +74,14 @@ export async function redirectToLogin(
     if (method === 'popup') {
       const { width, height, left, top } = calculatePopupPosition(600, 600)
       const handle: null | WindowProxy = window.open(
-        loginUrl,
+        `${loginUrl}?${params.toString()}`,
         'loginPopup',
         `width=${width},height=${height},top=${top},left=${left}`
       )
       if (handle) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location.assign(loginUrl)
+    window.location.assign(`${loginUrl}?${params.toString()}`)
   })
 }
 
@@ -116,7 +133,11 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     // TODO: Remove in 2.0
     ...config.extraAuthParams,
   }
-  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials)
+  if (config.tokenEndpoint) return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials)
+
+  return getPublicWellKnownConfig(config).then((wellKnownConfig) =>
+    postTokenRequest(wellKnownConfig.token_endpoint, tokenRequest, config.tokenRequestCredentials)
+  )
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -132,7 +153,12 @@ export const fetchWithRefreshToken = (props: {
     ...config.extraTokenParameters,
   }
   if (config.refreshWithScope) refreshRequest.scope = config.scope
-  return postTokenRequest(config.tokenEndpoint, refreshRequest, config.tokenRequestCredentials)
+  if (config.tokenEndpoint)
+    return postTokenRequest(config.tokenEndpoint, refreshRequest, config.tokenRequestCredentials)
+
+  return getPublicWellKnownConfig(config).then((wellKnownConfig) =>
+    postTokenRequest(wellKnownConfig.token_endpoint, refreshRequest, config.tokenRequestCredentials)
+  )
 }
 
 export function redirectToLogout(
@@ -156,7 +182,13 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
-  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
+
+  if (config.logoutEndpoint) return window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
+
+  // TODO: This now removes the option to disable "true" logout. Make it configurable?
+  getPublicWellKnownConfig(config).then((wellKnownConfig) => {
+    window.location.assign(`${wellKnownConfig.revocation_endpoint}?${params.toString()}`)
+  })
 }
 
 export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {
