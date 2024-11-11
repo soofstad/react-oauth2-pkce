@@ -76,6 +76,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     setRefreshTokenExpire(undefined)
     setIdToken(undefined)
     setLoginInProgress(false)
+    localStorage.removeItem(`${config.storageKeyPrefix}well_known`)
   }
 
   function logOut(state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) {

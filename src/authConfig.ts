@@ -46,11 +46,11 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
 export function validateConfig(config: TInternalConfig) {
   if (stringIsUnset(config?.clientId))
     throw Error("'clientId' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
-  if (stringIsUnset(config?.authorizationEndpoint))
+  if (stringIsUnset(config?.authorizationEndpoint) && stringIsUnset(config?.discoveryEndpoint))
     throw Error(
       "'authorizationEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
     )
-  if (stringIsUnset(config?.tokenEndpoint))
+  if (stringIsUnset(config?.tokenEndpoint) && stringIsUnset(config?.discoveryEndpoint))
     throw Error(
       "'tokenEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
     )

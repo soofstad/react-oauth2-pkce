@@ -23,6 +23,14 @@ export type TTokenData = {
   [x: string]: any
 }
 
+export type TWellKnown = {
+  authorization_endpoint: string
+  token_endpoint: string
+  revocation_endpoint: string
+  // biome-ignore lint: It really can be `any` (almost)
+  [x: string]: any
+}
+
 export type TTokenResponse = {
   access_token: string
   scope: string
@@ -61,11 +69,11 @@ export interface IAuthContext {
 
 export type TPrimitiveRecord = { [key: string]: string | boolean | number }
 
-// Input from users of the package, some optional values
-export type TAuthConfig = {
+type TAuthConfigBase = {
   clientId: string
-  authorizationEndpoint: string
-  tokenEndpoint: string
+  authorizationEndpoint?: string
+  tokenEndpoint?: string
+  discoveryEndpoint?: string
   redirectUri: string
   scope?: string
   state?: string
@@ -92,17 +100,29 @@ export type TAuthConfig = {
   tokenRequestCredentials?: RequestCredentials
 }
 
+// Input from users of the package, some optional values
+export type TAuthConfig = TAuthConfigBase &
+  (
+    | {
+        authorizationEndpoint: string
+        tokenEndpoint: string
+        discoveryEndpoint?: string
+      }
+    | {
+        discoveryEndpoint: string
+        tokenEndpoint?: string
+        authorizationEndpoint?: string
+      }
+  )
+
 export type TRefreshTokenExpiredEvent = {
   logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
   /** @deprecated Use `logIn` instead. Will be removed in a future version. */
   login: (state?: string, additionalParameters?: TPrimitiveRecord, method?: 'redirect' | 'popup') => void
 }
 
-// The AuthProviders internal config type. All values will be set by user provided, or default values
-export type TInternalConfig = {
+type TInternalConfigBase = {
   clientId: string
-  authorizationEndpoint: string
-  tokenEndpoint: string
   redirectUri: string
   scope?: string
   state?: string
@@ -128,3 +148,17 @@ export type TInternalConfig = {
   refreshWithScope: boolean
   tokenRequestCredentials: RequestCredentials
 }
+// The AuthProviders internal config type. All values will be set by user provided, or default values
+export type TInternalConfig = TInternalConfigBase &
+  (
+    | {
+        authorizationEndpoint: string
+        tokenEndpoint: string
+        discoveryEndpoint?: string
+      }
+    | {
+        discoveryEndpoint: string
+        tokenEndpoint?: string
+        authorizationEndpoint?: string
+      }
+  )
