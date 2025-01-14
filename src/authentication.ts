@@ -43,7 +43,7 @@ export async function redirectToLogin(
     }
 
     storage.removeItem(stateStorageKey)
-    const state = customState ?? config.state
+    const state = customState ?? (config.stateFn && config.stateFn())
     if (state) {
       storage.setItem(stateStorageKey, state)
       params.append('state', state)
