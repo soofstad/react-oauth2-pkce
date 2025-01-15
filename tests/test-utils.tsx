@@ -11,7 +11,7 @@ export const authConfig: TAuthConfig = {
   logoutRedirect: 'primary-logout-redirect',
   scope: 'someScope openid',
   decodeToken: false,
-  state: 'testState',
+  stateFn: () => 'testState',
   loginMethod: 'redirect',
   extraLogoutParameters: {
     testLogoutKey: 'logoutValue',
