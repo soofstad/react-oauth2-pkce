@@ -68,6 +68,7 @@ export type TAuthConfig = {
   tokenEndpoint: string
   redirectUri: string
   scope?: string
+  state?: string
   stateFn?: () => string
   logoutEndpoint?: string
   logoutRedirect?: string
@@ -105,6 +106,7 @@ export type TInternalConfig = {
   tokenEndpoint: string
   redirectUri: string
   scope?: string
+  state?: string
   stateFn?: () => string
   logoutEndpoint?: string
   logoutRedirect?: string

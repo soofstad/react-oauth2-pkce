@@ -123,6 +123,8 @@ type TAuthConfig = {
   redirectUri: string  // Required
   // Which scopes to request for the auth token
   scope?: string  // default: ''
+  // Optional state value. Will often make more sense to provide the state in a call to the 'logIn()' function
+  state?: string // default: null
   // Optional state function. This function should generate a random, URL-safe String. 
   stateFn?: () => string // default: undefined
   // Which URL to call for logging out of the auth provider
