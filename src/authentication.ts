@@ -21,6 +21,7 @@ export async function redirectToLogin(
   method: TLoginMethod = 'redirect'
 ): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
+  const navigationMethod = method === 'replace' ? 'replace' : 'assign'
 
   // Create and store a random string in storage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
@@ -65,7 +66,7 @@ export async function redirectToLogin(
       if (handle) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location.assign(loginUrl)
+    window.location[navigationMethod](loginUrl)
   })
 }
 
