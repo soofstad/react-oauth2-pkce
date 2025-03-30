@@ -82,7 +82,7 @@ interface IAuthContext {
   // Function to trigger login. 
   // If you want to use 'state', you might want to set 'clearURL' configuration parameter to 'false'.
   // Note that most browsers block popups by default. The library will print a warning and fallback to redirect if the popup is blocked
-  logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }, method: 'redirect' | 'popup' = 'redirect') => void
+  logIn: (state?: string, additionalParameters?: { [key: string]: string | boolean | number }, method: TLoginMethod = 'redirect') => void
   // Function to trigger logout from authentication provider. You may provide optional 'state', and 'logout_hint' values.
   // See https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for details.
   logOut: (state?: string, logoutHint?: string, additionalParameters?: { [key: string]: string | boolean | number }) => void
@@ -135,9 +135,9 @@ type TAuthConfig = {
   // Optionally provide a callback function to run _after_ the
   // user has been redirected back from the auth server
   postLogin?: () => void  // default: () => null
-  // Which method to use for login. Can be either 'redirect' or 'popup'
+  // Which method to use for login. Can be 'redirect', 'replace', or 'popup'
   // Note that most browsers block popups by default. The library will print a warning and fallback to redirect if the popup is blocked
-  loginMethod: 'redirect' | 'popup'  // default: 'redirect'
+  loginMethod: 'redirect' | 'replace' | 'popup'  // default: 'redirect'
   // Optional callback function for the 'refreshTokenExpired' event.
   // You likely want to display a message saying the user need to log in again. A page refresh is enough.
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void  // default: undefined

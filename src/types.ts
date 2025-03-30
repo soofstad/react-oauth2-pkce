@@ -38,7 +38,7 @@ export type TTokenResponse = {
   id_token?: string
 }
 
-export type TLoginMethod = 'redirect' | 'popup'
+export type TLoginMethod = 'redirect' | 'replace' | 'popup'
 
 export type TPopupPosition = {
   left: number
