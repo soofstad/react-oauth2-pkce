@@ -178,7 +178,7 @@ type TAuthConfig = {
   // Warning: Including browser credentials deviates from the standard protocol and can introduce unforeseen security issues. Only set this to 'include' if you know what 
   // you are doing and CSRF protection is present. Setting this to 'include' is required when the token endpoint requires client certificate authentication, but likely is
   // not needed in any other case. Use with caution.
-  tokenRequestCredentials?: 'same-origin'|'include'|'omit' // default: 'same-origin'
+  tokenRequestCredentials?: 'same-origin' | 'include' | 'omit' // default: 'same-origin'
 }
 
 ```
