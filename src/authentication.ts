@@ -3,6 +3,7 @@ import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { calculatePopupPosition } from './popupUtils'
 import type {
   TInternalConfig,
+  TLoginMethod,
   TPrimitiveRecord,
   TTokenRequest,
   TTokenRequestForRefresh,
@@ -17,7 +18,7 @@ export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
   additionalParameters?: TPrimitiveRecord,
-  method: 'popup' | 'redirect' = 'redirect'
+  method: TLoginMethod = 'redirect'
 ): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
 

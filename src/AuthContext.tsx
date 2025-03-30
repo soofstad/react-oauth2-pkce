@@ -9,6 +9,7 @@ import type {
   IAuthContext,
   IAuthProvider,
   TInternalConfig,
+  TLoginMethod,
   TPrimitiveRecord,
   TRefreshTokenExpiredEvent,
   TTokenData,
@@ -58,7 +59,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     false,
     config.storage
   )
-  const [loginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>(
+  const [loginMethod, setLoginMethod] = useBrowserStorage<TLoginMethod>(
     `${config.storageKeyPrefix}loginMethod`,
     'redirect',
     config.storage
@@ -85,7 +86,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
-  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: 'redirect' | 'popup' = 'redirect') {
+  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: TLoginMethod = 'redirect') {
     clearStorage()
     setLoginInProgress(true)
     setLoginMethod(method)
