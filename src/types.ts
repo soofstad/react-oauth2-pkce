@@ -53,12 +53,14 @@ export interface IAuthProvider {
 }
 
 type TLogInFunction = (state?: string, additionalParameters?: TPrimitiveRecord, method?: TLoginMethod) => void
+type TLogInSilentFunction = (initial?: boolean) => void
 export interface IAuthContext {
   token: string
   logIn: TLogInFunction
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
   /** @deprecated Use `logIn` instead */
   login: TLogInFunction
+  logInSilent: TLogInSilentFunction
   error: string | null
   tokenData?: TTokenData
   idToken?: string

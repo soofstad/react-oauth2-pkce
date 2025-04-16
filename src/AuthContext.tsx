@@ -20,6 +20,7 @@ export const AuthContext = createContext<IAuthContext>({
   token: '',
   login: () => null,
   logIn: () => null,
+  logInSilent: () => null,
   logOut: () => null,
   error: null,
   loginInProgress: false,
@@ -104,6 +105,39 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       setError(error.message)
       setLoginInProgress(false)
     })
+  }
+
+  function logInSilent(initial: boolean = false) {
+    setToken('')
+    setTokenExpire(epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME))
+    setIdToken(undefined)
+    setLoginInProgress(true)
+    if (refreshToken) {
+      fetchWithRefreshToken({ config, refreshToken })
+        .then((result: TTokenResponse) => handleTokenResponse(result))
+        .catch((error: unknown) => {
+          if (error instanceof FetchError) {
+            // If the fetch failed with status 400, assume expired refresh token
+            if (error.status === 400) {
+              handleExpiredRefreshToken(initial)
+              return
+            }
+            // Unknown error. Set error, and log in if first page load
+            console.error(error)
+            setError(error.message)
+            if (initial) logIn(undefined, undefined, config.loginMethod)
+          }
+          // Unknown error. Set error, and log in if first page load
+          else if (error instanceof Error) {
+            console.error(error)
+            setError(error.message)
+            if (initial) logIn(undefined, undefined, config.loginMethod)
+          }
+        })
+        .finally(() => {
+          setLoginInProgress(false)
+        })
+    }
   }
 
   function handleTokenResponse(response: TTokenResponse) {
@@ -269,6 +303,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         login: logIn,
         logIn,
         logOut,
+        logInSilent,
         error,
         loginInProgress,
       }}
