@@ -130,6 +130,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
       }
     }
+    setError(null);
   }
 
   function handleExpiredRefreshToken(initial = false): void {
