@@ -15,6 +15,7 @@ Long version;
 <https://www.rfc-editor.org/rfc/rfc6749.html>
 <https://datatracker.ietf.org/doc/html/rfc7636>
 <https://oauth.net/2/pkce/>
+<https://datatracker.ietf.org/doc/html/rfc8252>
 
 ## Features
 
@@ -24,6 +25,7 @@ Long version;
 - Session expired callback
 - Silently refreshes short-lived access tokens in the background
 - Decodes JWT's
+- Native login flow for mobile devices
 - A total of ~440 lines of code, easy for anyone to audit and understand
 
 ## Example
