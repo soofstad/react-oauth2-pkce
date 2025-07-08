@@ -56,6 +56,19 @@ export async function redirectToLogin(
     // Call any preLogin function in authConfig
     if (config?.preLogin) config.preLogin()
 
+    // Handle native login method
+    if (method === 'native') {
+      if (config.onLoginUrlReady) {
+        config.onLoginUrlReady(loginUrl)
+      } else {
+        console.warn(
+          'Native login method requires onLoginUrlReady callback to be configured. ' +
+          'The login URL will not be handled automatically.'
+        )
+      }
+      return
+    }
+
     if (method === 'popup') {
       const { width, height, left, top } = calculatePopupPosition(600, 600)
       const handle: null | WindowProxy = window.open(

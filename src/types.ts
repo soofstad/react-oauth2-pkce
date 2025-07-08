@@ -38,7 +38,7 @@ export type TTokenResponse = {
   id_token?: string
 }
 
-export type TLoginMethod = 'redirect' | 'replace' | 'popup'
+export type TLoginMethod = 'redirect' | 'replace' | 'popup' | 'native'
 
 export type TPopupPosition = {
   left: number
@@ -81,6 +81,7 @@ export type TAuthConfig = {
   preLogin?: () => void
   postLogin?: () => void
   loginMethod?: TLoginMethod
+  onLoginUrlReady?: (url: string) => void
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
