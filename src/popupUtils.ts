@@ -1,4 +1,4 @@
-import type { TPopupPosition } from './types'
+import type { TPopupPosition } from './Types'
 
 export function calculatePopupPosition(popupWidth = 600, popupHeight = 600): TPopupPosition {
   // Calculate the screen dimensions and position the popup at the center

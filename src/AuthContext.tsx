@@ -9,12 +9,11 @@ import type {
   IAuthContext,
   IAuthProvider,
   TInternalConfig,
-  TLoginMethod,
   TPrimitiveRecord,
   TRefreshTokenExpiredEvent,
   TTokenData,
   TTokenResponse,
-} from './types'
+} from './Types'
 
 export const AuthContext = createContext<IAuthContext>({
   token: '',
@@ -31,38 +30,49 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   const [refreshToken, setRefreshToken] = useBrowserStorage<string | undefined>(
     `${config.storageKeyPrefix}refreshToken`,
     undefined,
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
   const [refreshTokenExpire, setRefreshTokenExpire] = useBrowserStorage<number | undefined>(
     `${config.storageKeyPrefix}refreshTokenExpire`,
     undefined,
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
-  const [token, setToken] = useBrowserStorage<string>(`${config.storageKeyPrefix}token`, '', config.storage)
+  const [token, setToken] = useBrowserStorage<string>(`${config.storageKeyPrefix}token`, '',
+    config.storage,
+    config?.baseDomain || ''
+  )
+
   const [tokenExpire, setTokenExpire] = useBrowserStorage<number>(
     `${config.storageKeyPrefix}tokenExpire`,
     epochAtSecondsFromNow(FALLBACK_EXPIRE_TIME),
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
   const [idToken, setIdToken] = useBrowserStorage<string | undefined>(
     `${config.storageKeyPrefix}idToken`,
     undefined,
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
   const [loginInProgress, setLoginInProgress] = useBrowserStorage<boolean>(
     `${config.storageKeyPrefix}loginInProgress`,
     false,
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
   const [refreshInProgress, setRefreshInProgress] = useBrowserStorage<boolean>(
     `${config.storageKeyPrefix}refreshInProgress`,
     false,
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
-  const [loginMethod, setLoginMethod] = useBrowserStorage<TLoginMethod>(
+  const [loginMethod, setLoginMethod] = useBrowserStorage<'redirect' | 'popup'>(
     `${config.storageKeyPrefix}loginMethod`,
     'redirect',
-    config.storage
+    config.storage,
+    config?.baseDomain || ''
   )
   const tokenData = useMemo(() => {
     if (config.decodeToken) return decodeAccessToken(token)
@@ -86,7 +96,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       redirectToLogout(config, token, refreshToken, idToken, state, logoutHint, additionalParameters)
   }
 
-  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: TLoginMethod = 'redirect') {
+  function logIn(state?: string, additionalParameters?: TPrimitiveRecord, method: 'redirect' | 'popup' = 'redirect') {
     clearStorage()
     setLoginInProgress(true)
     setLoginMethod(method)
@@ -122,6 +132,17 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
       console.warn(`Failed to decode idToken: ${(e as Error).message}`)
     }
     const tokenExpiresIn = config.tokenExpiresIn ?? response.expires_in ?? tokenExp
+
+    // loggind for debugging purposes
+    console.log("Debug: tokenExpiresIn", tokenExpiresIn)
+    console.log({
+      "config.tokenExpiresIn": config?.tokenExpiresIn,
+      "response.expires_in": response.expires_in,
+      tokenExp,
+      FALLBACK_EXPIRE_TIME,
+      "decodedToken.exp": decodeJWT(response?.id_token || "")?.exp || undefined,
+    })
+
     setTokenExpire(epochAtSecondsFromNow(tokenExpiresIn))
     const refreshTokenExpiresIn = config.refreshTokenExpiresIn ?? getRefreshExpiresIn(tokenExpiresIn, response)
     if (response.refresh_token) {
@@ -130,7 +151,6 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         setRefreshTokenExpire(epochAtSecondsFromNow(refreshTokenExpiresIn))
       }
     }
-    setError(null)
   }
 
   function handleExpiredRefreshToken(initial = false): void {

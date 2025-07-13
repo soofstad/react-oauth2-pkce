@@ -4,4 +4,4 @@ export type {
   IAuthProvider,
   IAuthContext,
   TRefreshTokenExpiredEvent,
-} from './types'
+} from './Types'

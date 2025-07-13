@@ -3,13 +3,12 @@ import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { calculatePopupPosition } from './popupUtils'
 import type {
   TInternalConfig,
-  TLoginMethod,
   TPrimitiveRecord,
   TTokenRequest,
   TTokenRequestForRefresh,
   TTokenRequestWithCodeAndVerifier,
   TTokenResponse,
-} from './types'
+} from './Types'
 
 const codeVerifierStorageKey = 'PKCE_code_verifier'
 const stateStorageKey = 'ROCP_auth_state'
@@ -18,10 +17,9 @@ export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
   additionalParameters?: TPrimitiveRecord,
-  method: TLoginMethod = 'redirect'
+  method: 'popup' | 'redirect' = 'redirect'
 ): Promise<void> {
   const storage = config.storage === 'session' ? sessionStorage : localStorage
-  const navigationMethod = method === 'replace' ? 'replace' : 'assign'
 
   // Create and store a random string in storage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
@@ -66,7 +64,7 @@ export async function redirectToLogin(
       if (handle) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location[navigationMethod](loginUrl)
+    window.location.assign(loginUrl)
   })
 }
 

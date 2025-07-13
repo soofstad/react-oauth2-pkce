@@ -1,4 +1,4 @@
-import type { TAuthConfig, TInternalConfig } from './types'
+import type { TAuthConfig, TInternalConfig } from "./Types"
 
 function stringIsUnset(value: string | null | undefined) {
   const unset = ['', undefined, null]
@@ -56,7 +56,7 @@ export function validateConfig(config: TInternalConfig) {
     )
   if (stringIsUnset(config?.redirectUri))
     throw Error("'redirectUri' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
-  if (!['session', 'local'].includes(config.storage)) throw Error("'storage' must be one of ('session', 'local')")
+  if (!['session', 'local', 'cookie'].includes(config.storage)) throw Error("'storage' must be one of ('session', 'local', 'cookie')")
   if (config?.extraAuthParams)
     console.warn(
       "The 'extraAuthParams' configuration parameter will be deprecated. You should use " +

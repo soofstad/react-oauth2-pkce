@@ -1,5 +1,5 @@
 import { FetchError } from './errors'
-import type { TTokenRequest } from './types'
+import type { TTokenRequest } from './Types'
 
 function buildUrlEncodedRequest(request: TTokenRequest): string {
   let queryString = ''

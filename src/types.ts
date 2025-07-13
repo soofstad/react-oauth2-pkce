@@ -1,8 +1,4 @@
-import type { ReactNode } from 'react'
-
-// Makes only the specified keys required in the provided type
-// Source: https://www.emmanuelgautier.com/blog/snippets/typescript-required-properties
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+import type { ReactNode } from "react"
 
 interface TTokenRqBase {
   grant_type: string
@@ -38,8 +34,6 @@ export type TTokenResponse = {
   id_token?: string
 }
 
-export type TLoginMethod = 'redirect' | 'replace' | 'popup'
-
 export type TPopupPosition = {
   left: number
   top: number
@@ -52,13 +46,12 @@ export interface IAuthProvider {
   children: ReactNode
 }
 
-type TLogInFunction = (state?: string, additionalParameters?: TPrimitiveRecord, method?: TLoginMethod) => void
 export interface IAuthContext {
   token: string
-  logIn: TLogInFunction
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: "redirect" | "popup") => void
   logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
   /** @deprecated Use `logIn` instead */
-  login: TLogInFunction
+  login: (state?: string, additionalParameters?: TPrimitiveRecord) => void
   error: string | null
   tokenData?: TTokenData
   idToken?: string
@@ -80,7 +73,7 @@ export type TAuthConfig = {
   logoutRedirect?: string
   preLogin?: () => void
   postLogin?: () => void
-  loginMethod?: TLoginMethod
+  loginMethod?: "redirect" | "popup"
   onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
   decodeToken?: boolean
   autoLogin?: boolean
@@ -92,29 +85,48 @@ export type TAuthConfig = {
   extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
-  refreshTokenExpiryStrategy?: 'renewable' | 'absolute'
-  storage?: 'session' | 'local'
+  refreshTokenExpiryStrategy?: "renewable" | "absolute"
+  storage?: "session" | "local" | "cookie"
   storageKeyPrefix?: string
   refreshWithScope?: boolean
   tokenRequestCredentials?: RequestCredentials
+  baseDomain?: string
 }
 
 export type TRefreshTokenExpiredEvent = {
-  logIn: TLogInFunction
+  logIn: (state?: string, additionalParameters?: TPrimitiveRecord, method?: "redirect" | "popup") => void
   /** @deprecated Use `logIn` instead. Will be removed in a future version. */
-  login: TLogInFunction
+  login: (state?: string, additionalParameters?: TPrimitiveRecord, method?: "redirect" | "popup") => void
 }
 
 // The AuthProviders internal config type. All values will be set by user provided, or default values
-export type TInternalConfig = WithRequired<
-  TAuthConfig,
-  | 'loginMethod'
-  | 'decodeToken'
-  | 'autoLogin'
-  | 'clearURL'
-  | 'refreshTokenExpiryStrategy'
-  | 'storage'
-  | 'storageKeyPrefix'
-  | 'refreshWithScope'
-  | 'tokenRequestCredentials'
->
+export type TInternalConfig = {
+  clientId: string
+  authorizationEndpoint: string
+  tokenEndpoint: string
+  redirectUri: string
+  scope?: string
+  state?: string
+  logoutEndpoint?: string
+  logoutRedirect?: string
+  preLogin?: () => void
+  postLogin?: () => void
+  loginMethod: "redirect" | "popup"
+  onRefreshTokenExpire?: (event: TRefreshTokenExpiredEvent) => void
+  decodeToken: boolean
+  autoLogin: boolean
+  clearURL: boolean
+  /** @deprecated Use `extraAuthParameters` instead. Will be removed in a future version. */
+  extraAuthParams?: TPrimitiveRecord
+  extraAuthParameters?: TPrimitiveRecord
+  extraTokenParameters?: TPrimitiveRecord
+  extraLogoutParameters?: TPrimitiveRecord
+  tokenExpiresIn?: number
+  refreshTokenExpiresIn?: number
+  refreshTokenExpiryStrategy: "renewable" | "absolute"
+  storage: "session" | "local" | "cookie"
+  storageKeyPrefix: string
+  refreshWithScope: boolean
+  tokenRequestCredentials: RequestCredentials
+  baseDomain?: string
+}

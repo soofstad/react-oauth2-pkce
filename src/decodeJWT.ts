@@ -1,4 +1,4 @@
-import type { TTokenData } from './types'
+import type { TTokenData } from './Types'
 
 /**
  * Decodes the base64 encoded JWT. Returns a TToken.
