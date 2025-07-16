@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,8 +15,8 @@ export default defineConfig({
         // Organize assets in folders
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js'
-      }
+        entryFileNames: 'assets/[name]-[hash].js',
+      },
     },
 
     // Ensure all assets are included
@@ -26,7 +26,7 @@ export default defineConfig({
     minify: true,
 
     // Generate source maps for debugging (optional)
-    sourcemap: false
+    sourcemap: false,
   },
 
   // Base path for deployment (change if deploying to subdirectory)
@@ -41,20 +41,20 @@ export default defineConfig({
     cors: true,
 
     // History API fallback for SPA routing
-    historyApiFallback: true
+    historyApiFallback: true,
   },
 
   // Preview server configuration (for testing built app)
   preview: {
     port: 4173,
     // SPA fallback for preview as well
-    historyApiFallback: true
+    historyApiFallback: true,
   },
 
   // Ensure client-only rendering
   ssr: {
     // Disable SSR completely
-    noExternal: []
+    noExternal: [],
   },
 
   // Define environment variables available to client
@@ -62,6 +62,6 @@ export default defineConfig({
     // Ensure we're in client-only mode
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     // Add any other client-side env vars
-    __CLIENT_ONLY__: true
-  }
+    __CLIENT_ONLY__: true,
+  },
 })

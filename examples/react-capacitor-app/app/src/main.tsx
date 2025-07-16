@@ -1,8 +1,8 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { AuthProvider, type TAuthConfig } from 'react-oauth2-code-pkce'
-import { Capacitor } from '@capacitor/core'
 import { Browser } from '@capacitor/browser'
+import { Capacitor } from '@capacitor/core'
+import React from 'react'
+import ReactDOM, { createRoot } from 'react-dom/client'
+import { AuthProvider, type TAuthConfig } from 'react-oauth2-code-pkce'
 import App from './App.tsx'
 import './index.css'
 
@@ -45,8 +45,7 @@ const authConfig: TAuthConfig = {
   clientId: '6559ce69-219d-4e82-b6ed-889a861c7c94',
   authorizationEndpoint:
     'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/authorize',
-  tokenEndpoint:
-    'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
+  tokenEndpoint: 'https://login.microsoftonline.com/d422398d-b6a5-454d-a202-7ed4c1bec457/oauth2/v2.0/token',
 
   // Use deep link for Capacitor, localhost for web
   redirectUri: isCapacitor()
@@ -85,10 +84,13 @@ const authConfig: TAuthConfig = {
  * Root component that wraps the App with AuthProvider
  * This ensures authentication context is available throughout the app
  */
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root')
+if (!container) throw new Error('No container found')
+const root = createRoot(container)
+root.render(
   <React.StrictMode>
     <AuthProvider authConfig={authConfig}>
       <App />
     </AuthProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
