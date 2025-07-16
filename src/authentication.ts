@@ -65,7 +65,7 @@ export async function redirectToLogin(
       } else {
         console.warn(
           'Native login method requires onLoginUrlReady callback to be configured. ' +
-          'The login URL will not be handled automatically.'
+            'The login URL will not be handled automatically.'
         )
       }
       return

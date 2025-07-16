@@ -31,7 +31,7 @@ Long version;
 ## Example
 
 ```tsx
-import {AuthContext, AuthProvider, TAuthConfig, TRefreshTokenExpiredEvent} from "react-oauth2-code-pkce"
+import { AuthContext, AuthProvider, TAuthConfig, TRefreshTokenExpiredEvent } from "react-oauth2-code-pkce"
 
 const authConfig: TAuthConfig = {
   clientId: 'myClientID',
@@ -43,20 +43,20 @@ const authConfig: TAuthConfig = {
 }
 
 const UserInfo = (): JSX.Element => {
-  const {token, tokenData} = useContext<IAuthContext>(AuthContext)
+    const {token, tokenData} = useContext<IAuthContext>(AuthContext)
 
-  return <>
-    <h4>Access Token</h4>
-    <pre>{token}</pre>
-    <h4>User Information from JWT</h4>
-    <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-  </>
+    return <>
+        <h4>Access Token</h4>
+        <pre>{token}</pre>
+        <h4>User Information from JWT</h4>
+        <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+    </>
 }
 
 ReactDOM.render(<AuthProvider authConfig={authConfig}>
-    <UserInfo/>
-  </AuthProvider>
-  , document.getElementById('root'),
+        <UserInfo/>
+    </AuthProvider>
+    , document.getElementById('root'),
 )
 ```
 
@@ -131,7 +131,7 @@ type TAuthConfig = {
   // Which URL the auth provider should redirect the user to after successful authentication/login
   redirectUri: string  // Required
   // Which scopes to request for the auth token
-  scope?: string  // Default: ''
+  scope?: string  // default: ''
   // Optional state value. Will often make more sense to provide the state in a call to the 'logIn()' function
   state?: string // default: null
   // Which URL to call for logging out of the auth provider
@@ -146,7 +146,7 @@ type TAuthConfig = {
   postLogin?: () => void  // default: () => null
   // Which method to use for login. Can be 'redirect', 'replace', or 'popup'
   // Note that most browsers block popups by default. The library will print a warning and fallback to redirect if the popup is blocked
-  loginMethod: 'redirect' | 'replace' | 'popup' | 'native'  // Default: 'redirect'
+  loginMethod: 'redirect' | 'replace' | 'popup' | 'native'  // default: 'redirect'
   // Optional callback function for the native login method. If loginMethod is set to 'native', this function,
   // which become required, will be called with the URL to open in the native browser(browser in app or somewhere else).
   // This is used to open the native login flow on mobile devices.
@@ -159,7 +159,7 @@ type TAuthConfig = {
   decodeToken?: boolean  // default: true
   // By default, the package will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "logIn()" function to log in (e.g. with a "Log in" button)
-  autoLogin?: boolean  // Default: true
+  autoLogin?: boolean  // default: true
   // Store login state in 'localStorage' or 'sessionStorage'
   // If set to 'session', no login state is persisted by 'react-oauth2-code-pkce` when the browser closes.
   // NOTE: Many authentication servers will keep the client logged in by cookies. You should therefore use
@@ -186,7 +186,7 @@ type TAuthConfig = {
   // - 'absolute': The refresh token's expiration time is fixed from its initial issuance and does not change, regardless of how many times it is used.
   refreshTokenExpiryStrategy?: 'renewable' | 'absolute' // default: renewable
   // Whether or not to post 'scope' when refreshing the access token
-  refreshWithScope?: boolean // Default: true
+  refreshWithScope?: boolean // default: true
   // Controls whether browser credentials (cookies, TLS client certificates, or authentication headers containing a username and password) are sent when requesting tokens.
   // Warning: Including browser credentials deviates from the standard protocol and can introduce unforeseen security issues. Only set this to 'include' if you know what
   // you are doing and CSRF protection is present. Setting this to 'include' is required when the token endpoint requires client certificate authentication, but likely is
@@ -220,20 +220,20 @@ This can be solved by marking the module with `use client` and importing the com
 'use client'
 import {useContext} from "react";
 import dynamic from 'next/dynamic'
-import {TAuthConfig, TRefreshTokenExpiredEvent, AuthContext} from 'react-oauth2-code-pkce'
+import {TAuthConfig,TRefreshTokenExpiredEvent, AuthContext} from 'react-oauth2-code-pkce'
 
 const AuthProvider = dynamic(
-  () => import("react-oauth2-code-pkce")
-    .then((mod) => mod.AuthProvider),
-  {ssr: false}
+    ()=> import("react-oauth2-code-pkce")
+        .then((mod) => mod.AuthProvider),
+    {ssr: false}
 )
 
 const authConfig: TAuthConfig = {...for you to fill inn}
 
 export default function Authenticated() {
-  (<AuthProvider authConfig={authConfig}>
-    <LoginInfo/>
-  </AuthProvider>)
+    (<AuthProvider authConfig={authConfig}>
+        <LoginInfo/>
+    </AuthProvider>)
 }
 ```
 
