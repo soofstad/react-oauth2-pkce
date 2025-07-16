@@ -61,7 +61,7 @@ export function validateConfig(config: TInternalConfig) {
   if (config.loginMethod === 'native' && !config.onLoginUrlReady) {
     throw Error(
       "'onLoginUrlReady' callback must be provided when using 'native' loginMethod. " +
-      "This callback will receive the authorization URL that should be opened in an external browser."
+        'This callback will receive the authorization URL that should be opened in an external browser.'
     )
   }
   if (config?.extraAuthParams)
