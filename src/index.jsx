@@ -37,14 +37,14 @@ function LoginInfo() {
   return (
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
-      <>
-        <button onClick={() => logIn('', {}, 'popup')}>Log in w/popup</button>
-        <button onClick={() => logIn()}>Log in w/redirect</button>
-        <button onClick={() => logIn('customLoginState')}>Log in w/state</button>
-        <button onClick={() => logIn('customLoginState', { scope: 'profile', something: 123 })}>
-          Log in w/extra params
-        </button>
-      </>
+
+      <button onClick={() => logIn('', {}, 'popup')}>Log in w/popup</button>
+      <button onClick={() => logIn()}>Log in w/redirect</button>
+      <button onClick={() => logIn('customLoginState')}>Log in w/state</button>
+      <button onClick={() => logIn('customLoginState', { scope: 'profile', something: 123 })}>
+        Log in w/extra params
+      </button>
+
       {token ? (
         <>
           <button onClick={() => logOut('rememberThis', idTokenData?.session_state)}>Log out</button>
