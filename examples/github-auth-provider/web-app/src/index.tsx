@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 // @ts-ignore
 import ReactDOM from 'react-dom'
 import { AuthContext, AuthProvider, type IAuthContext, type TAuthConfig } from 'react-oauth2-code-pkce'
@@ -17,7 +17,7 @@ const authConfig: TAuthConfig = {
 }
 
 function LoginInfo(): JSX.Element {
-  const { tokenData, token, logIn, logOut, idToken, error }: IAuthContext = useContext(AuthContext)
+  const { tokenData, token, logIn, logOut, error }: IAuthContext = useContext(AuthContext)
 
   if (error) {
     return (

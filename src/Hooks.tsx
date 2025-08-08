@@ -7,7 +7,7 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
     const item = storage.getItem(key)
     try {
       return item ? JSON.parse(item) : initialValue
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       console.warn(`Failed to parse stored value for '${key}'.\nContinuing with default value.`)
       return initialValue
     }
@@ -24,7 +24,7 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
       const valueToStore = value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
       storage.setItem(key, JSON.stringify(valueToStore))
-    } catch (error) {
+    } catch (_error) {
       console.error(`Failed to store value '${value}' for key '${key}'`)
     }
   }
@@ -37,7 +37,7 @@ function useBrowserStorage<T>(key: string, initialValue: T, type: 'session' | 'l
         } else {
           try {
             setStoredValue(JSON.parse(event.newValue ?? '') as T)
-          } catch (error: unknown) {
+          } catch (_error: unknown) {
             console.warn(`Failed to handle storageEvent's newValue='${event.newValue}' for key '${key}'`)
           }
         }

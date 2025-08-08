@@ -1,7 +1,7 @@
-export { AuthProvider, AuthContext } from './AuthContext'
+export { AuthContext, AuthProvider } from './AuthContext'
 export type {
-  TAuthConfig,
-  IAuthProvider,
   IAuthContext,
+  IAuthProvider,
+  TAuthConfig,
   TRefreshTokenExpiredEvent,
 } from './types'
