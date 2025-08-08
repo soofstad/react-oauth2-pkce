@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import { AuthProvider } from '../src'
 import { AuthConsumer, authConfig } from './test-utils'
 

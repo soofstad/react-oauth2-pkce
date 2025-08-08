@@ -12,7 +12,8 @@ repos:
         exclude: ^.*\.(lock)$||^docs\/
 
   - repo: https://github.com/biomejs/pre-commit
-    rev: v0.4.0
+    rev: v2.1.4
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.8.3"]
+        args: ["--unsafe"]
+        additional_dependencies: ["@biomejs/biome@2.1.4"]

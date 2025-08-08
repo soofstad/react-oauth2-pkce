@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom'
 import { render, screen, waitFor } from '@testing-library/react'
-import React from 'react'
 import { AuthProvider } from '../src'
 import { AuthConsumer, authConfig } from './test-utils'
 
@@ -50,10 +49,12 @@ test('Attempting to log in with an unsecure context should raise error', async (
     </AuthProvider>
   )
 
-  const errorNode = await waitFor(() => screen.findByLabelText('error'))
+  const errorNode = await waitFor(() => screen.getByTestId('error'))
 
-  expect(errorNode).toHaveTextContent(
-    "The context/environment is not secure, and does not support the 'crypto.subtle' module. See: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/subtle for details"
+  await waitFor(() =>
+    expect(errorNode).toHaveTextContent(
+      "The context/environment is not secure, and does not support the 'crypto.subtle' module. See: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/subtle for details"
+    )
   )
-  expect(screen.getByLabelText('loginInProgress')).toHaveTextContent('false')
+  expect(screen.getByTestId('loginInProgress')).toHaveTextContent('false')
 })

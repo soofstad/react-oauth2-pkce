@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { AuthContext, type TAuthConfig } from '../src'
 
 export const authConfig: TAuthConfig = {
@@ -25,7 +25,7 @@ export const authConfig: TAuthConfig = {
 }
 
 export const AuthConsumer = () => {
-  const { tokenData, logOut, loginInProgress, idToken, idTokenData, logIn, token, error } = useContext(AuthContext)
+  const { tokenData, logOut, loginInProgress, logIn, token, error } = useContext(AuthContext)
   return (
     <>
       <div>{tokenData?.name}</div>
@@ -35,9 +35,9 @@ export const AuthConsumer = () => {
       <button type='button' onClick={() => logIn('loginState')}>
         Log in
       </button>
-      <label aria-label={'loginInProgress'}>{JSON.stringify(loginInProgress)}</label>
-      <label aria-label={'error'}>{error}</label>
-      <label aria-label={'token'}>{token}</label>
+      <p data-testid={'loginInProgress'}>{JSON.stringify(loginInProgress)}</p>
+      <p data-testid={'error'}>{error}</p>
+      <p data-testid={'token'}>{token}</p>
     </>
   )
 }
