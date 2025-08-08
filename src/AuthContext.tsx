@@ -1,10 +1,10 @@
-import React, { createContext, useEffect, useMemo, useRef, useState } from 'react'
-import useBrowserStorage from './Hooks'
+import { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeAccessToken, decodeIdToken, decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
-import { FALLBACK_EXPIRE_TIME, epochAtSecondsFromNow, epochTimeIsPast, getRefreshExpiresIn } from './timeUtils'
+import useBrowserStorage from './Hooks'
+import { epochAtSecondsFromNow, epochTimeIsPast, FALLBACK_EXPIRE_TIME, getRefreshExpiresIn } from './timeUtils'
 import type {
   IAuthContext,
   IAuthProvider,
@@ -12,7 +12,6 @@ import type {
   TLoginMethod,
   TPrimitiveRecord,
   TRefreshTokenExpiredEvent,
-  TTokenData,
   TTokenResponse,
 } from './types'
 
