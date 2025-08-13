@@ -25,7 +25,9 @@ export async function redirectToLogin(
 
   // Create and store a random string in storage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
-  storage.setItem(codeVerifierStorageKey, codeVerifier)
+  // Prefix the code verifier key name to prevent multi-application collisions
+  const codeVerifierStorageKeyName = config.storageKeyPrefix + codeVerifierStorageKey
+  storage.setItem(codeVerifierStorageKeyName, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
   return generateCodeChallenge(codeVerifier).then((codeChallenge) => {
@@ -99,7 +101,9 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
   */
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
-  const codeVerifier = storage.getItem(codeVerifierStorageKey)
+  // Prefix the code verifier key name to prevent multi-application collisions
+  const codeVerifierStorageKeyName = config.storageKeyPrefix + codeVerifierStorageKey
+  const codeVerifier = storage.getItem(codeVerifierStorageKeyName)
 
   if (!authCode) {
     throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")

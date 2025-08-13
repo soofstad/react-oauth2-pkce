@@ -23,7 +23,7 @@ describe('make token request', () => {
   beforeEach(() => {
     // Setting up a state similar to what it would be just after redirect back from auth provider
     localStorage.setItem('ROCP_loginInProgress', 'true')
-    localStorage.setItem('PKCE_code_verifier', 'arandomstring')
+    localStorage.setItem('ROCP_PKCE_code_verifier', 'arandomstring')
     window.location.search = '?code=1234'
   })
 
