@@ -5,7 +5,7 @@ beforeEach(() => {
   localStorage.removeItem('ROCP_loginInProgress')
   localStorage.removeItem('ROCP_token')
   localStorage.removeItem('ROCP_refreshToken')
-  localStorage.removeItem('PKCE_code_verifier')
+  localStorage.removeItem('ROCP_PKCE_code_verifier')
 
   global.TextEncoder = TextEncoder
   global.TextDecoder = TextDecoder
