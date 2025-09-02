@@ -152,7 +152,7 @@ type TAuthConfig = {
   // NOTE: Many authentication servers will keep the client logged in by cookies. You should therefore use 
   // the logOut() function to properly log out the client. Or configure your server not to issue cookies.
   storage?: 'local' | 'session'  // default: 'local'
-  // Sets the prefix used when storing login state
+  // Sets the prefix for keys used by this library in storage
   storageKeyPrefix?: string // default: 'ROCP_'
   // Set to false if you need to access the urlParameters sent back from the login server.
   clearURL?: boolean  // default: true
