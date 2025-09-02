@@ -29,7 +29,7 @@ export async function generateCodeChallenge(codeVerifier: string): Promise<strin
   }
   const encoder = new TextEncoder()
   const bytes: Uint8Array = encoder.encode(codeVerifier) // Encode the verifier to a byteArray
-  const hash: ArrayBuffer = await window.crypto.subtle.digest('SHA-256', bytes as BufferSource); // sha256 hash it
+  const hash: ArrayBuffer = await window.crypto.subtle.digest('SHA-256', bytes as BufferSource) // sha256 hash it
   const hashString: string = String.fromCharCode(...new Uint8Array(hash))
   const base64 = btoa(hashString) // Base64 encode the verifier hash
   return base64 // Base64Url encode the base64 encoded string, making it safe as a query param
