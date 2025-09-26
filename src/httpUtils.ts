@@ -1,31 +1,42 @@
-import { FetchError } from './errors'
-import type { TTokenRequest } from './types'
+import { FetchError } from "./errors";
+import type { TPrimitiveRecord, TTokenRequest } from "./types";
 
 function buildUrlEncodedRequest(request: TTokenRequest): string {
-  let queryString = ''
+  let queryString = "";
   for (const [key, value] of Object.entries(request)) {
-    queryString += `${queryString ? '&' : ''}${key}=${encodeURIComponent(value)}`
+    queryString += `${queryString ? "&" : ""}${key}=${encodeURIComponent(
+      value
+    )}`;
   }
-  return queryString
+  return queryString;
 }
 
 interface PostWithXFormParams {
-  url: string
-  request: TTokenRequest
-  credentials: RequestCredentials
+  url: string;
+  request: TTokenRequest;
+  credentials: RequestCredentials;
+  headers?: TPrimitiveRecord;
 }
 
-export async function postWithXForm({ url, request, credentials }: PostWithXFormParams): Promise<Response> {
+export async function postWithXForm({
+  url,
+  request,
+  credentials,
+  headers,
+}: PostWithXFormParams): Promise<Response> {
   return fetch(url, {
-    method: 'POST',
+    method: "POST",
     body: buildUrlEncodedRequest(request),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      ...headers,
+    },
     credentials: credentials,
   }).then(async (response: Response) => {
     if (!response.ok) {
-      const responseBody = await response.text()
-      throw new FetchError(response.status, response.statusText, responseBody)
+      const responseBody = await response.text();
+      throw new FetchError(response.status, response.statusText, responseBody);
     }
-    return response
-  })
+    return response;
+  });
 }

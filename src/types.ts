@@ -88,6 +88,7 @@ export type TAuthConfig = {
   /** @deprecated Use `extraAuthParameters` instead. Will be removed in a future version. */
   extraAuthParams?: TPrimitiveRecord
   extraAuthParameters?: TPrimitiveRecord
+  extraTokenHeaders?: TPrimitiveRecord
   extraTokenParameters?: TPrimitiveRecord
   extraLogoutParameters?: TPrimitiveRecord
   tokenExpiresIn?: number

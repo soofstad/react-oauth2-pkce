@@ -64,4 +64,24 @@ describe('make token request', () => {
       })
     )
   })
+
+  test('with extra headers', async () => {
+    render(
+      <AuthProvider authConfig={{ ...authConfig, extraTokenHeaders: { 'X-Test-Header': 'TestValue' } }}>
+        <AuthConsumer />
+      </AuthProvider>
+    )
+
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
+        body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Test-Header': 'TestValue',
+        },
+        method: 'POST',
+        credentials: 'same-origin',
+      })
+    )
+  });
 })
