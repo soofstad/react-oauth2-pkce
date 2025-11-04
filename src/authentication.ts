@@ -80,9 +80,10 @@ function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse
 function postTokenRequest(
   tokenEndpoint: string,
   tokenRequest: TTokenRequest,
-  credentials: RequestCredentials
+  credentials: RequestCredentials,
+  headers?: TPrimitiveRecord
 ): Promise<TTokenResponse> {
-  return postWithXForm({ url: tokenEndpoint, request: tokenRequest, credentials: credentials }).then((response) => {
+  return postWithXForm({ url: tokenEndpoint, request: tokenRequest, credentials: credentials, headers }).then((response) => {
     return response.json().then((body: TTokenResponse | unknown): TTokenResponse => {
       if (isTokenResponse(body)) {
         return body
@@ -122,7 +123,7 @@ export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> =>
     // TODO: Remove in 2.0
     ...config.extraAuthParams,
   }
-  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials)
+  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials, config.extraTokenHeaders)
 }
 
 export const fetchWithRefreshToken = (props: {
