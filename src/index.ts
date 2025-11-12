@@ -5,3 +5,4 @@ export type {
   TAuthConfig,
   TRefreshTokenExpiredEvent,
 } from './types'
+export { useAuthContext } from './useAuthContext'

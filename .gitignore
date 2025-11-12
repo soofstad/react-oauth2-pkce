@@ -2,6 +2,7 @@ node_modules
 .venv
 dist
 .idea
+.vscode
 log.txt
 /src/react-app-env.d.ts
 .env

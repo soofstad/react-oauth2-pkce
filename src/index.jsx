@@ -6,9 +6,10 @@
 // If you want to run the project locally you will need to update the authConfig object with your own auth provider
 // ##########################################
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { AuthContext, AuthProvider } from './AuthContext'
+import { AuthProvider } from './AuthContext'
+import { useAuthContext } from './useAuthContext'
 
 // Get auth provider info from "https://keycloak.ofstad.xyz/realms/master/.well-known/openid-configuration"
 /** @type {import('./types').TAuthConfig} */
@@ -31,7 +32,7 @@ const authConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idTokenData, logIn, logOut, error, loginInProgress } = useContext(AuthContext)
+  const { tokenData, token, idTokenData, logIn, logOut, error, loginInProgress } = useAuthContext()
 
   if (loginInProgress) return null
   return (

@@ -28,7 +28,7 @@ Long version;
 ## Example
 
 ```tsx
-import { AuthContext, AuthProvider, TAuthConfig, TRefreshTokenExpiredEvent } from "react-oauth2-code-pkce"
+import { useAuthContext, AuthProvider, TAuthConfig, TRefreshTokenExpiredEvent } from "react-oauth2-code-pkce"
 
 const authConfig: TAuthConfig = {
   clientId: 'myClientID',
@@ -40,7 +40,7 @@ const authConfig: TAuthConfig = {
 }
 
 const UserInfo = (): JSX.Element => {
-    const {token, tokenData} = useContext<IAuthContext>(AuthContext)
+    const {token, tokenData} = useAuthContext()
 
     return <>
         <h4>Access Token</h4>
@@ -71,7 +71,7 @@ npm install react-oauth2-code-pkce
 
 ### IAuthContext values
 
-The object that's returned by `useContext(AuthContext)` provides these values;
+The object that's returned by `useAuthContext()` provides these values;
 
 ```typescript
 interface IAuthContext {
@@ -200,9 +200,8 @@ This can be solved by marking the module with `use client` and importing the com
 
 ```tsx
 'use client'
-import {useContext} from "react";
 import dynamic from 'next/dynamic'
-import {TAuthConfig,TRefreshTokenExpiredEvent, AuthContext} from 'react-oauth2-code-pkce'
+import {TAuthConfig, TRefreshTokenExpiredEvent, useAuthContext} from 'react-oauth2-code-pkce'
 
 const AuthProvider = dynamic(
     ()=> import("react-oauth2-code-pkce")
