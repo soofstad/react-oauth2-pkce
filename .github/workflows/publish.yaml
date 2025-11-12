@@ -5,6 +5,7 @@ on:
       - v*
 
 permissions:
+  id-token: write
   contents: read
 
 jobs:
@@ -15,14 +16,12 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn install
+      - run: npm install
       - run: cd src && tsc
       - run: cp ./README.md ./src/README.md
       - run: cd src && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
