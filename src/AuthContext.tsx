@@ -15,8 +15,11 @@ import type {
   TTokenResponse,
 } from './types'
 
+export const DEFAULT_CONTEXT_TOKEN = 'DEFAULT_CONTEXT_TOKEN'
+
+// TODO: Change to undefined context and update useAuthContext accordingly in v2
 export const AuthContext = createContext<IAuthContext>({
-  token: '',
+  token: DEFAULT_CONTEXT_TOKEN,
   login: () => null,
   logIn: () => null,
   logOut: () => null,
