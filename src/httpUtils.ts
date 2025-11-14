@@ -15,6 +15,14 @@ interface PostWithXFormParams {
   credentials: RequestCredentials
 }
 
+export type NavigationMethod = 'assign' | 'replace'
+
+// Wrapper around window.location.assign and window.location.replace to make it easier to mock in tests
+export function navigate(url: string, method: NavigationMethod = 'assign') {
+    console.log(`Navigating to ${url} using ${method}`)
+  window.location[method](url)
+}
+
 export async function postWithXForm({ url, request, credentials }: PostWithXFormParams): Promise<Response> {
   return fetch(url, {
     method: 'POST',

@@ -1,4 +1,4 @@
-import { postWithXForm } from './httpUtils'
+import {navigate, postWithXForm} from './httpUtils'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { calculatePopupPosition } from './popupUtils'
 import type {
@@ -68,7 +68,7 @@ export async function redirectToLogin(
       if (handle) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location[navigationMethod](loginUrl)
+      navigate(loginUrl, navigationMethod)
   })
 }
 
@@ -162,7 +162,7 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
-  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
+  navigate(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
 export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {

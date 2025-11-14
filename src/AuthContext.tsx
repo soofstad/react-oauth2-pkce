@@ -209,7 +209,9 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   useEffect(() => {
     // The client has been redirected back from the auth endpoint with an auth code
     if (loginInProgress) {
+      console.log(window.location.href)
       const urlParams = new URLSearchParams(window.location.search)
+      console.log(urlParams.get('code'))
       if (!urlParams.get('code')) {
         // This should not happen. There should be a 'code' parameter in the url by now...
         const error_description =

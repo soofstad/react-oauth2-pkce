@@ -1,5 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+// import userEvent from '@testing-library/user-event'
+import { expect, test } from 'vitest'
+import { render } from 'vitest-browser-react'
 import { AuthProvider } from '../src'
 import { AuthConsumer, authConfig } from './test-utils'
 
@@ -7,7 +8,7 @@ test('Full featured logout requests', async () => {
   localStorage.setItem('ROCP_loginInProgress', 'false')
   localStorage.setItem('ROCP_token', '"test-token-value"')
   localStorage.setItem('ROCP_refreshToken', '"test-refresh-value"')
-  const user = userEvent.setup()
+  // const user = userEvent.setup()
 
   render(
     <AuthProvider authConfig={authConfig}>

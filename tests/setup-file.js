@@ -1,5 +1,7 @@
-const { TextDecoder, TextEncoder } = require('node:util')
-const nodeCrypto = require('node:crypto')
+import { beforeEach, vi } from 'vitest'
+import 'vitest-browser-react'
+// const { TextDecoder, TextEncoder } = require('node:util')
+// const nodeCrypto = require('node:crypto')
 
 beforeEach(() => {
   localStorage.removeItem('ROCP_loginInProgress')
@@ -10,11 +12,11 @@ beforeEach(() => {
   global.TextEncoder = TextEncoder
   global.TextDecoder = TextDecoder
 
-  global.crypto.subtle = nodeCrypto.webcrypto.subtle
+  // global.crypto.subtle = nodeCrypto.webcrypto.subtle
 
-  delete window.location
+  // delete window.location
   const location = new URL('https://www.example.com')
-  location.assign = jest.fn()
+  location.assign = vi.fn()
   window.location = location
-  window.open = jest.fn()
+  window.open = vi.fn()
 })

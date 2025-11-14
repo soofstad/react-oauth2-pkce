@@ -16,11 +16,9 @@ export const authConfig: TAuthConfig = {
   extraLogoutParameters: {
     testLogoutKey: 'logoutValue',
   },
-  extraAuthParams: {
-    client_id: 'anotherClientId',
-  },
   extraTokenParameters: {
     testTokenKey: 'tokenValue',
+    client_id: 'anotherClientId',
   },
 }
 
