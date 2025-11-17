@@ -1,29 +1,26 @@
 {
   "name": "package-development",
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "jest --silent",
-    "test:watch": "jest --silent --watch"
+    "test": "vitest",
+    "test:watch": "vitest --silent --watch"
   },
   "dependencies": {
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "@types/react-dom": "^19.2.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.14",
-    "@types/react": "18.3.12",
-    "@vitejs/plugin-react": "^4.3.3",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "typescript": "5.6.3",
-    "vite": "^5.4.10"
+    "@types/react": "19.2.4",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/browser-playwright": "^4.0.9",
+    "typescript": "5.9.3",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.9",
+    "vitest-browser-react": "^2.0.2"
   },
   "browserslist": {
     "production": [

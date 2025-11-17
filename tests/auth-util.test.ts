@@ -1,3 +1,5 @@
+import { expect, test, vi } from 'vitest'
+
 import { fetchWithRefreshToken } from '../src/authentication'
 import { decodeJWT } from '../src/decodeJWT'
 import { FetchError } from '../src/errors'
@@ -18,10 +20,6 @@ const authConfig: TInternalConfig = {
   storageKeyPrefix: 'ROCP_',
   refreshWithScope: true,
   loginMethod: 'redirect',
-  extraAuthParams: {
-    prompt: true,
-    client_id: 'anotherClientId',
-  },
   extraTokenParameters: {
     prompt: true,
     client_id: 'anotherClientId',
@@ -38,7 +36,7 @@ test('decode a JWT token', () => {
 })
 
 test('decode a non-JWT token', () => {
-  console.error = jest.fn()
+  console.error = vi.fn() // Silence errors in console
   expect(() => {
     decodeJWT('somethingStringWhateverThis is not a JWT')
   }).toThrow()
@@ -76,7 +74,7 @@ test('check if still valid token outside buffer has expired', () => {
 
 test('failed refresh fetch raises FetchError', () => {
   // @ts-ignore
-  global.fetch = jest.fn(() =>
+  global.fetch = vi.fn(() =>
     Promise.resolve({
       ok: false,
       status: 400,

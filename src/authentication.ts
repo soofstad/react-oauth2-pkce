@@ -1,4 +1,4 @@
-import { postWithXForm } from './httpUtils'
+import { navigate, openPopup, postWithXForm } from './httpUtils'
 import { generateCodeChallenge, generateRandomString } from './pkceUtils'
 import { calculatePopupPosition } from './popupUtils'
 import type {
@@ -60,19 +60,14 @@ export async function redirectToLogin(
 
     if (method === 'popup') {
       const { width, height, left, top } = calculatePopupPosition(600, 600)
-      const handle: null | WindowProxy = window.open(
-        loginUrl,
-        'loginPopup',
-        `width=${width},height=${height},top=${top},left=${left}`
-      )
-      if (handle) return
+      if (openPopup(loginUrl, width, height, top, left)) return
       console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
-    window.location[navigationMethod](loginUrl)
+    navigate(loginUrl, navigationMethod)
   })
 }
 
-// This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
+// This is called a "type predicate". Which allows us to know which kind of response we got, in a type safe way.
 function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
 }
@@ -162,7 +157,7 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
-  window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
+  navigate(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
 export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {
