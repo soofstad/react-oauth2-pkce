@@ -19,7 +19,7 @@ test('Full featured logout requests', async () => {
 
   await waitFor(() =>
     expect(window.location.assign).toHaveBeenCalledWith(
-      'myLogoutEndpoint?token=test-refresh-value&token_type_hint=refresh_token&client_id=myClientID&post_logout_redirect_uri=primary-logout-redirect&ui_locales=en-US+en&testLogoutKey=logoutValue&state=logoutState'
+      'myLogoutEndpoint?token=test-refresh-value&token_type_hint=refresh_token&client_id=myClientID&ui_locales=en-US+en&testLogoutKey=logoutValue&state=logoutState&post_logout_redirect_uri=primary-logout-redirect'
     )
   )
   expect(window.location.assign).toHaveBeenCalledTimes(1)
@@ -41,7 +41,7 @@ test('No refresh token, no logoutRedirect, logout request', async () => {
 
   await waitFor(() =>
     expect(window.location.assign).toHaveBeenCalledWith(
-      'myLogoutEndpoint?token=test-token-value&token_type_hint=access_token&client_id=myClientID&post_logout_redirect_uri=http%3A%2F%2Flocalhost%2F&ui_locales=en-US+en&testLogoutKey=logoutValue&state=logoutState'
+      'myLogoutEndpoint?token=test-token-value&token_type_hint=access_token&client_id=myClientID&ui_locales=en-US+en&testLogoutKey=logoutValue&state=logoutState&post_logout_redirect_uri=http%3A%2F%2Flocalhost%2F'
     )
   )
   expect(window.location.assign).toHaveBeenCalledTimes(1)

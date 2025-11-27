@@ -7,7 +7,7 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 interface TTokenRqBase {
   grant_type: string
   client_id: string
-  redirect_uri: string
+  redirect_uri?: string
 }
 
 export interface TTokenRequestWithCodeAndVerifier extends TTokenRqBase {
@@ -73,7 +73,7 @@ export type TAuthConfig = {
   clientId: string
   authorizationEndpoint: string
   tokenEndpoint: string
-  redirectUri: string
+  redirectUri?: string
   scope?: string
   state?: string
   logoutEndpoint?: string
