@@ -120,7 +120,8 @@ type TAuthConfig = {
   // URL for the token endpoint at the authentication provider
   tokenEndpoint: string  // Required
   // Which URL the auth provider should redirect the user to after successful authentication/login
-  redirectUri: string  // Required
+  // NOTE: Even if it is declared as optional in the RFC, most identity providers will require it to be set
+  redirectUri?: string  // default: undefined
   // Which scopes to request for the auth token
   scope?: string  // default: ''
   // Optional state value. Will often make more sense to provide the state in a call to the 'logIn()' function

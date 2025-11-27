@@ -35,7 +35,6 @@ export async function redirectToLogin(
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: config.clientId,
-      redirect_uri: config.redirectUri,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256',
       ...config.extraAuthParameters,
@@ -44,6 +43,9 @@ export async function redirectToLogin(
 
     if (config.scope !== undefined && !params.has('scope')) {
       params.append('scope', config.scope)
+    }
+    if (config.redirectUri !== undefined && !params.has('redirect_uri')) {
+      params.append('redirect_uri', config.redirectUri)
     }
 
     storage.removeItem(stateStorageKey)
@@ -154,7 +156,6 @@ export function redirectToLogout(
     token: refresh_token || token,
     token_type_hint: refresh_token ? 'refresh_token' : 'access_token',
     client_id: config.clientId,
-    post_logout_redirect_uri: config.logoutRedirect ?? config.redirectUri,
     ui_locales: window.navigator.languages.join(' '),
     ...config.extraLogoutParameters,
     ...additionalParameters,
@@ -162,6 +163,9 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
+  if (config.logoutRedirect) params.append('post_logout_redirect_uri', config.logoutRedirect)
+  if (!config.logoutRedirect && config.redirectUri) params.append('post_logout_redirect_uri', config.redirectUri)
+
   window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
