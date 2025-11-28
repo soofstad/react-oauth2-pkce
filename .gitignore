@@ -1,4 +1,6 @@
 node_modules
+__screenshots__
+pnpm-lock.yaml
 .venv
 .vscode
 dist

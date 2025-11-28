@@ -1,10 +1,11 @@
-import { render, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { render } from 'vitest-browser-react'
 import { AuthProvider } from '../src'
 import type { TTokenResponse } from '../src/types'
 import { AuthConsumer, authConfig } from './test-utils'
 
 // @ts-ignore
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () =>
@@ -23,7 +24,10 @@ describe('make token request', () => {
     // Setting up a state similar to what it would be just after redirect back from auth provider
     localStorage.setItem('ROCP_loginInProgress', 'true')
     localStorage.setItem('ROCP_PKCE_code_verifier', 'arandomstring')
-    window.location.search = '?code=1234'
+    // Cannot simply override URL, as the vitest-browser environment depends on specific metadata in the URL
+    const originalUrl = new URL(window.location.href)
+    originalUrl.searchParams.set('code', '1234')
+    window.history.pushState({}, '', originalUrl.toString())
   })
 
   test('with extra parameters', async () => {
@@ -33,7 +37,7 @@ describe('make token request', () => {
       </AuthProvider>
     )
 
-    await waitFor(() =>
+    await vi.waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
         body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
         headers: {
@@ -52,7 +56,7 @@ describe('make token request', () => {
       </AuthProvider>
     )
 
-    await waitFor(() =>
+    await vi.waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('myTokenEndpoint', {
         body: 'grant_type=authorization_code&code=1234&client_id=anotherClientId&redirect_uri=http%3A%2F%2Flocalhost%2F&code_verifier=arandomstring&testTokenKey=tokenValue',
         headers: {
