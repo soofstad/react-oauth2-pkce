@@ -14,6 +14,7 @@ import type {
   TTokenResponse,
 } from './types'
 import { useBrowserStorage } from './useBrowserStorage'
+import { useInterval } from './useInterval'
 
 export const DEFAULT_CONTEXT_TOKEN = 'DEFAULT_CONTEXT_TOKEN'
 
@@ -195,13 +196,8 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     )
   }
 
-  // Register the 'check for soon expiring access token' interval (every ~10 seconds).
-  useEffect(() => {
-    // The randomStagger is used to avoid multiple tabs logging in at the exact same time.
-    const randomStagger = 10000 * Math.random()
-    const interval = setInterval(() => refreshAccessToken(), 5000 + randomStagger)
-    return () => clearInterval(interval)
-  }, [token, refreshToken, refreshTokenExpire, tokenExpire, refreshInProgress]) // Replace the interval with a new when values used inside refreshAccessToken changes
+  // Run refreshAccessToken every 10000ms seconds, with an up to 5000ms random stagger.
+  useInterval(refreshAccessToken, 10000, 5000)
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
