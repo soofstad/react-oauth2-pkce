@@ -3,7 +3,6 @@ import { createInternalConfig } from './authConfig'
 import { fetchTokens, fetchWithRefreshToken, redirectToLogin, redirectToLogout, validateState } from './authentication'
 import { decodeAccessToken, decodeIdToken, decodeJWT } from './decodeJWT'
 import { FetchError } from './errors'
-import useBrowserStorage from './Hooks'
 import { epochAtSecondsFromNow, epochTimeIsPast, FALLBACK_EXPIRE_TIME, getRefreshExpiresIn } from './timeUtils'
 import type {
   IAuthContext,
@@ -14,6 +13,7 @@ import type {
   TRefreshTokenExpiredEvent,
   TTokenResponse,
 } from './types'
+import { useBrowserStorage } from './useBrowserStorage'
 
 export const DEFAULT_CONTEXT_TOKEN = 'DEFAULT_CONTEXT_TOKEN'
 
