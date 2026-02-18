@@ -148,7 +148,19 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
     } as TRefreshTokenExpiredEvent)
   }
 
-  function refreshAccessToken(initial = false): void {
+  async function manualRefreshToken(): Promise<void> {
+    if (!refreshToken) throw new Error('No refresh token available')
+    if (refreshTokenExpire && epochTimeIsPast(refreshTokenExpire)) throw new Error('Refresh token has expired')
+
+    setRefreshInProgress(true)
+    return fetchWithRefreshToken({ config, refreshToken })
+      .then((result: TTokenResponse) => handleTokenResponse(result))
+      .finally(() => {
+        setRefreshInProgress(false)
+      })
+  }
+
+  function internalRefreshAccessToken(initial = false): void {
     if (!token) return
     // The token has not expired. Do nothing
     if (!epochTimeIsPast(tokenExpire)) return
@@ -197,7 +209,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
   }
 
   // Run refreshAccessToken every 10000ms seconds, with an up to 5000ms random stagger.
-  useInterval(refreshAccessToken, 10000, 5000)
+  useInterval(internalRefreshAccessToken, 10000, 5000)
 
   // This ref is used to make sure the 'fetchTokens' call is only made once.
   // Multiple calls with the same code will, and should, return an error from the API
@@ -255,7 +267,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
 
     // First page visit
     if (!token && config.autoLogin) return logIn(undefined, undefined, config.loginMethod)
-    refreshAccessToken(true) // Check if token should be updated
+    internalRefreshAccessToken(true) // Check if token should be updated
   }, [])
 
   return (
@@ -270,6 +282,7 @@ export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {
         logOut,
         error,
         loginInProgress,
+        refreshAccessToken: manualRefreshToken,
       }}
     >
       {children}
