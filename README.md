@@ -94,6 +94,10 @@ interface IAuthContext {
   idTokenData?: TTokenData
   // If the <AuthProvider> is done fetching tokens or not. Usefull for controlling page rendering
   loginInProgress: boolean
+  // The library handles silently refreshing access tokens automatically be default.
+  // This function is exposed if you for some reason need to trigger a refresh manually.
+  // You will need to handle any errors thrown. Usually by calling 'logIn()'.
+  refreshAccessToken: async () => Promise<void>
 }
 ```
 

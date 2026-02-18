@@ -32,13 +32,18 @@ const authConfig = {
 }
 
 function LoginInfo() {
-  const { tokenData, token, idTokenData, logIn, logOut, error, loginInProgress } = useAuthContext()
+  const { tokenData, token, idTokenData, logIn, logOut, error, loginInProgress, refreshAccessToken } = useAuthContext()
 
   if (loginInProgress) return null
   return (
     <>
       {error && <div style={{ color: 'red' }}>An error occurred during authentication: {error}</div>}
 
+      <button
+        onClick={() => refreshAccessToken().catch((err) => alert(`Failed to refresh access token: ${err.message}`))}
+      >
+        Refresh access token
+      </button>
       <button onClick={() => logIn('', {}, 'popup')}>Log in w/popup</button>
       <button onClick={() => logIn()}>Log in w/redirect</button>
       <button onClick={() => logIn('customLoginState')}>Log in w/state</button>

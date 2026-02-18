@@ -64,6 +64,7 @@ export interface IAuthContext {
   idToken?: string
   idTokenData?: TTokenData
   loginInProgress: boolean
+  refreshAccessToken: () => void
 }
 
 export type TPrimitiveRecord = { [key: string]: string | boolean | number }
