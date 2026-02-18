@@ -21,7 +21,7 @@ export function useInterval(callback: () => void, delay: number, maxRandomStagge
 
   useEffect(() => {
     tick() // Tick immediately on mount/effect, instead of waiting for the first interval to pass
-    const interval = setInterval(tick, 100)
+    const interval = setInterval(tick, 100) // Run tick every 100ms to check if the specified delay has passed
     return () => clearInterval(interval)
   }, [callback, delay, randomStagger])
 }
