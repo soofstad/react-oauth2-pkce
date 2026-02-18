@@ -26,6 +26,7 @@ export const AuthContext = createContext<IAuthContext>({
   logOut: () => null,
   error: null,
   loginInProgress: false,
+  refreshAccessToken: () => null,
 })
 
 export const AuthProvider = ({ authConfig, children }: IAuthProvider) => {

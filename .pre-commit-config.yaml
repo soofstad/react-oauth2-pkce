@@ -17,3 +17,12 @@ repos:
       - id: biome-check
         args: ["--unsafe"]
         additional_dependencies: ["@biomejs/biome@2.1.4"]
+
+  - repo: local
+    hooks:
+      - id: typescript-check
+        name: typescript-check
+        entry: npx --package=typescript tsc --noEmit
+        language: system
+        types_or: [ ts, tsx ]
+        pass_filenames: false
